@@ -10,7 +10,7 @@ void(set_digit_pin_state(uint8_t __pin_id, uint8_t __pin_state))
 }
 
 int simulated_pin_state_i [2][8] = {{1, 0, 1, 1, 1, 1, 1, 1}, {1, 1, 0, 1, 1, 1, 1, 1}} ;
-int simulated_pin_state_c [10] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1} ;
+int simulated_pin_state_c [10] = {1, 0, 1, 1, 1, 1, 1, 1, 1, 1} ;
 int simulated_return_i = 0; 
 int current_pin_pos_i = 0;
 int current_arr_pos = 0;
