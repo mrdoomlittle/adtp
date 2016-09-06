@@ -1,5 +1,5 @@
 # include "io_service.hpp"
-
+# include "dynamic_buffer.hpp"
 # include <boost/cstdint.hpp>
 
 # include <iostream>
@@ -60,6 +60,13 @@ void(external_mltick (adtp::io_service (* _this ) ) )
 
 int(main( ) )
 {
+    adtp::dbint_t my_buffer;
+    my_buffer.dbuff_init(2,2);
+    my_buffer.add_to_dbuff(21299, 0, 0, true, true);
+    my_buffer.add_to_dbuff(21299, 0, 0, true, true);
+    my_buffer.add_to_dbuff(21299, 0, 0, true, true);
+    my_buffer.add_to_dbuff(21299, 0, 0, true, true);
+    //std::cout << ">>>>>>>" << my_buffer.get_from_dbuff(0,1,false,false) << std::endl;
     adtp::io_service io_service (
         & set_digit_pin_mode,
         & set_digit_pin_state,
