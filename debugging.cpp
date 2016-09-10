@@ -61,16 +61,30 @@ void(external_mltick (adtp::io_service (* _this ) ) )
 int(main( ) )
 {
     adtp::dbint_t my_buffer;
-    my_buffer.dbuff_init(2,2);
-    my_buffer.add_to_dbuff(1, 0, 0, false, false);
-    my_buffer.add_to_dbuff(2, 0, 1, false, false);
-    my_buffer.add_to_dbuff(3, 1, 0, false, false);
-    my_buffer.del_from_buffer();
-    my_buffer.add_to_dbuff(4, 1, 0, false, false);
-    std::cout << "B0 / S0 > " << *my_buffer.get_from_dbuff(0,0,false,false,true) << std::endl;
-    std::cout << "B1 / S0 > " << *my_buffer.get_from_dbuff(0,1,false,false,true) << std::endl;
-    std::cout << "B0 / S1 > " << *my_buffer.get_from_dbuff(1,0,false,false,true) << std::endl;
-    //std::cout << "B1 / S1 > " << *my_buffer.get_from_dbuff(1,1,false,false,true) << std::endl;
+    my_buffer.dbuff_init(2,2,2);
+    int * h = new int [2];
+    h[0] = 2;
+    
+    h[1] = 4;
+
+    my_buffer.add_to_dbuff(h, 2, 0, 0, 0, false, false, false);
+    my_buffer.add_to_dbuff(h, 2, 0, 0, 1, false, false, false);
+    //my_buffer.add_to_dbuff(h, 2, 0, 0, 0, false, false, false);
+    //my_buffer.del_from_buffer();
+    //my_buffer.add_to_dbuff(4, 1, 0, false, false);
+    int * * output = new int * [8];
+    output[0] = my_buffer.get_from_dbuff(2, 0, 0, 0, false, false, false, false);
+    output[1] = my_buffer.get_from_dbuff(2, 0, 0, 1, false, false, false, false);
+    if (output[0] != nullptr)
+        std::cout << "B0 / S0 > " << *(output[0]) << std::endl;
+    else
+        std::cout << "Pointer Is Nulled" << std::endl;
+    if (output[1] != nullptr)
+        std::cout << "B1 / S0 > " << *(output[1])<< std::endl;
+    else
+        std::cout << "Pointer Is Nulled" << std::endl;
+    //std::cout << "B0 / S1 > " << *my_buffer.get_from_dbuff(1,0,false,false,true) << std::endl;
+    //std::cout << "B1 / S1 > " << *my_buffer.get_from_dbuff(1,1,false,false,true) << std::endl;*/
     adtp::io_service io_service (
         & set_digit_pin_mode,
         & set_digit_pin_state,
