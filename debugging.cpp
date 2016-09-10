@@ -12,7 +12,7 @@ int unsigned (simulated_pin_state_i [2] [8]) = { {1, 0, 1, 1, 1, 1, 1, 1}, {1, 1
 
 int unsigned (simulated_pin_state_c [10]) = {1, 0, 1, 1, 1, 1, 1, 1, 1, 1} ;
 
-int unsigned (simulated_return_i ) = 0; 
+int unsigned (simulated_return_i ) = 0;
 int unsigned (current_pin_pos_i ) = 0;
 int unsigned (current_arr_pos ) = 0;
 
@@ -33,7 +33,7 @@ int(get_digit_pin_state (uint8_t (__pin_id ) ) )
             else
                 current_arr_pos ++;
         }
-        else current_pin_pos_i ++; 
+        else current_pin_pos_i ++;
         return simulated_return_i;
     }
 
@@ -50,7 +50,7 @@ int(get_digit_pin_state (uint8_t (__pin_id ) ) )
 
 void(external_mlinit (adtp::io_service (* _this ) ) )
 {
-    
+
 }
 
 void(external_mltick (adtp::io_service (* _this ) ) )
@@ -62,11 +62,15 @@ int(main( ) )
 {
     adtp::dbint_t my_buffer;
     my_buffer.dbuff_init(2,2);
-    my_buffer.add_to_dbuff(21299, 0, 0, true, true);
-    my_buffer.add_to_dbuff(21299, 0, 0, true, true);
-    my_buffer.add_to_dbuff(21299, 0, 0, true, true);
-    my_buffer.add_to_dbuff(21299, 0, 0, true, true);
-    //std::cout << ">>>>>>>" << my_buffer.get_from_dbuff(0,1,false,false) << std::endl;
+    my_buffer.add_to_dbuff(1, 0, 0, false, false);
+    my_buffer.add_to_dbuff(2, 0, 1, false, false);
+    my_buffer.add_to_dbuff(3, 1, 0, false, false);
+    //my_buffer.del_from_buffer();
+    my_buffer.add_to_dbuff(4, 1, 1, false, false);
+    std::cout << "B0 / S0 > " << *my_buffer.get_from_dbuff(0,0,false,false,true) << std::endl;
+    std::cout << "B1 / S0 > " << *my_buffer.get_from_dbuff(0,1,false,false,true) << std::endl;
+    std::cout << "B0 / S1 > " << *my_buffer.get_from_dbuff(1,0,false,false,true) << std::endl;
+    std::cout << "B1 / S1 > " << *my_buffer.get_from_dbuff(1,1,false,false,true) << std::endl;
     adtp::io_service io_service (
         & set_digit_pin_mode,
         & set_digit_pin_state,

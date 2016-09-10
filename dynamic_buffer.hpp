@@ -6,262 +6,290 @@
 # define block_not_used false
 # include <iostream>
 // this is still not finished
-namespace adtp { 
+namespace adtp {
 template <typename __dbuff_type>
 class dynamic_buffer
 {
     private :
 
     public :
-        void (set_sector_id(int unsigned(__sector_tid), int unsigned(__sector_rid)))
+        void (set_sector_arr_pos (int unsigned(__sector_pos_id ), int unsigned(__sector_arr_pos ) ) )
         {
-            (this-> sector_id [(data_id::__main)] [__sector_tid]) = __sector_rid; }
+            (this-> sector_pos_id [(data_id::__main)] [__sector_pos_id]) = __sector_arr_pos;
+        }
 
-        int unsigned (get_sector_id(int unsigned(__sector_tid)))
+        int unsigned (get_sector_arr_pos (int unsigned(__sector_pos_id ) ) )
         {
-            return ((this-> sector_id [(data_id::__main)] [__sector_tid])); }
+            return ( (this-> sector_pos_id [(data_id::__main)] [__sector_pos_id]) );
+        }
 
-        void (set_block_id(int unsigned(__block_tid), int unsigned(__block_rid)))
+        void (set_block_arr_pos(int unsigned(__sector_pos_id), int unsigned(__block_pos_id ), int unsigned(__block_arr_pos ) ) )
         {
-            (this-> block_id [(data_id::__main)] [__block_tid]) = __block_rid; }
+            (this-> block_pos_id [(data_id::__main)] [((this-> get_sector_arr_pos(__sector_pos_id)) * (this-> blocks_per_sector)) + __block_pos_id]) = (((this-> get_sector_arr_pos(__sector_pos_id)) * (this-> blocks_per_sector)) + __block_arr_pos);
+        }
 
-        int unsigned (get_block_id(int unsigned(__block_tid)))
+        int unsigned (get_block_arr_pos(int unsigned(__sector_pos_id), int unsigned(__block_pos_id)))
         {
-            return ((this-> block_id [(data_id::__main)] [__block_tid])); }
+            return ((this-> block_pos_id [(data_id::__main)] [((this-> get_sector_arr_pos(__sector_pos_id)) * (this-> blocks_per_sector)) + __block_pos_id]));
+        }
 
         void (dbuff_init(int unsigned(__amount_of_sectors), int unsigned(__blocks_per_sector)))
         {
-            /* make sure that the dbuff init indecator is not true else return/exit function
-            */
             if ((this-> is_dbuff_init(true)) == true) return;
 
-
-            /* check the value's are less then one if true then return/exit
-            * this is because arrays need a value 1 2 etc so 0 will cause errors/s
-            */
             if (__amount_of_sectors < 1) return;
             if (__blocks_per_sector < 1) return;
 
-            /* store the init args for later uses
-            */ 
+            (this-> total_block_count) = (__amount_of_sectors * __blocks_per_sector);
             (this-> amount_of_sectors) = __amount_of_sectors;
             (this-> blocks_per_sector) = __blocks_per_sector;
 
-            /* init arrays for the sector/block status markers
-            */
             (this-> sector_smarker [(data_id::__main)]) = new bool [__amount_of_sectors];
-            (this-> block_smarker [(data_id::__main)]) = new bool [(__amount_of_sectors * __blocks_per_sector)];
+            (this-> block_smarker [(data_id::__main)]) = new bool [(this-> total_block_count)];
 
-            /* init arrays for the sector/block id storage
-            */
-            (this-> sector_id [(data_id::__main)]) = new int unsigned [__amount_of_sectors];
-            (this-> block_id [(data_id::__main)]) = new int unsigned [(__amount_of_sectors * __blocks_per_sector)];
+            (this-> sector_pos_id [(data_id::__main)]) = new int unsigned [__amount_of_sectors];
+            (this-> block_pos_id [(data_id::__main)]) = new int unsigned [(this-> total_block_count)];
 
-            for (int unsigned(sector_pos ) = 0; sector_pos != __amount_of_sectors; sector_pos ++)
+            for (int unsigned(sector_pos_id ) = 0; sector_pos_id != __amount_of_sectors; sector_pos_id ++)
             {
-                /* set sector markers to default (not_used). & and set id's to array pos
-                */
-                (this-> set_sector_mark(sector_not_used, sector_pos));
-                (this-> set_sector_id(sector_pos, sector_pos));
-                for (int unsigned(block_pos ) = 0; block_pos != __blocks_per_sector; block_pos ++)
+                (this-> set_sector_arr_pos(sector_pos_id, sector_pos_id));
+
+                (this-> set_sector_marker(sector_not_used, sector_pos_id));
+
+                for (int unsigned(block_pos_id ) = 0; block_pos_id != __blocks_per_sector; block_pos_id ++)
                 {
-                    /* same thing as the sector setup ^
-                    */
-                    (this-> set_block_mark(block_not_used, sector_pos, block_pos));
-                    (this-> set_block_id((((sector_pos) * (__blocks_per_sector)) + block_pos),
-                    (((sector_pos) * (__blocks_per_sector)) + block_pos))); 
+                    (this-> set_block_arr_pos(sector_pos_id, block_pos_id, block_pos_id));
+
+                    (this-> set_block_marker(block_not_used, sector_pos_id, block_pos_id));
                 }
             }
 
-            /* init the array for storing the free/used space for the sectors
-            */
             (this-> sector_free_c [(data_id::__main)]) = new int unsigned [__amount_of_sectors];
             (this-> sector_used_c [(data_id::__main)]) = new int unsigned [__amount_of_sectors];
 
-            /* loop thrue eatch sector freec and set them to the amount of block's per sector
-            */
-            for (int unsigned(sector_pos ) = 0; sector_pos != __amount_of_sectors; sector_pos ++)
-                (this-> sector_free_c [(data_id::__main)] [sector_pos]) = (__blocks_per_sector - 1);
-
-            /* last thing to do is to init the main block storage. this is where the data will be stored
-            */
-            (this-> dbuff_blocks [(data_id::__main)]) = new __dbuff_type [(__amount_of_sectors * __blocks_per_sector)]; 
-
-            /* toggle the dbuff init indecator defualt if false to change it to true
-            */
-            (this-> toggle_dbuff_init());
-        }
-
-        void (toggle_dbuff_init())
-        {
-            /* toggle the dbuff init indecator if true then false / if false then true
-            */
-            (this-> has_dbuff_init) = (this-> has_dbuff_init) == true? false : true;
-        }
-
-        bool(is_dbuff_init(bool(__is_type)))
-        {
-            /* check if the dbuff init indecator if a match to __is_type if match then return true
-            */
-            return((this-> has_dbuff_init) == __is_type? true: false);
-        }
-
-        void (add_to_dbuff(__dbuff_type (__block_data), int unsigned(__sector_pos), int unsigned(__block_pos), bool(__auto_sector), bool(__auto_block) ) )
-        {
-            /* check if sector and block sizes are right to prevent error/s
-            */
-            if (__sector_pos >= (this-> amount_of_sectors)) return;
-            if (__block_pos >= (this-> blocks_per_sector)) return;
-
-            /* if auto sector is enabled then we need to skip setting the sector id to the sector id arg
-            */
-            if (__auto_sector == true) goto auto_sector;
-            /* if we are setting up stuff manually then we need to set the sector position
-            */
-            (this-> sector_position [1]) = __sector_pos;
-          
-            /* if auto sector is enabled then we will need to skip the auto sector code
-            */
-            goto skip_auto_sector;
-            /* for the auto sector id finder we will look at the sector marking to see
-            * if the sector is full or not if its marked as full then skip to the next etc..
-            */
-            auto_sector :
-
-            for (int unsigned(sector_pos ) = 0; sector_pos != (this-> amount_of_sectors); sector_pos ++ )
+            for (int unsigned(sector_pos_id ) = 0; sector_pos_id != __amount_of_sectors; sector_pos_id ++)
             {
-                if ((this-> is_sector_mark(sector_not_used, (this-> get_sector_id(sector_pos)))) == true)
+                (this-> sector_free_c [(data_id::__main)] [sector_pos_id]) = (__blocks_per_sector - 1);
+                (this-> sector_used_c [(data_id::__main)] [sector_pos_id]) = 0;
+            }
+
+            (this-> dbuff_blocks [(data_id::__main)]) = new __dbuff_type [(this-> total_block_count)];
+
+            (this-> toggle_dbuff_init( ) );
+        }
+
+        void (toggle_dbuff_init( ) )
+        {
+            (this-> has_dbuff_init ) = (this-> has_dbuff_init ) == true? false : true;
+        }
+
+        bool (is_dbuff_init (bool(__is_type ) ) )
+        {
+            return ((this-> has_dbuff_init) == __is_type? true : false);
+        }
+
+        bool (sb_pos_id_incheck( bool(__check_sector ), bool(__check_block ), int unsigned(__sector_pos_id), int unsigned(__block_pos_id) ))
+        {
+            if (__check_sector == true && __sector_pos_id >= (this-> amount_of_sectors)) return false;
+            if (__check_block == true && __block_pos_id >= (this-> blocks_per_sector)) return false;
+            return true;
+        }
+
+        void (add_to_dbuff (__dbuff_type(__block_data ), int unsigned(__sector_pos_id ), int unsigned(__block_pos_id ), bool(__auto_sector_selc ), bool(__auto_block_selc ) ) )
+        {
+            if ((this-> sb_pos_id_incheck(true, true, __sector_pos_id, __block_pos_id)) == false) return;
+
+            if (__auto_sector_selc == true) goto auto_sector_selc;
+
+                (this-> sector_position [1]) = __sector_pos_id;
+
+            goto skip_auto_sector_selc;
+
+            auto_sector_selc :
+
+                for (int unsigned(sector_pos_id ) = 0; sector_pos_id != (this-> amount_of_sectors); sector_pos_id ++ )
                 {
-                    (this-> sector_position [1]) = sector_pos;
-                    break;
+                    if ( (this-> is_sector_marker (sector_not_used, sector_pos_id) ) == true)
+                    {
+                        (this-> sector_position [1]) = sector_pos_id;
+                        break;
+                    }
                 }
-            }            
- 
-            skip_auto_sector :
-            /* works the same as the sector one look at the comment for that
-            */
-            if (__auto_block == true) goto auto_block;
-            (this-> block_position [1]) = __block_pos;
- 
-            goto skip_auto_block;
-            /* this works the same as sector auto selection. see the sector working comment for more info
-            */
-            auto_block :
 
-            for (int unsigned(block_pos ) = 0; block_pos != (this-> blocks_per_sector); block_pos ++ )
-            {
-                if ((this-> is_block_mark(block_not_used, (this-> sector_position [1]), (this-> get_block_id(block_pos)))) == true)
+            skip_auto_sector_selc :
+
+            if (__auto_block_selc == true) goto auto_block_selc;
+
+                (this-> block_position [1]) = __block_pos_id;
+
+            goto skip_auto_block_selc;
+
+            auto_block_selc :
+
+                for (int unsigned(block_pos_id ) = 0; block_pos_id != (this-> blocks_per_sector); block_pos_id ++ )
                 {
-                    (this-> block_position [1]) = block_pos;
-                    break;
-                }                
-            }
+                    if ( (this-> is_block_marker (block_not_used, (this-> sector_position [1]), block_pos_id) ) == true)
+                    {
+                        (this-> block_position [1]) = block_pos_id;
+                        break;
+                    }
+                }
 
-            skip_auto_block :
+            skip_auto_block_selc :
 
-            /* as the manual one does not check if the sector/block is used/full or not we will re check it to make 
-            * sure its not in use or not
-            */
-            if ((this-> is_sector_mark(sector_is_in_use, (this-> sector_position [1]))) == true) return;
-            if ((this-> is_block_mark(block_is_in_use, (this-> sector_position [1]), (this-> block_position [1]))) == true) return;
+            if ( (this-> is_sector_marker(sector_is_in_use, (this-> sector_position [1]) ) ) == true) return;
+            if ( (this-> is_block_marker(block_is_in_use, (this-> sector_position [1]), (this-> block_position [1]) ) ) == true) return;
 
-            /* to allow us to check if the amount of free/used space in the sector there is we will - and +
-            * to two value's one start at the amount of block in one sector the other start from 0 
-            */
-            if ((this-> sector_used_c [(data_id::__main)] [(this-> sector_position [1])]) != (this-> blocks_per_sector) - 1)
+            (this-> set_dbuff_block(__block_data, (this-> sector_position [1]), (this-> block_position [1]), false) );
+
+            (this-> update_sector_used_c( ) );
+            (this-> update_sector_free_c( ) );
+
+        }
+
+        void (update_sector_used_c( ) )
+        {
+            if ((this-> sector_used_c [(data_id::__main)] [(this-> sector_position [1])]) != (this-> blocks_per_sector))
                 (this-> sector_used_c [(data_id::__main)] [(this-> sector_position [1])]) ++;
+        }
 
+        void (update_sector_free_c( ) )
+        {
             if ((this-> sector_free_c [(data_id::__main)] [(this-> sector_position [1])]) == 0)
-            {
-                (this-> set_sector_mark(sector_is_in_use, (this-> sector_position [1])));
-            }
-            else (this-> sector_free_c [(data_id::__main)] [(this-> sector_position [1])]) --; 
-          
-            /* to make sure that the next add to dbuff call dosent overwrite used data we will set the
-            * state of the block to used
-            */
-            (this-> set_block_mark(block_is_in_use, (this-> sector_position [1]), (this-> block_position [1])));
-
-
-            // this is so i can debug stuff 
-            for (int unsigned x = 0; x != amount_of_sectors; x++)
-                std::cout << "FREE: " << (this-> sector_free_c [(data_id::__main)] [x]) << ", USED: " << (this-> sector_used_c [(data_id::__main)] [x]) << ", SID: " << x  << std::endl;
-
-            for (int unsigned x = 0; x != ((this-> amount_of_sectors) * (this-> blocks_per_sector)); x++)
-                std::cout << "|" << block_smarker[0][x];
-            std::cout << std::endl;
-            return;
+                (this-> set_sector_marker(sector_is_in_use, (this-> sector_position [1])));
+            else
+                (this-> sector_free_c [(data_id::__main)] [(this-> sector_position [1])]) --;
         }
 
-        __dbuff_type (get_from_dbuff(int unsigned(__sector_pos), int unsigned(__block_pos), bool(__auto_sector), bool(__auto_block)))
+        __dbuff_type (* get_from_dbuff (int unsigned(__sector_pos_id ), int unsigned(__block_pos_id ), bool(__auto_sector_selc ), bool(__auto_block_selc ), bool(__return_empty ) ) )
         {
-            if (__sector_pos >= (this-> amount_of_sectors)) return 0;
-            if (__block_pos >= (this-> blocks_per_sector)) return 0;
+            if ((this-> sb_pos_id_incheck(true, true, __sector_pos_id, __block_pos_id)) == false) return nullptr;
 
-            if (__auto_sector == true) goto auto_sector;
+            if (__auto_sector_selc == true) goto auto_sector_selc;
 
-            goto skip_auto_sector;
-            auto_sector :
+                (this-> sector_position [1]) = __sector_pos_id;
 
-            skip_auto_sector :
-            if (__auto_block == true) goto auto_block;
-            
-            return ((this-> dbuff_blocks [(data_id::__main)] [((__sector_pos * (this-> amount_of_sectors)) + __block_pos)]));
+            goto skip_auto_sector_selc;
 
-            return 0;
-            auto_block :
-            return 0 ;
+            // still working on auto sb
+            auto_sector_selc :
+
+                if ((this-> block_position [0]) == (this-> blocks_per_sector))
+                    std::cout << "SP" << std::endl;
+                else
+                    (this-> sector_position [0]) ++;
+
+                (this-> sector_position [1]) = (this-> sector_position [0]);
+
+            skip_auto_sector_selc : /*skip*/
+
+            if (__auto_block_selc == true) goto auto_block_selc;
+
+                (this-> block_position [1]) = __block_pos_id;
+
+            goto skip_auto_block_selc;
+
+            auto_block_selc :
+
+                if ((this-> block_position [0]) == (this-> blocks_per_sector))
+                    std::cout << "BP" << std::endl;
+                else
+                    (this-> block_position [0]) ++;
+
+                (this-> block_position [1]) = (this-> block_position [0]);
+
+            skip_auto_block_selc : /*skip*/
+
+            if (this-> is_block_marker (block_not_used, __sector_pos_id, __block_pos_id) == true && __return_empty == false) return (nullptr);
+
+            return ( (this-> get_dbuff_block ( (this-> sector_position [1]), (this-> block_position [1]), false) ) );
         }
 
-        void (set_sector_mark(bool(__sector_state), int unsigned(__sector_pos)))
+        void (del_from_buffer( ) )
         {
-            if (__sector_pos >= (this-> amount_of_sectors)) return;
-
-            (this-> sector_smarker [(data_id::__main)] [(this-> get_sector_id(__sector_pos))]) = __sector_state;
+            (this-> del_dbuff_block (1,0) );
         }
 
-        void (set_block_mark(bool(__block_state), int unsigned(__sector_pos), int unsigned(__block_pos)))
+        void (set_sector_marker (bool(__sector_state ), int unsigned(__sector_pos_id ) ) )
         {
-            if (__sector_pos >= (this-> amount_of_sectors)) return;
-            if (__block_pos >= (this-> blocks_per_sector)) return;
+            if ( (this-> sb_pos_id_incheck (true, false, __sector_pos_id, 0) ) == false) return;
 
-            (this-> block_smarker [(data_id::__main)] [(this-> get_block_id(((__sector_pos) * (this-> blocks_per_sector)) + __block_pos))]) = __block_state;
+            (this-> sector_smarker [(data_id::__main)] [(this-> get_sector_arr_pos (__sector_pos_id))]) = __sector_state;
         }
 
-        bool (is_sector_mark(bool(__is_type), int unsigned(__sector_pos)))
+        void (set_block_marker (bool(__block_state ), int unsigned(__sector_pos_id ), int unsigned(__block_pos_id ) ) )
         {
-            if (__sector_pos >= (this-> amount_of_sectors)) return false;
+            if ( (this-> sb_pos_id_incheck (true, true, __sector_pos_id, __block_pos_id) ) == false) return;
 
-            return ((this-> sector_smarker [(data_id::__main)] [(this-> get_sector_id(__sector_pos))]) == __is_type? true : false);
+            (this-> block_smarker [(data_id::__main)] [(this-> get_block_arr_pos (__sector_pos_id, __block_pos_id) )]) = __block_state;
         }
 
-        bool (is_block_mark(bool(__is_type), int unsigned(__sector_pos), int unsigned(__block_pos)))
+        bool (is_sector_marker (bool(__is_type ), int unsigned(__sector_pos_id ) ) )
         {
-            if (__sector_pos >= (this-> amount_of_sectors)) return false;
-            if (__block_pos >= (this-> blocks_per_sector)) return false;
-          
-            return ((this-> block_smarker [(data_id::__main)] [(this-> get_block_id(((__sector_pos) * (this-> blocks_per_sector)) + __block_pos))]) == __is_type? true : false);
+            if ( (this-> sb_pos_id_incheck (true, false, __sector_pos_id, 0) ) == false) return (false);
+
+            return ((this-> sector_smarker [(data_id::__main)] [(this-> get_sector_arr_pos(__sector_pos_id))]) == __is_type? true : false);
+        }
+
+        bool (is_block_marker (bool(__is_type ), int unsigned(__sector_pos_id ), int unsigned(__block_pos_id ) ) )
+        {
+            if ( (this-> sb_pos_id_incheck (true, true, __sector_pos_id, __block_pos_id) ) == false) return (false);
+
+            return ((this-> block_smarker [(data_id::__main)] [(this-> get_block_arr_pos (__sector_pos_id, __block_pos_id) )]) == __is_type? true : false);
+        }
+
+        void (set_dbuff_block (__dbuff_type (__block_data ), int unsigned (__sector_pos_id ), int unsigned(__block_pos_id ), bool(__overwrite ) ) )
+        {
+            if ( (this-> sb_pos_id_incheck (true, true, __sector_pos_id, __block_pos_id) ) == false) return;
+
+            if (__overwrite == false && (this-> is_block_marker (block_is_in_use, __sector_pos_id, __block_pos_id) ) == true) return;
+
+            (this-> set_block_marker (block_is_in_use, __sector_pos_id, __block_pos_id) );
+
+            (this-> dbuff_blocks [(data_id::__main)] [(this-> get_block_arr_pos (__sector_pos_id, __block_pos_id) )]) = __block_data;
+        }
+
+        __dbuff_type (* get_dbuff_block (int unsigned(__sector_pos_id ), int unsigned(__block_pos_id ), bool(__return_empty ) ) )
+        {
+            if ( (this-> sb_pos_id_incheck (true, true, __sector_pos_id, __block_pos_id) ) == false) return (nullptr);
+
+            if (__return_empty == false && (this-> is_block_marker (block_not_used, __sector_pos_id, __block_pos_id) ) == true) return nullptr;
+
+            return & (this-> dbuff_blocks [(data_id::__main)] [(this-> get_block_arr_pos (__sector_pos_id, __block_pos_id) )]);
+        }
+
+        void (del_dbuff_block (int unsigned (__sector_pos_id ), int unsigned(__block_pos_id ) ) )
+        {
+            (this-> set_block_marker (block_not_used, __sector_pos_id, __block_pos_id) );
         }
 
     private :
     enum unit_id { __sector, __block } ;
     enum data_id { __main = 0, __swap = 1 } ;
-
+    int unsigned(total_block_count) = 0;
     int unsigned(amount_of_sectors) = 0;
     int unsigned(blocks_per_sector) = 0;
+
+    int unsigned(* curr_sector_pos) = new int unsigned [2];
+    int unsigned(* curr_block_pos) = new int unsigned [2];
+
     int unsigned(* sector_position) = new int unsigned [2];
     int unsigned(* block_position) = new int unsigned [2];
+
     int unsigned(* * sector_free_c) = new int unsigned * [2];
     int unsigned(* * sector_used_c) = new int unsigned * [2];
-    int unsigned(* * sector_id) = new int unsigned * [2];
-    int unsigned(* * block_id) = new int unsigned * [2];
+   
+    int unsigned(* * sector_pos_id) = new int unsigned * [2];
+    int unsigned(* * block_pos_id) = new int unsigned * [2];
+
     bool(* * sector_smarker) = new bool * [2];
     bool(* * block_smarker) = new bool * [2];
     bool(has_dbuff_init) = false;
 
-    // sector count = block amount / sector count = amout of blocks per sector
     __dbuff_type(* * dbuff_blocks) = new __dbuff_type * [2];
 } ;
+
+// NOTE: only for debugging
 typedef dynamic_buffer <int> dbint_t;
 }
 # endif /*__dynamic__buffer__hpp__*/
