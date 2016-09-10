@@ -65,12 +65,12 @@ int(main( ) )
     my_buffer.add_to_dbuff(1, 0, 0, false, false);
     my_buffer.add_to_dbuff(2, 0, 1, false, false);
     my_buffer.add_to_dbuff(3, 1, 0, false, false);
-    //my_buffer.del_from_buffer();
-    my_buffer.add_to_dbuff(4, 1, 1, false, false);
+    my_buffer.del_from_buffer();
+    my_buffer.add_to_dbuff(4, 1, 0, false, false);
     std::cout << "B0 / S0 > " << *my_buffer.get_from_dbuff(0,0,false,false,true) << std::endl;
     std::cout << "B1 / S0 > " << *my_buffer.get_from_dbuff(0,1,false,false,true) << std::endl;
     std::cout << "B0 / S1 > " << *my_buffer.get_from_dbuff(1,0,false,false,true) << std::endl;
-    std::cout << "B1 / S1 > " << *my_buffer.get_from_dbuff(1,1,false,false,true) << std::endl;
+    //std::cout << "B1 / S1 > " << *my_buffer.get_from_dbuff(1,1,false,false,true) << std::endl;
     adtp::io_service io_service (
         & set_digit_pin_mode,
         & set_digit_pin_state,

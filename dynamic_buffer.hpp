@@ -25,7 +25,8 @@ class dynamic_buffer
 
         void (set_block_arr_pos(int unsigned(__sector_pos_id), int unsigned(__block_pos_id ), int unsigned(__block_arr_pos ) ) )
         {
-            (this-> block_pos_id [(data_id::__main)] [((this-> get_sector_arr_pos(__sector_pos_id)) * (this-> blocks_per_sector)) + __block_pos_id]) = (((this-> get_sector_arr_pos(__sector_pos_id)) * (this-> blocks_per_sector)) + __block_arr_pos);
+            (this-> block_pos_id [(data_id::__main)] [((this-> get_sector_arr_pos(__sector_pos_id)) * (this-> blocks_per_sector)) + __block_pos_id]) = 
+                (((this-> get_sector_arr_pos(__sector_pos_id)) * (this-> blocks_per_sector)) + __block_arr_pos);
         }
 
         int unsigned (get_block_arr_pos(int unsigned(__sector_pos_id), int unsigned(__block_pos_id)))
@@ -33,7 +34,7 @@ class dynamic_buffer
             return ((this-> block_pos_id [(data_id::__main)] [((this-> get_sector_arr_pos(__sector_pos_id)) * (this-> blocks_per_sector)) + __block_pos_id]));
         }
 
-        void (dbuff_init(int unsigned(__amount_of_sectors), int unsigned(__blocks_per_sector)))
+        void (dbuff_init(int unsigned(__amount_of_sectors), int unsigned(__blocks_per_sector), int unsigned(__block_length) ))
         {
             if ((this-> is_dbuff_init(true)) == true) return;
 
@@ -92,10 +93,26 @@ class dynamic_buffer
         {
             if (__check_sector == true && __sector_pos_id >= (this-> amount_of_sectors)) return false;
             if (__check_block == true && __block_pos_id >= (this-> blocks_per_sector)) return false;
+            if ((this-> is_dbuff_init(false)) == true) return false;
             return true;
         }
 
-        void (add_to_dbuff (__dbuff_type(__block_data ), int unsigned(__sector_pos_id ), int unsigned(__block_pos_id ), bool(__auto_sector_selc ), bool(__auto_block_selc ) ) )
+        void (set_block_data(__dbuff_type(__block_data ), int unsigned(__sector_pos_id ), int unsigned(__block_pos_id ), int unsigned(__block_ipos ) ) )
+        {
+
+
+
+        }
+
+        void (get_block_data(int unsigned(__sector_pos_id ), int unsigned(__block_pos_id ), int unsigned(__block_ipos ) ))
+        {
+
+
+
+        }
+
+        // when adding a block to a sector the current block will have a size of how many int/etc it can hold
+        void (add_to_dbuff (__dbuff_type(* __block_data ), int unsigned(__sector_pos_id ), int unsigned(__block_pos_id ), bool(__auto_sector_selc ), bool(__auto_block_selc ) ) )
         {
             if ((this-> sb_pos_id_incheck(true, true, __sector_pos_id, __block_pos_id)) == false) return;
 
@@ -140,7 +157,7 @@ class dynamic_buffer
             if ( (this-> is_sector_marker(sector_is_in_use, (this-> sector_position [1]) ) ) == true) return;
             if ( (this-> is_block_marker(block_is_in_use, (this-> sector_position [1]), (this-> block_position [1]) ) ) == true) return;
 
-            (this-> set_dbuff_block(__block_data, (this-> sector_position [1]), (this-> block_position [1]), false) );
+            //(this-> set_dbuff_block(__block_data, (this-> sector_position [1]), (this-> block_position [1]), false) );
 
             (this-> update_sector_used_c( ) );
             (this-> update_sector_free_c( ) );
@@ -153,12 +170,42 @@ class dynamic_buffer
                 (this-> sector_used_c [(data_id::__main)] [(this-> sector_position [1])]) ++;
         }
 
+        void (update_block_used_c( ))
+        {
+
+        }
+
         void (update_sector_free_c( ) )
         {
             if ((this-> sector_free_c [(data_id::__main)] [(this-> sector_position [1])]) == 0)
                 (this-> set_sector_marker(sector_is_in_use, (this-> sector_position [1])));
             else
                 (this-> sector_free_c [(data_id::__main)] [(this-> sector_position [1])]) --;
+        }
+    
+        void (update_block_free_c( ))
+        {
+
+        }
+
+        int unsigned(get_sector_used_c(int unsigned(__sector_pos_id)))
+        {
+
+        }
+
+        int unsigned(get_sector_free_c(int unsigned(__sector_pos_id)))
+        {
+
+        }
+
+        int unsigned(get_block_used_c(int unsigned(__sector_pos_id), int unsigned(__block_pos_id)))
+        {
+
+        }
+
+        int unsigned(get_block_free_c(int unsigned(__sector_pos_id), int unsigned(__block_pos_id)))
+        {
+
         }
 
         __dbuff_type (* get_from_dbuff (int unsigned(__sector_pos_id ), int unsigned(__block_pos_id ), bool(__auto_sector_selc ), bool(__auto_block_selc ), bool(__return_empty ) ) )
@@ -224,6 +271,11 @@ class dynamic_buffer
             (this-> block_smarker [(data_id::__main)] [(this-> get_block_arr_pos (__sector_pos_id, __block_pos_id) )]) = __block_state;
         }
 
+        void (set_block_imarker())
+        {
+
+        }
+
         bool (is_sector_marker (bool(__is_type ), int unsigned(__sector_pos_id ) ) )
         {
             if ( (this-> sb_pos_id_incheck (true, false, __sector_pos_id, 0) ) == false) return (false);
@@ -236,6 +288,11 @@ class dynamic_buffer
             if ( (this-> sb_pos_id_incheck (true, true, __sector_pos_id, __block_pos_id) ) == false) return (false);
 
             return ((this-> block_smarker [(data_id::__main)] [(this-> get_block_arr_pos (__sector_pos_id, __block_pos_id) )]) == __is_type? true : false);
+        }
+
+        bool (is_block_imarker())
+        {
+
         }
 
         void (set_dbuff_block (__dbuff_type (__block_data ), int unsigned (__sector_pos_id ), int unsigned(__block_pos_id ), bool(__overwrite ) ) )
@@ -281,9 +338,13 @@ class dynamic_buffer
    
     int unsigned(* * sector_pos_id) = new int unsigned * [2];
     int unsigned(* * block_pos_id) = new int unsigned * [2];
+    // block inner position id
+    int unsigned(* * block_ipos_id) = new int unsigned * [2];
 
     bool(* * sector_smarker) = new bool * [2];
     bool(* * block_smarker) = new bool * [2];
+    // block inner state marker
+    bool(* * block_ismarker) = new bool * [2];
     bool(has_dbuff_init) = false;
 
     __dbuff_type(* * dbuff_blocks) = new __dbuff_type * [2];
@@ -291,5 +352,6 @@ class dynamic_buffer
 
 // NOTE: only for debugging
 typedef dynamic_buffer <int> dbint_t;
+typedef dynamic_buffer <int unsigned> dbuint_t;
 }
 # endif /*__dynamic__buffer__hpp__*/
