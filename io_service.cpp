@@ -54,8 +54,8 @@ adtp::io_service::io_service (
     (this-> digit_o_bitset [6] ) = 1;
     (this-> digit_o_bitset [7] ) = 1;
 
-    (this-> i_bitset_buffer).dbuff_init(1, (this-> ibitset_buff_size), (this-> i_bitset_size));
-    (this-> o_bitset_buffer).dbuff_init(1, (this-> obitset_buff_size), (this-> o_bitset_size));
+//    (this-> i_bitset_buffer).dbuff_init(1, (this-> ibitset_buff_size), (this-> i_bitset_size));
+//    (this-> o_bitset_buffer).dbuff_init(1, (this-> obitset_buff_size), (this-> o_bitset_size));
 
     if ( (this-> clock_start_state ) == digit_pin_state_high )
     {
