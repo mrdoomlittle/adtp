@@ -6,7 +6,9 @@
 # define digit_pin_state_high 0x1
 # define digit_pin_state_low 0x0
 
-# include <iostream>
+# ifndef ARDUINO
+    # include <iostream>
+# endif
 
 adtp::io_service::io_service (
     set_digit_pin_mode_ft(* __set_digit_pin_mode_fptr ),
@@ -91,6 +93,7 @@ adtp::io_service::io_service (
 
         if ( (this-> get_mltick_count( ) ) != 0 ) (this-> call_external_mltick (this ) );
 
+# ifndef ARDUINO
         for (int unsigned(x ) = 0; x != ( (this-> i_bitset_size ) / (this->digit_i_pin_count ) ); x ++ )
                 std::cout << (this-> i_bitset_finished [x] );
         std::cout << " :IFBIT, ";
@@ -100,14 +103,14 @@ adtp::io_service::io_service (
         std::cout << " :OFBIT";
 
         std::cout << std::endl;
-
+# endif
         for (int unsigned(i_bitsetf_pos ) = 0; i_bitsetf_pos != ( (this-> i_bitset_size ) / (this-> digit_i_pin_count ) ); i_bitsetf_pos ++ )
         {
             if ( (this-> i_bitset_finished [i_bitsetf_pos] ) == true) (this-> i_bitsetf_truec ) ++;
             if ((this-> i_bitsetf_truec ) == ( (this-> i_bitset_size ) / (this-> digit_i_pin_count ) ) )
             {
                 (this-> i_bitsetf_truec ) = 0;
-
+# ifndef ARDUINO
                 std::cout << "IBITSET: Finished, TrueC: " << (this-> i_bitsetf_truec ) << ", MTickC: " << (this-> get_mltick_count( ) ) << std::endl;
 
                 std::cout << "IBITSET_DUMP: ";
@@ -116,7 +119,7 @@ adtp::io_service::io_service (
                     std::cout << unsigned( (this-> digit_i_bitset [x] ) );
 
                 std::cout << std::endl << std::endl;
-
+# endif
                 for (int unsigned(x ) = 0; x != (this-> i_bitset_size ); x ++ )
                     (this-> i_bitset_buffer).add_to_dbuff(&(this-> digit_i_bitset [x]), 2, 0, 0, 0, true, true, true);
 
@@ -139,7 +142,7 @@ adtp::io_service::io_service (
             if ( (this-> o_bitsetf_truec ) == ( (this-> o_bitset_size ) / (this-> digit_o_pin_count ) ) )
             {
                 (this-> o_bitsetf_truec ) = 0;
-
+# ifndef ARDUINO
                 std::cout << "OBITSET: Finished, TrueC: " << (this-> o_bitsetf_truec) << ", MTickC: " << (this-> get_mltick_count()) << std::endl;
 
                 std::cout << "OBITSET_DUMP: ";
@@ -148,7 +151,7 @@ adtp::io_service::io_service (
                     std::cout << unsigned( (this-> digit_o_bitset [x] ) );
 
                 std::cout << std::endl << std::endl;
-
+# endif
                 for (int unsigned(x ) = 0; x != ( (this-> o_bitset_size ) / (this-> digit_o_pin_count ) ); x ++ )
                     (this-> o_bitset_finished [x] ) = false;
             }

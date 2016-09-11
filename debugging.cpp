@@ -1,3 +1,4 @@
+# ifndef ARDUINO
 # include "io_service.hpp"
 # include <boost/cstdint.hpp>
 
@@ -121,3 +122,4 @@ int(main( ) )
         & external_mlinit,
         & external_mltick );
 }
+# endif
