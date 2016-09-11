@@ -1,10 +1,15 @@
 # ifndef __io__service__hpp__
 # define __io__service__hpp__
-# include <boost/cstdint.hpp>
+
+# ifdef ARDUINO
+    # include <stdint.h>
+# else
+    # include <boost/cstdint.hpp>
+# endif
 
 # include "dynamic_buffer.hpp"
 
-/* created by mrdoomlittle / daniel robson 
+/* created by mrdoomlittle / daniel robson
 * github: https://github.com/mrdoomlittle
 * email: doctordoomlittle@gmail.com
 */
@@ -61,7 +66,7 @@ namespace adtp { class io_service
         int unsigned(digit_o_pin_count ) = def_digit_o_pin_count;
         uint8_t
         (* digit_o_pin_ids ) = new uint8_t [digit_o_pin_count];
-        
+
         uint8_t(digit_clock_pin_id ) = def_digit_clock_pin_id;
 
         int unsigned(ibyte_read_delay ) = def_ibyte_read_delay;
@@ -112,7 +117,7 @@ namespace adtp { class io_service
         int unsigned(i_iltick_count) = 0;
         int unsigned(o_iltick_count) = 0;
 
-        // NOTE: move this to the cpp file 
+        // NOTE: move this to the cpp file
         void
         (update_rmltick_count (int unsigned(__update_amount ) ) )
         {
@@ -125,7 +130,7 @@ namespace adtp { class io_service
             (this-> real_iltick_count ) += __update_amount;
         }
 
-        bool(ilclockp_toggled) = false; 
+        bool(ilclockp_toggled) = false;
         int unsigned(ilclockp_tcount) = 0;
 
         bool(ilclockn_toggled ) = false;
@@ -136,7 +141,7 @@ namespace adtp { class io_service
         bool
         (* i_bitset_finished ) = new bool [(i_bitset_size / digit_i_pin_count)];
 
-        int unsigned(i_bitset_fcount ) = 0; 
+        int unsigned(i_bitset_fcount ) = 0;
     public :
         dynamic_buffer <uint8_t> (i_bitset_buffer );
         int unsigned(i_bitset_buff_pos ) = 0;
@@ -196,9 +201,9 @@ namespace adtp { class io_service
         (set_clock_ptcount (int unsigned(__clock_ptcount ) ) );
         void
         (set_clock_ntcount (int unsigned(__clock_ntcount ) ) );
-   
+
         bool
-        (is_clock_reading (bool(__is_type ) ) );  
+        (is_clock_reading (bool(__is_type ) ) );
         bool
         (is_external_clock (bool(__is_type ) ) );
 
@@ -223,13 +228,13 @@ namespace adtp { class io_service
         int unsigned
         (get_iltick_count( ) );
 
-        void 
+        void
         (reset_mltick_count( ) )
         {
             (this-> service_mltick_count) = 0;
         }
 
-        void 
+        void
         (reset_iltick_count( ) )
         {
             (this-> service_iltick_count) = 0;

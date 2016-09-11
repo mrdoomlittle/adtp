@@ -47,7 +47,7 @@ namespace adtp { template <typename __dbuff_type> class dynamic_buffer
             return ( (this-> block_pos_id [(data_id::__main)] [( (this-> get_block_arr_pos (__sector_pos_id, __block_pos_id) ) * (this-> block_inner_length) ) + __block_ipos_id]) );
         }
     public :
-        void 
+        void
         (dbuff_init (int unsigned(__amount_of_sectors ), int unsigned(__blocks_per_sector ), int unsigned(__block_inner_length ) ) )
         {
             if ( (this-> is_dbuff_init (true) ) == true) return;
@@ -74,19 +74,19 @@ namespace adtp { template <typename __dbuff_type> class dynamic_buffer
             {
                 (this-> set_sector_arr_pos (sector_pos_id, sector_pos_id) );
 
-                (this-> set_sector_smarker (state_marker::__free, sector_pos_id) );
+                (this-> set_sector_smarker (state_marker::__free__, sector_pos_id) );
 
                 for (int unsigned(block_pos_id ) = 0; block_pos_id != __blocks_per_sector; block_pos_id ++)
                 {
                     (this-> set_block_arr_pos (sector_pos_id, block_pos_id, block_pos_id) );
 
-                    (this-> set_block_smarker (state_marker::__free, sector_pos_id, block_pos_id) );
+                    (this-> set_block_smarker (state_marker::__free__, sector_pos_id, block_pos_id) );
 
                     for (int unsigned(block_ipos_id ) = 0; block_ipos_id != __block_inner_length; block_ipos_id ++)
                     {
                         (this-> set_block_iarr_pos (sector_pos_id, block_pos_id, block_ipos_id, block_ipos_id) );
 
-                        (this-> set_block_ismarker (state_marker::__free, sector_pos_id, block_pos_id, block_ipos_id) );
+                        (this-> set_block_ismarker (state_marker::__free__, sector_pos_id, block_pos_id, block_ipos_id) );
                     }
                 }
             }
@@ -159,7 +159,7 @@ namespace adtp { template <typename __dbuff_type> class dynamic_buffer
 
             if (__auto_sector_selc == true) goto auto_sector_selc;
 
-                if ( (this-> is_sector_smarker (state_marker::__used, __sector_pos_id) ) == true) return;
+                if ( (this-> is_sector_smarker (state_marker::__used__, __sector_pos_id) ) == true) return;
 
                 (this-> sector_position [1]) = __sector_pos_id;
 
@@ -169,11 +169,11 @@ namespace adtp { template <typename __dbuff_type> class dynamic_buffer
 
                 for (int unsigned(sector_pos_id ) = 0; sector_pos_id != (this-> amount_of_sectors); sector_pos_id ++ )
                 {
-                    if ( (this-> is_sector_smarker (state_marker::__free, sector_pos_id) ) == true)
+                    if ( (this-> is_sector_smarker (state_marker::__free__, sector_pos_id) ) == true)
                     {
                         (this-> sector_position [1]) = sector_pos_id; break;
-                    }              
-    
+                    }
+
                     if (sector_pos_id == (this-> amount_of_sectors) - 1) return;
                 }
 
@@ -181,7 +181,7 @@ namespace adtp { template <typename __dbuff_type> class dynamic_buffer
 
             if (__auto_block_selc == true) goto auto_block_selc;
 
-                if ( (this-> is_block_smarker (state_marker::__used, (this-> sector_position [1]), __block_pos_id) ) == true) return;
+                if ( (this-> is_block_smarker (state_marker::__used__, (this-> sector_position [1]), __block_pos_id) ) == true) return;
 
                 (this-> block_position [1]) = __block_pos_id;
 
@@ -191,7 +191,7 @@ namespace adtp { template <typename __dbuff_type> class dynamic_buffer
 
                 for (int unsigned(block_pos_id ) = 0; block_pos_id != (this-> blocks_per_sector); block_pos_id ++ )
                 {
-                    if ( (this-> is_block_smarker (state_marker::__free, (this-> sector_position [1]), block_pos_id) ) == true)
+                    if ( (this-> is_block_smarker (state_marker::__free__, (this-> sector_position [1]), block_pos_id) ) == true)
                     {
                         (this-> block_position [1]) = block_pos_id; break;
                     }
@@ -205,7 +205,7 @@ namespace adtp { template <typename __dbuff_type> class dynamic_buffer
 
             if (__dbuff_unit_id != (unit_id::__iblock) ) goto skip_iblock_selc;
 
-                if ( (this-> is_block_ismarker (state_marker::__used, (this-> sector_position [1]), (this-> block_position [1]), __block_ipos_id) ) == true) return;
+                if ( (this-> is_block_ismarker (state_marker::__used__, (this-> sector_position [1]), (this-> block_position [1]), __block_ipos_id) ) == true) return;
 
                 (this-> block_iposition [1]) = __block_ipos_id;
 
@@ -215,11 +215,11 @@ namespace adtp { template <typename __dbuff_type> class dynamic_buffer
 
                 for (int unsigned(block_ipos_id ) = 0; block_ipos_id != (this-> block_inner_length); block_ipos_id ++)
                 {
-                    if ( (this-> is_block_ismarker (state_marker::__free, (this-> sector_position [1]), (this-> block_position [1]), block_ipos_id) ) == true)
+                    if ( (this-> is_block_ismarker (state_marker::__free__, (this-> sector_position [1]), (this-> block_position [1]), block_ipos_id) ) == true)
                     {
                         (this-> block_iposition [1]) = block_ipos_id; break;
                     }
-                  
+
                     if (block_ipos_id == (this-> block_inner_length) - 1) return;
                 }
 
@@ -231,7 +231,7 @@ namespace adtp { template <typename __dbuff_type> class dynamic_buffer
             {
                 case (unit_id::__block) :
                     if ( (this-> get_sector_free_c ( (this-> sector_position [1]) ) ) == 0)
-                        (this-> set_sector_smarker (state_marker::__used, (this-> sector_position [1]) ) );
+                        (this-> set_sector_smarker (state_marker::__used__, (this-> sector_position [1]) ) );
 
                     // this is not finished
 
@@ -241,11 +241,11 @@ namespace adtp { template <typename __dbuff_type> class dynamic_buffer
 
                 case (unit_id::__iblock) :
                     if ( (this-> get_block_free_c ( (this-> sector_position [1]), (this-> block_position [1]) ) ) == 0)
-                        (this-> set_block_smarker (state_marker::__used, (this-> sector_position [1]), (this-> block_position [1]) ) );
+                        (this-> set_block_smarker (state_marker::__used__, (this-> sector_position [1]), (this-> block_position [1]) ) );
 
                     (this-> set_dbuff_iblock(__block_data, (this-> sector_position [1]), (this-> block_position [1]), (this-> block_iposition [1])));
 
-                    (this-> set_block_ismarker(state_marker::__used, (this-> sector_position [1]), (this-> block_position [1]), (this-> block_iposition [1])));
+                    (this-> set_block_ismarker(state_marker::__used__, (this-> sector_position [1]), (this-> block_position [1]), (this-> block_iposition [1])));
 
                     (this-> update_block_used_c ( (this-> sector_position [1]), (this-> block_position [1]) ) );
                     (this-> update_block_free_c ( (this-> sector_position [1]), (this-> block_position [1]) ) );
@@ -356,18 +356,18 @@ namespace adtp { template <typename __dbuff_type> class dynamic_buffer
             switch (dbuff_unit_id)
             {
                 case (unit_id::__block) :
-                    if ((this-> is_block_smarker(state_marker::__free, (this-> sector_position [0]), (this-> block_position [0]))) == true && __return_nonused == false) return (nullptr);
+                    if ((this-> is_block_smarker(state_marker::__free__, (this-> sector_position [0]), (this-> block_position [0]))) == true && __return_nonused == false) return (nullptr);
                     return ((this-> get_dbuff_block((this-> sector_position [0]), (this-> block_position [0]))));
                 break;
                 case (unit_id::__iblock) :
-                    if ((this-> is_block_ismarker(state_marker::__free, (this-> sector_position [0]), (this-> block_position [0]), (this-> block_iposition [0]))) == true && __return_nonused == false) return (nullptr);
+                    if ((this-> is_block_ismarker(state_marker::__free__, (this-> sector_position [0]), (this-> block_position [0]), (this-> block_iposition [0]))) == true && __return_nonused == false) return (nullptr);
                     return ((this-> get_dbuff_iblock((this-> sector_position [0]), (this-> block_position [0]), (this-> block_iposition [0]))));
                 break;
                 default : return (nullptr);
             }
         }
 
-        void 
+        void
         (del_from_dbuffer (int unsigned(__dbuff_unit_id ), int unsigned(__sector_pos_id ), int unsigned(__block_pos_id ), int unsigned(__block_ipos_id ) ) )
         {
             switch (__dbuff_unit_id)
@@ -386,57 +386,57 @@ namespace adtp { template <typename __dbuff_type> class dynamic_buffer
         }
 
     private :
-        void 
+        void
         (set_sector_smarker (bool(__sector_state ), int unsigned(__sector_pos_id ) ) )
         {
             (this-> sector_smarker [(data_id::__main)] [(this-> get_sector_arr_pos (__sector_pos_id) )]) = __sector_state;
         }
 
-        void 
+        void
         (set_block_smarker (bool(__block_state ), int unsigned(__sector_pos_id ), int unsigned(__block_pos_id ) ) )
         {
             (this-> block_smarker [(data_id::__main)] [(this-> get_block_arr_pos (__sector_pos_id, __block_pos_id) )]) = __block_state;
         }
 
-        void 
+        void
         (set_block_ismarker (bool(__block_istate ), int unsigned(__sector_pos_id ), int unsigned(__block_pos_id ), int unsigned(__block_ipos_id ) ) )
         {
             (this-> block_ismarker [(data_id::__main)] [(this-> get_block_iarr_pos (__sector_pos_id, __block_pos_id, __block_ipos_id) )]) = __block_istate;
         }
 
-        bool 
+        bool
         (is_sector_smarker (bool(__is_type ), int unsigned(__sector_pos_id ) ) )
         {
             return ( (this-> sector_smarker [(data_id::__main)] [(this-> get_sector_arr_pos(__sector_pos_id) )]) == __is_type? true : false);
         }
 
-        bool 
+        bool
         (is_block_smarker (bool(__is_type ), int unsigned(__sector_pos_id ), int unsigned(__block_pos_id ) ) )
         {
             return ( (this-> block_smarker [(data_id::__main)] [(this-> get_block_arr_pos (__sector_pos_id, __block_pos_id) )]) == __is_type? true : false);
         }
 
-        bool 
+        bool
         (is_block_ismarker (bool(__is_type ), int unsigned(__sector_pos_id ), int unsigned(__block_pos_id ), int unsigned(__block_ipos_id ) ) )
         {
             return ( (this-> block_ismarker [(data_id::__main)] [(this-> get_block_iarr_pos (__sector_pos_id, __block_pos_id, __block_ipos_id) )]) == __is_type? true : false);
         }
 /*
-        void 
+        void
         (set_dbuff_sector (__dbuff_type (* * __sector_data ), int unsigned (__sector_pos_id ) ) )
         {
             for (int unsigned(block_pos_id) = 0; block_pos_id != (this-> blocks_per_sector); block_pos_id ++)
                 (this-> set_dbuff_block((__sector_data [block_pos_id]), __sector_pos_id, block_pos_id));
         }
 */
-        void 
+        void
         (set_dbuff_block (__dbuff_type (* __block_data ), int unsigned (__sector_pos_id ), int unsigned(__block_pos_id ) ) )
         {
             for (int unsigned(block_ipos_id ) = 0; block_ipos_id != (this-> block_inner_length); block_ipos_id ++)
                 (this-> set_dbuff_iblock ( (__block_data [block_ipos_id]), __sector_pos_id, __block_pos_id, block_ipos_id) );
         }
 
-        void 
+        void
         (set_dbuff_iblock (__dbuff_type (* __block_idata ), int unsigned (__sector_pos_id ), int unsigned(__block_pos_id ), int unsigned(__block_ipos_id ) ) )
         {
             (this-> dbuff_iblocks [(data_id::__main)] [(this-> get_block_iarr_pos (__sector_pos_id, __block_pos_id, __block_ipos_id) )]) = (* __block_idata);
@@ -455,48 +455,50 @@ namespace adtp { template <typename __dbuff_type> class dynamic_buffer
             return (& (this-> dbuff_iblocks [(data_id::__main)] [(this-> get_block_iarr_pos (__sector_pos_id, __block_pos_id, __block_ipos_id) )]) );
         }
 
-        void 
+        void
         (del_dbuff_sector (int unsigned (__sector_pos_id ) ) )
         {
-            (this-> set_sector_smarker (state_marker::__free, __sector_pos_id) );
+            (this-> set_sector_smarker (state_marker::__free__, __sector_pos_id) );
 
             for (int unsigned (block_pos_id ) = 0; block_pos_id != (this-> blocks_per_sector); block_pos_id ++)
                 (this-> del_dbuff_block (__sector_pos_id, block_pos_id) );
         }
 
-        void 
+        void
         (del_dbuff_block (int unsigned (__sector_pos_id ), int unsigned(__block_pos_id ) ) )
         {
-            (this-> set_block_smarker (state_marker::__free, __sector_pos_id, __block_pos_id) );
+            (this-> set_block_smarker (state_marker::__free__, __sector_pos_id, __block_pos_id) );
 
             for (int unsigned (block_ipos_id ) = 0; block_ipos_id != (this-> block_inner_length); block_ipos_id ++)
                 (this-> del_dbuff_iblock (__sector_pos_id, __block_pos_id, block_ipos_id) );
         }
 
-        void 
+        void
         (del_dbuff_iblock (int unsigned (__sector_pos_id ), int unsigned(__block_pos_id ), int unsigned(__block_ipos_id ) ) )
         {
-            (this-> set_block_ismarker (state_marker::__free, __sector_pos_id, __block_pos_id, __block_ipos_id) );
+            (this-> set_block_ismarker (state_marker::__free__, __sector_pos_id, __block_pos_id, __block_ipos_id) );
         }
 
     private :
-        enum unit_id : const int unsigned 
-        { 
-            __sector = 0, 
-            __block = 1, 
-            __iblock = 2 
+        enum unit_id : const int unsigned
+        {
+            __sector = 0,
+            __block = 1,
+            __iblock = 2
         } ;
 
         enum data_id : const int unsigned
-        { 
-            __main = 0, 
-            __swap = 1 
+        {
+            __main = 0,
+            __swap = 1
         } ;
 
-        enum state_marker : const bool 
-        { 
-            __used = true, 
-            __free = false
+
+        /* __free/__used where conflicting with something in the 101 corelibs. */
+        enum state_marker : const bool
+        {
+            __used__ = true,
+            __free__ = false
         } ;
 
         int unsigned(total_block_count ) = 0;

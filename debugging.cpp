@@ -1,5 +1,4 @@
 # include "io_service.hpp"
-# include "dynamic_buffer.hpp"
 # include <boost/cstdint.hpp>
 
 # include <iostream>
@@ -8,9 +7,11 @@ void(set_digit_pin_mode (uint8_t (__pin_id ), uint8_t (__pin_mode ) ) ) { }
 
 void(set_digit_pin_state (uint8_t (__pin_id ), uint8_t (__pin_state ) ) ) { }
 
-int unsigned (simulated_pin_state_i [2] [8]) = { {1, 0, 1, 1, 1, 1, 1, 1}, {1, 1, 0, 1, 1, 1, 1, 1} } ;
+int unsigned (simulated_pin_state_i [4] [8]) = {
+    {1, 0, 1, 1, 1, 1, 1, 1}, {1, 1, 0, 1, 1, 1, 1, 1},
+    {1, 1, 1, 0, 1, 1, 1, 1}, {1, 1, 1, 1, 0, 1, 1, 1} } ;
 
-int unsigned (simulated_pin_state_c [10]) = {1, 0, 1, 1, 1, 1, 1, 1, 1, 1} ;
+int unsigned (simulated_pin_state_c [10]) = {1, 0, 1, 0, 1, 1, 1, 1, 1, 1} ;
 
 int unsigned (simulated_return_i ) = 0;
 int unsigned (current_pin_pos_i ) = 0;
@@ -28,7 +29,7 @@ int(get_digit_pin_state (uint8_t (__pin_id ) ) )
         if (current_pin_pos_i == 7)
         {
             current_pin_pos_i = 0;
-            if (current_arr_pos == 1)
+            if (current_arr_pos == 3)
                 current_arr_pos = 0;
             else
                 current_arr_pos ++;
