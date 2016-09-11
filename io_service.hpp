@@ -126,9 +126,10 @@ namespace adtp { class io_service
         uint8_t(* digit_i_bitset ) = new uint8_t [i_bitset_size];
         bool(* i_bitset_finished ) = new bool [(i_bitset_size / digit_i_pin_count)];
         int unsigned(i_bitset_fcount ) = 0; 
+    public :
         dynamic_buffer <uint8_t> (i_bitset_buffer);
         int unsigned(i_bitset_buff_pos ) = 0;
-       
+    private :
         uint8_t(* digit_o_bitset ) = new uint8_t [o_bitset_size];
         bool(* o_bitset_finished ) = new bool [(o_bitset_size / digit_o_pin_count)];
         int unsigned(o_bitset_fcount ) = 0;

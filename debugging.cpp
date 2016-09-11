@@ -53,9 +53,19 @@ void(external_mlinit (adtp::io_service (* _this ) ) )
 
 }
 
+int * * i_bitset = new int * [8];
 void(external_mltick (adtp::io_service (* _this ) ) )
 {
+    for (int x = 0; x != 8; x++)
+    {
+    for (int y = 0; y != 8; y++)
+    {
+    std::cout << unsigned(*_this-> i_bitset_buffer.get_from_dbuff(2, 0, x, y, false, false, false, true));
 
+    }
+    std::cout << std::endl;
+    }
+   
 }
 
 int(main( ) )

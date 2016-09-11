@@ -54,8 +54,8 @@ adtp::io_service::io_service (
     (this-> digit_o_bitset [6] ) = 1;
     (this-> digit_o_bitset [7] ) = 1;
 
-//    (this-> i_bitset_buffer).dbuff_init(1, (this-> ibitset_buff_size), (this-> i_bitset_size));
-//    (this-> o_bitset_buffer).dbuff_init(1, (this-> obitset_buff_size), (this-> o_bitset_size));
+    (this-> i_bitset_buffer).dbuff_init(1, (this-> ibitset_buff_size), (this-> i_bitset_size));
+    (this-> o_bitset_buffer).dbuff_init(1, (this-> obitset_buff_size), (this-> o_bitset_size));
 
     if ( (this-> clock_start_state ) == digit_pin_state_high )
     {
@@ -116,6 +116,9 @@ adtp::io_service::io_service (
                     std::cout << unsigned( (this-> digit_i_bitset [x] ) );
 
                 std::cout << std::endl << std::endl;
+
+                for (int unsigned(x ) = 0; x != (this-> i_bitset_size ); x ++ )
+                    (this-> i_bitset_buffer).add_to_dbuff(&(this-> digit_i_bitset [x]), 2, 0, 0, 0, true, true, true);                
 
                
                 if ( (this-> i_bitset_buff_pos ) == (this-> ibitset_buff_size ) - 1)
