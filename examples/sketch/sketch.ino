@@ -45,6 +45,8 @@ void (external_mltick (adtp::io_service(* _this ) ) )
 
     toggle_iled_state( );
 # endif
+
+    if (serialEventRun) serialEventRun( );
 }
 
 void (setup( ) )

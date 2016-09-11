@@ -47,6 +47,16 @@ namespace adtp { template <typename __dbuff_type> class dynamic_buffer
             return ( (this-> block_pos_id [(data_id::__main)] [( (this-> get_block_arr_pos (__sector_pos_id, __block_pos_id) ) * (this-> block_inner_length) ) + __block_ipos_id]) );
         }
     public :
+        dynamic_buffer( )
+        {
+
+        }
+
+        ~dynamic_buffer( )
+        {
+            // free memory
+        }
+
         void
         (dbuff_init (int unsigned(__amount_of_sectors ), int unsigned(__blocks_per_sector ), int unsigned(__block_inner_length ) ) )
         {

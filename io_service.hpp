@@ -38,8 +38,14 @@
 # define def_ibit_read_delay 1
 # define def_obit_write_delay 1
 
-# define def_mltick_delay 3000000
-# define def_iltick_delay 3000000
+# ifdef ARDUINO
+    // the 101 has a slower clock cycle
+    # define def_mltick_delay 300000
+    # define def_iltick_delay 300000
+# else
+    # define def_mltick_delay 3000000
+    # define def_iltick_delay 3000000
+# endif
 
 # define def_ibitset_buff_size 8
 # define def_obitset_buff_size 8
@@ -108,6 +114,12 @@ namespace adtp { class io_service
             external_mlinit_ft(* __external_mlinit_fptr) = nullptr,
             external_mltick_ft(* __external_mltick_fptr) = nullptr
         );
+        
+        ~io_service( )
+        {
+       
+        }
+
     private :
         int unsigned(mltick_delay) = def_mltick_delay;
         int unsigned(iltick_delay) = def_iltick_delay;
