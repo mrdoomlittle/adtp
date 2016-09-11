@@ -70,6 +70,7 @@ void(external_mltick (adtp::io_service (* _this ) ) )
 
 int(main( ) )
 {
+    /*
     int unsigned dbuff_blocks = 2;
     adtp::dbint_t my_dbuff;
     int * block_0_data = new int [2];
@@ -110,6 +111,8 @@ int(main( ) )
         else
             std::cout << "Pointer Is Nulled" << std::endl;
     }
+    */
+
     adtp::io_service io_service (
         & set_digit_pin_mode,
         & set_digit_pin_state,

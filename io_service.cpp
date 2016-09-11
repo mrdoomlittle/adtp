@@ -20,7 +20,7 @@ adtp::io_service::io_service (
     external_mltick_ft(* __external_mltick_fptr ) )
 {
     if (__set_digit_pin_mode_fptr == nullptr) return;
-    if (__set_digit_pin_state_fptr == nullptr) return; 
+    if (__set_digit_pin_state_fptr == nullptr) return;
     if (__get_digit_pin_state_fptr == nullptr) return;
     if (__external_mlinit_fptr == nullptr) return;
     if (__external_mltick_fptr == nullptr) return;
@@ -40,11 +40,11 @@ adtp::io_service::io_service (
     (this-> digit_o_pin_ids [0] ) = def_digit_o_pin_id_0;
     (this-> digit_o_pin_ids [1] ) = def_digit_o_pin_id_1;
 
-    (this-> set_digit_pin_mode ( 
-        (this-> digit_clock_pin_id ), 
+    (this-> set_digit_pin_mode (
+        (this-> digit_clock_pin_id ),
         digit_pin_mode_input
     ) );
-    
+
     (this-> digit_o_bitset [0] ) = 1;
     (this-> digit_o_bitset [1] ) = 1;
     (this-> digit_o_bitset [2] ) = 0;
@@ -83,7 +83,7 @@ adtp::io_service::io_service (
 
         (this-> ibit_read_delay ) = def_ibit_read_delay;
         (this-> obit_write_delay ) = def_obit_write_delay;
-         
+
         (this-> ibit_read_delay ) = ( (this-> ibit_read_delay ) + ( ( (this-> ibyte_read_delay ) - 1) * ( (this-> i_bitset_size ) / (this-> digit_i_pin_count ) ) ) );
         (this-> obit_write_delay ) = ( (this-> obit_write_delay ) + ( ( (this-> obyte_write_delay ) - 1) * ( (this-> o_bitset_size ) / (this-> digit_o_pin_count ) ) ) );
 
@@ -91,11 +91,11 @@ adtp::io_service::io_service (
 
         if ( (this-> get_mltick_count( ) ) != 0 ) (this-> call_external_mltick (this ) );
 
-        for (int(x ) = 0; x != ( (this-> i_bitset_size ) / (this->digit_i_pin_count ) ); x ++ )
+        for (int unsigned(x ) = 0; x != ( (this-> i_bitset_size ) / (this->digit_i_pin_count ) ); x ++ )
                 std::cout << (this-> i_bitset_finished [x] );
         std::cout << " :IFBIT, ";
 
-        for (int(x ) = 0; x != ( (this-> o_bitset_size ) / (this->digit_o_pin_count ) ); x ++ )
+        for (int unsigned(x ) = 0; x != ( (this-> o_bitset_size ) / (this->digit_o_pin_count ) ); x ++ )
             std::cout << (this-> o_bitset_finished [x] );
         std::cout << " :OFBIT";
 
@@ -118,15 +118,15 @@ adtp::io_service::io_service (
                 std::cout << std::endl << std::endl;
 
                 for (int unsigned(x ) = 0; x != (this-> i_bitset_size ); x ++ )
-                    (this-> i_bitset_buffer).add_to_dbuff(&(this-> digit_i_bitset [x]), 2, 0, 0, 0, true, true, true);                
+                    (this-> i_bitset_buffer).add_to_dbuff(&(this-> digit_i_bitset [x]), 2, 0, 0, 0, true, true, true);
 
-               
+
                 if ( (this-> i_bitset_buff_pos ) == (this-> ibitset_buff_size ) - 1)
                     (this-> i_bitset_buff_pos ) = 0;
                 else
                     (this-> i_bitset_buff_pos ) ++;
 
-                for (int(x ) = 0; x != ( (this-> i_bitset_size ) / (this-> digit_i_pin_count ) ); x ++ )
+                for (int unsigned(x ) = 0; x != ( (this-> i_bitset_size ) / (this-> digit_i_pin_count ) ); x ++ )
                     (this-> i_bitset_finished [x] ) = false;
             }
         }
@@ -149,7 +149,7 @@ adtp::io_service::io_service (
 
                 std::cout << std::endl << std::endl;
 
-                for (int(x ) = 0; x != ( (this-> o_bitset_size ) / (this-> digit_o_pin_count ) ); x ++ )
+                for (int unsigned(x ) = 0; x != ( (this-> o_bitset_size ) / (this-> digit_o_pin_count ) ); x ++ )
                     (this-> o_bitset_finished [x] ) = false;
             }
         }
@@ -171,7 +171,7 @@ adtp::io_service::io_service (
 
                 if ( (this-> is_clock_reading (true) ) == true && (this-> ilclockp_toggled ) == false)
                 {
-                    (this-> ilclockn_tcount ) = 0; 
+                    (this-> ilclockn_tcount ) = 0;
                     (this-> ilclockn_toggled ) = false;
                     (this-> ilclockp_toggled ) = true;
                 }
@@ -196,7 +196,7 @@ adtp::io_service::io_service (
             (this-> temp_iltick_count ) = (this-> get_iltick_count( ) );
 
             (this-> set_iltick_count ( (this-> i_iltick_count ) ) );
-         
+
             if ( (this-> get_iltick_count( ) ) <= ( ((this-> digit_i_pin_count) - 1) + ((this-> ibit_read_delay) - 1) ) && ( (this-> get_iltick_count( ) ) ) >= ((this-> ibit_read_delay) - 1) )
             {
                 (this-> digit_i_buffer [(this-> digit_i_buffer_pos)] ) = (this-> get_digit_pin_state ( (this-> digit_i_pin_ids [(this-> digit_i_buffer_pos)] ) ) );
@@ -219,7 +219,7 @@ adtp::io_service::io_service (
                 {
                     for (int unsigned(i_bitset_pos ) = 0; i_bitset_pos != (this-> digit_i_pin_count ); i_bitset_pos ++)
                         (this-> digit_i_bitset [( (this-> i_bitset_fcount ) * (this-> digit_i_pin_count ) + i_bitset_pos)] ) = (this-> digit_i_buffer [i_bitset_pos] );
-                
+
                     if ( (this-> i_bitset_finished [(this-> i_bitset_fcount )] ) == false)
                         (this-> i_bitset_finished [(this-> i_bitset_fcount )] ) = true;
 
@@ -243,25 +243,25 @@ adtp::io_service::io_service (
                         (this-> o_bitset_finished [(this-> o_bitset_fcount )] ) = true;
 
                     if ( (this-> o_bitset_fcount ) == ( (this-> o_bitset_size ) / (this-> digit_o_pin_count ) ) - 1)
-                        (this-> o_bitset_fcount ) = 0; 
+                        (this-> o_bitset_fcount ) = 0;
                     else
                         (this-> o_bitset_fcount ) ++;
                 }
 
-                (this-> set_digit_pin_state ( 
-                    (this-> digit_o_pin_ids [(this-> digit_o_buffer_pos )] ), 
-                    (this-> digit_o_buffer [(this-> digit_o_buffer_pos )] ) 
+                (this-> set_digit_pin_state (
+                    (this-> digit_o_pin_ids [(this-> digit_o_buffer_pos )] ),
+                    (this-> digit_o_buffer [(this-> digit_o_buffer_pos )] )
                 ) );
 
                 if ( (this-> get_iltick_count( ) ) == ( ( ( (this-> digit_o_pin_count ) - 1) + (this-> obit_write_delay - 1) ) + (this-> obp_pcount_multiplier ) ) )
                 {
                     (this-> obp_pcount_multiplier ) += (this-> digit_o_pin_count );
                     (this-> digit_o_buffer_pos ) = 0;
-                    if ( (this-> get_iltick_count( ) ) == 0) 
+                    if ( (this-> get_iltick_count( ) ) == 0)
                         (this-> obp_pcount_multiplier ) = 0;
                 }
                 else
-                { 
+                {
                     (this-> digit_o_buffer_pos ) ++;
                     if ( (this-> obp_pcount_multiplier ) == (this-> digit_o_pin_count ) )
                         (this-> obp_pcount_multiplier ) = 0;
@@ -277,12 +277,12 @@ adtp::io_service::io_service (
                     (this-> i_iltick_count ) = 0;
                     (this-> o_iltick_count ) = 0;
                     break;
-                }       
-            } 
+                }
+            }
             else
             {
                 if ( (this-> i_iltick_count ) == ( (this-> digit_i_pin_count - 1) + (this-> ibit_read_delay - 1) ) )
-                { 
+                {
                     (this-> i_iltick_count ) = 0;
                     break;
                 }
@@ -291,9 +291,9 @@ adtp::io_service::io_service (
                 {
                     (this-> o_iltick_count ) = 0;
                     break;
-                } 
+                }
             }
-   
+
             (this-> reset_iltick_count( ) );
 
             (this-> i_iltick_count ) ++;
@@ -315,90 +315,134 @@ adtp::io_service::io_service (
         (this-> update_rmltick_count (1) );
     } while ( (this-> is_mloop_running (true) ) == true);
 }
-void (adtp::io_service::set_digit_pin_mode (uint8_t(__pin_id ), uint8_t(__pin_mode ) ) )
-{
-    (this-> set_digit_pin_mode_fptr (__pin_id, __pin_mode ) ); }
 
-void (adtp::io_service::set_digit_pin_state (uint8_t(__pin_id ), uint8_t(__pin_state ) ) )
+void
+(adtp::io_service::set_digit_pin_mode (uint8_t(__pin_id ), uint8_t(__pin_mode ) ) )
 {
-    (this-> set_digit_pin_state_fptr (__pin_id, __pin_state ) ); }
+    (this-> set_digit_pin_mode_fptr (__pin_id, __pin_mode ) );
+}
 
-bool (adtp::io_service::get_digit_pin_state (uint8_t(__pin_id ) ) )
+void
+(adtp::io_service::set_digit_pin_state (uint8_t(__pin_id ), uint8_t(__pin_state ) ) )
 {
-    return ( (this-> get_digit_pin_state_fptr (__pin_id ) ) == 1? true: false); }
+    (this-> set_digit_pin_state_fptr (__pin_id, __pin_state ) );
+}
 
-void (adtp::io_service::call_external_mlinit (io_service(* __class_ptr ) ) )
+bool
+(adtp::io_service::get_digit_pin_state (uint8_t(__pin_id ) ) )
 {
-    (this-> external_mlinit_fptr (__class_ptr ) ); }
+    return ( (this-> get_digit_pin_state_fptr (__pin_id ) ) == 1? true: false);
+}
 
-void (adtp::io_service::call_external_mltick (io_service(* __class_ptr ) ) )
+void
+(adtp::io_service::call_external_mlinit (io_service(* __class_ptr ) ) )
 {
-    (this-> external_mltick_fptr (__class_ptr ) ); }
+    (this-> external_mlinit_fptr (__class_ptr ) );
+}
 
-void (adtp::io_service::update_clock_ptcount (int unsigned(__update_amount ) ) )
-{ 
+void
+(adtp::io_service::call_external_mltick (io_service(* __class_ptr ) ) )
+{
+    (this-> external_mltick_fptr (__class_ptr ) );
+}
+
+void
+(adtp::io_service::update_clock_ptcount (int unsigned(__update_amount ) ) )
+{
     (this-> external_clock_ptcount ) += __update_amount; }
 
-void (adtp::io_service::update_clock_ntcount (int unsigned(__update_amount ) ) )  
+void
+(adtp::io_service::update_clock_ntcount (int unsigned(__update_amount ) ) )
 {
-    (this-> external_clock_ntcount ) += __update_amount; }
+    (this-> external_clock_ntcount ) += __update_amount;
+}
 
-void (adtp::io_service::set_clock_ptcount (int unsigned(__clock_ptcount ) ) )
+void
+(adtp::io_service::set_clock_ptcount (int unsigned(__clock_ptcount ) ) )
 {
-    (this-> external_clock_ptcount ) = __clock_ptcount; }
+    (this-> external_clock_ptcount ) = __clock_ptcount;
+}
 
-void (adtp::io_service::set_clock_ntcount (int unsigned(__clock_ntcount ) ) )
+void
+(adtp::io_service::set_clock_ntcount (int unsigned(__clock_ntcount ) ) )
 {
-    (this-> external_clock_ntcount ) = __clock_ntcount; }
+    (this-> external_clock_ntcount ) = __clock_ntcount;
+}
 
-bool (adtp::io_service::is_clock_reading (bool(__is_type ) ) )
+bool
+(adtp::io_service::is_clock_reading (bool(__is_type ) ) )
 {
-    return ( (this-> external_clock_reading ) == __is_type? true : false); }
+    return ( (this-> external_clock_reading ) == __is_type? true : false);
+}
 
-bool (adtp::io_service::is_external_clock (bool(__is_type ) ) )
+bool
+(adtp::io_service::is_external_clock (bool(__is_type ) ) )
 {
-    return ( (this-> get_digit_pin_state_fptr ( (this-> digit_clock_pin_id ) ) ) == __is_type? true : false); }
+    return ( (this-> get_digit_pin_state_fptr ( (this-> digit_clock_pin_id ) ) ) == __is_type? true : false);
+}
 
-void (adtp::io_service::toggle_mloop_state( ) )
+void
+(adtp::io_service::toggle_mloop_state( ) )
 {
-    (this-> service_mloop_running ) = (this-> service_mloop_running ) ? false : true; }
+    (this-> service_mloop_running ) = (this-> service_mloop_running ) ? false : true;
+}
 
-void (adtp::io_service::toggle_iloop_state( ) )
+void
+(adtp::io_service::toggle_iloop_state( ) )
 {
-    (this-> service_iloop_running ) = (this-> service_iloop_running ) ? false : true; }
+    (this-> service_iloop_running ) = (this-> service_iloop_running ) ? false : true;
+}
 
-void (adtp::io_service::update_clock_reading( ) )
+void
+(adtp::io_service::update_clock_reading( ) )
 {
-    (this-> external_clock_reading ) = (this-> get_digit_pin_state_fptr ( (this-> digit_clock_pin_id ) ) ) == 1? true : false; }
+    (this-> external_clock_reading ) = (this-> get_digit_pin_state_fptr ( (this-> digit_clock_pin_id ) ) ) == 1? true : false;
+}
 
-void (adtp::io_service::update_mltick_count (int unsigned(__update_amount ) ) )
+void
+(adtp::io_service::update_mltick_count (int unsigned(__update_amount ) ) )
 {
-    (this-> service_mltick_count ) += __update_amount; }
+    (this-> service_mltick_count ) += __update_amount;
+}
 
-void (adtp::io_service::update_iltick_count (int unsigned(__update_amount ) ) )
+void
+(adtp::io_service::update_iltick_count (int unsigned(__update_amount ) ) )
 {
-    (this-> service_iltick_count ) += __update_amount; }
+    (this-> service_iltick_count ) += __update_amount;
+}
 
-void (adtp::io_service::set_mltick_count (int unsigned(__mltick_count ) ) )
+void
+(adtp::io_service::set_mltick_count (int unsigned(__mltick_count ) ) )
 {
-    (this-> service_mltick_count ) = __mltick_count; }
+    (this-> service_mltick_count ) = __mltick_count;
+}
 
-void (adtp::io_service::set_iltick_count (int unsigned(__iltick_count ) ) )
+void
+(adtp::io_service::set_iltick_count (int unsigned(__iltick_count ) ) )
 {
-    (this-> service_iltick_count ) = __iltick_count; }
+    (this-> service_iltick_count ) = __iltick_count;
+}
 
-int unsigned (adtp::io_service::get_mltick_count( ) )
+int unsigned
+(adtp::io_service::get_mltick_count( ) )
 {
-    return (this-> service_mltick_count ); }
+    return (this-> service_mltick_count );
+}
 
-int unsigned (adtp::io_service::get_iltick_count( ) )
+int unsigned
+(adtp::io_service::get_iltick_count( ) )
 {
-    return (this-> service_iltick_count ); }
+    return (this-> service_iltick_count );
+}
 
-bool (adtp::io_service::is_mloop_running (bool(__is_type ) ) )
+bool
+(adtp::io_service::is_mloop_running (bool(__is_type ) ) )
 {
-    return ( (this-> service_mloop_running ) == __is_type? true : false); }
+    return ( (this-> service_mloop_running ) == __is_type? true : false);
+}
 
-bool (adtp::io_service::is_iloop_running (bool(__is_type ) ) )
+bool
+(adtp::io_service::is_iloop_running (bool(__is_type ) ) )
 {
-    return ( (this-> service_iloop_running ) == __is_type? true : false); }
+    return ( (this-> service_iloop_running ) == __is_type? true : false);
+}
