@@ -1,7 +1,7 @@
 # ifndef ARDUINO
 # include "io_service.hpp"
 # include <boost/cstdint.hpp>
-
+# include "bitset.hpp"
 # include <iostream>
 
 void(set_digit_pin_mode (uint8_t (__pin_id ), uint8_t (__pin_mode ) ) ) { }
@@ -58,6 +58,9 @@ void(external_mlinit (adtp::io_service (* _this ) ) )
 //int * * i_bitset = new int * [8];
 void(external_mltick (adtp::io_service (* _this ) ) )
 {
+    bitset test(21);
+
+    
 
     for (int x = 0; x != 8; x++)
         std::cout << unsigned(*_this-> get_i_bitset(0, x)) ;
