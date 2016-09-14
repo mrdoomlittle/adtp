@@ -43,7 +43,7 @@
     # define def_mltick_delay 300000
     # define def_iltick_delay 300000
 # else
-    # define def_mltick_delay 3000000
+    # define def_mltick_delay 9000000
     # define def_iltick_delay 3000000
 # endif
 
@@ -157,7 +157,6 @@ namespace adtp { class io_service
     public :
         dynamic_buffer <uint8_t> (i_bitset_buffer );
         int unsigned(i_bitset_buff_pos ) = 0;
-
     private :
         uint8_t
         (* digit_o_bitset ) = new uint8_t [o_bitset_size];

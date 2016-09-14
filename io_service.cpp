@@ -47,6 +47,7 @@ adtp::io_service::io_service (
         digit_pin_mode_input
     ) );
 
+    // this is for debugging
     (this-> digit_o_bitset [0] ) = 1;
     (this-> digit_o_bitset [1] ) = 1;
     (this-> digit_o_bitset [2] ) = 0;
@@ -96,6 +97,7 @@ adtp::io_service::io_service (
 # ifndef ARDUINO
         for (int unsigned(x ) = 0; x != ( (this-> i_bitset_size ) / (this->digit_i_pin_count ) ); x ++ )
                 std::cout << (this-> i_bitset_finished [x] );
+       
         std::cout << " :IFBIT, ";
 
         for (int unsigned(x ) = 0; x != ( (this-> o_bitset_size ) / (this->digit_o_pin_count ) ); x ++ )
@@ -122,10 +124,20 @@ adtp::io_service::io_service (
 # endif
                 for (int unsigned(x ) = 0; x != (this-> i_bitset_size ); x ++ )
                     (this-> i_bitset_buffer).add_to_dbuff(&(this-> digit_i_bitset [x]), 2, 0, 0, 0, true, true, true);
+            
+                for (int unsigned(x ) = 0; x != (this-> i_bitset_size ); x ++ )
+                    std::cout << "STATE: " << i_bitset_buffer.is_block_smarker(true, 0, x) << ", DBUFF_ID: " << x << std::endl;
 
-
+                std::cout << "DBUFF_POS: " << i_bitset_buff_pos << std::endl;
                 if ( (this-> i_bitset_buff_pos ) == (this-> ibitset_buff_size ) - 1)
+                {
+                    std::cout << "Delete/ing  BITSET DBUFF" << std::endl;
+                    /* this will mark the data in the buffer as free to use
+                    */
+                    for (int unsigned(x ) = 0; x != (this-> ibitset_buff_size ); x ++ )
+                        (this-> i_bitset_buffer).del_from_dbuffer(1, 0, x, 0);
                     (this-> i_bitset_buff_pos ) = 0;
+                }
                 else
                     (this-> i_bitset_buff_pos ) ++;
 

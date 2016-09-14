@@ -280,6 +280,12 @@ namespace adtp { template <typename __dbuff_type> class dynamic_buffer
         }
 
         void
+        (set_block_used_c (int unsigned(__block_used_c ), int unsigned(__sector_pos_id ), int unsigned(__block_pos_id ) ) )
+        {
+            (this-> block_used_c [(data_id::__main)] [(this-> get_block_arr_pos (__sector_pos_id, __block_pos_id) )]) = __block_used_c;
+        }
+
+        void
         (update_sector_free_c (int unsigned(__sector_pos_id ) ) )
         {
             if ( (this-> sector_free_c [(data_id::__main)] [(this-> get_sector_arr_pos (__sector_pos_id) )]) != 0)
@@ -292,6 +298,13 @@ namespace adtp { template <typename __dbuff_type> class dynamic_buffer
             if ( (this-> block_free_c [(data_id::__main)] [(this-> get_block_arr_pos (__sector_pos_id, __block_pos_id) )]) != 0)
                 (this-> block_free_c [(data_id::__main)] [(this-> get_block_arr_pos (__sector_pos_id, __block_pos_id) )]) --;
         }
+
+        void
+        (set_block_free_c (int unsigned(__block_free_c ), int unsigned(__sector_pos_id ), int unsigned(__block_pos_id ) ) )
+        {
+            (this-> block_free_c [(data_id::__main)] [(this-> get_block_arr_pos (__sector_pos_id, __block_pos_id) )]) = __block_free_c;
+        }
+
     public :
         int unsigned
         (get_sector_used_c (int unsigned(__sector_pos_id ) ) )
@@ -413,7 +426,7 @@ namespace adtp { template <typename __dbuff_type> class dynamic_buffer
         {
             (this-> block_ismarker [(data_id::__main)] [(this-> get_block_iarr_pos (__sector_pos_id, __block_pos_id, __block_ipos_id) )]) = __block_istate;
         }
-
+    public :
         bool
         (is_sector_smarker (bool(__is_type ), int unsigned(__sector_pos_id ) ) )
         {
@@ -431,6 +444,7 @@ namespace adtp { template <typename __dbuff_type> class dynamic_buffer
         {
             return ( (this-> block_ismarker [(data_id::__main)] [(this-> get_block_iarr_pos (__sector_pos_id, __block_pos_id, __block_ipos_id) )]) == __is_type? true : false);
         }
+    private :
 /*
         void
         (set_dbuff_sector (__dbuff_type (* * __sector_data ), int unsigned (__sector_pos_id ) ) )
@@ -477,6 +491,10 @@ namespace adtp { template <typename __dbuff_type> class dynamic_buffer
         void
         (del_dbuff_block (int unsigned (__sector_pos_id ), int unsigned(__block_pos_id ) ) )
         {
+            (this-> set_block_used_c (0, __sector_pos_id, __block_pos_id) );
+
+            (this-> set_block_free_c ((this-> block_inner_length - 1), __sector_pos_id, __block_pos_id) );
+
             (this-> set_block_smarker (state_marker::__free__, __sector_pos_id, __block_pos_id) );
 
             for (int unsigned (block_ipos_id ) = 0; block_ipos_id != (this-> block_inner_length); block_ipos_id ++)
