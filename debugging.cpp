@@ -52,12 +52,24 @@ int(get_digit_pin_state (uint8_t (__pin_id ) ) )
 
 void(external_mlinit (adtp::io_service (* _this ) ) )
 {
-
+   
 }
 
 //int * * i_bitset = new int * [8];
 void(external_mltick (adtp::io_service (* _this ) ) )
 {
+
+    for (int x = 0; x != 8; x++)
+        std::cout << unsigned(*_this-> get_i_bitset(0, x)) ;
+    std::cout << "####################" << std::endl;
+
+    _this-> flip_o_bitset();
+
+    for (int x = 0; x != 8; x++)
+        std::cout << unsigned(*_this-> get_i_bitset(0, x)) ;
+    std::cout << "####################" << std::endl;
+
+
     for (int x = 0; x != 8; x++)
     {
     for (int y = 0; y != 8; y++)

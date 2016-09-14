@@ -14,8 +14,6 @@
 * email: doctordoomlittle@gmail.com
 */
 
-// NOTE: put default defines into a diffrent hpp file
-
 /* example: if the start state is 0x0 then the clock will start ticking when changes to 0x1
 */
 # define def_clock_start_state 0x1
@@ -130,70 +128,32 @@ namespace adtp { class io_service
         enum sg_type : int unsigned { __individual = 0, __total_array = 1 } ;
         enum shift_direction : int unsigned { __right = 0, __left = 1 };
 
-        // NOTE: put o_bitset shift/flip/get/set funcs into cpp file
         void (shift_o_bitset(int unsigned(__direction), int unsigned(__shift_amount) ))
         {
-
-            switch (__direction)
+            for (int unsigned (y ) = 0; y != __shift_amount; y ++)
             {
-                case (shift_direction::__right):
-                    for (int unsigned (y ) = 0; y != __shift_amount; y ++)
-                        (this-> digit_o_bitset [(this-> o_bitset_size -1) - y]) = 0;
-            
-                    for (int unsigned (x ) = o_bitset_size-1; x != __shift_amount-1; x --)
-                        (this-> digit_o_bitset [x]) = (this-> digit_o_bitset [x-__shift_amount]);
-            
-                    for (int unsigned (y ) = 0; y != __shift_amount; y ++) (this-> digit_o_bitset [y]) = 0;
-                break;
-                case (shift_direction::__left):
-                    for (int unsigned (y ) = 0; y != __shift_amount; y ++) (this-> digit_o_bitset [y]) = 0;
+                (this-> digit_o_bitset [(this-> o_bitset_size -1) - y]) = 0;
+            }
 
-                    for (int unsigned (x ) = 0; x != o_bitset_size- __shift_amount; x ++)
-                        (this-> digit_o_bitset [x]) = (this-> digit_o_bitset [x+__shift_amount]);
-
-                    for (int unsigned (y ) = o_bitset_size-__shift_amount; y != o_bitset_size; y ++)
-                        (this-> digit_o_bitset [y]) = 0;
-                break;
-                default : return;
-           }
+            for (int unsigned (x ) = o_bitset_size-1; x != 0; x--)
+            {
+                (this-> digit_o_bitset [x]) = (this-> digit_o_bitset [x-__shift_amount]);
+            }
         }
    
         void (shift_i_bitset(int unsigned(__direction)))
         {
-            switch (__direction)
-            {
-                case (shift_direction::__right):
-                break;
-                case (shift_direction::__left):
-                break;
-                default : return;
-            } 
+            
         }
 
         void (flip_o_bitset())
         {
-            uint8_t * temp = new uint8_t[(this-> o_bitset_size)];
 
-            for (int unsigned(x ) = 0; x != (this-> o_bitset_size); x++)
-                temp[x] = (this-> digit_o_bitset [x]); 
-
-            for (int unsigned(x ) = 0; x != ((this-> o_bitset_size)); x++)
-                (this-> digit_o_bitset [x]) = temp[(o_bitset_size-1)-x];
-
-            delete[] temp;
         }
 
         void (flip_i_bitset())
         {
-            uint8_t * temp = new uint8_t[(this-> i_bitset_size)];
 
-            for (int unsigned(x ) = 0; x != (this-> i_bitset_size); x++)
-                temp[x] = (this-> digit_i_bitset [x]);
-
-            for (int unsigned(x ) = 0; x != ((this-> i_bitset_size)); x++)
-                (this-> digit_i_bitset [x]) = temp[(i_bitset_size-1)-x];
-
-            delete[] temp;    
         }
 
         void (set_o_bitset (int unsigned(__set_type), uint8_t(* __o_bitset ), int unsigned(__o_bitset_pos ) ) )
@@ -208,7 +168,8 @@ namespace adtp { class io_service
                         (this-> digit_o_bitset [x]) = __o_bitset [x];
                 break;
                 default : return;
-            }
+            } ;
+    
         }
 
         uint8_t (* get_o_bitset (int unsigned(__get_type), int unsigned(__i_bitset_pos)))
@@ -220,7 +181,7 @@ namespace adtp { class io_service
                 case (sg_type::__total_array):
                     return ((this-> digit_o_bitset));
                 default : return(nullptr);
-            }
+            } ;
         }
 
         void (set_i_bitset (int unsigned(__set_type), uint8_t(* __i_bitset ), int unsigned(__i_bitset_pos ) ) )
@@ -235,7 +196,7 @@ namespace adtp { class io_service
                         (this-> digit_i_bitset [x]) = __i_bitset [x];
                 break;
                 default : return;
-            }
+            } ;
         }
 
         uint8_t (* get_i_bitset (int unsigned(__get_type), int unsigned(__i_bitset_pos) ))
@@ -248,7 +209,7 @@ namespace adtp { class io_service
                 case (sg_type::__total_array):
                     return ((this-> digit_o_bitset));
                 default : return(nullptr);
-            }
+            } ;
         }
 
     private :

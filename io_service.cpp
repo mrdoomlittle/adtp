@@ -37,10 +37,11 @@ adtp::io_service::io_service (
     (this-> toggle_mloop_state( ) );
     (this-> toggle_iloop_state( ) );
 
-    (this-> digit_i_pin_ids [0] ) = def_digit_i_pin_id_0;
-    (this-> digit_i_pin_ids [1] ) = def_digit_i_pin_id_1;
-    (this-> digit_o_pin_ids [0] ) = def_digit_o_pin_id_0;
-    (this-> digit_o_pin_ids [1] ) = def_digit_o_pin_id_1;
+    for (int unsigned x = 0; x != digit_i_pin_count; x++)
+        (this-> digit_i_pin_ids [x] ) = (def_digit_i_pin_id [x]);
+
+    for (int unsigned x = 0; x != digit_o_pin_count; x++)
+        (this-> digit_o_pin_ids [x] ) = (def_digit_o_pin_id [x]);
 
     (this-> set_digit_pin_mode (
         (this-> digit_clock_pin_id ),
