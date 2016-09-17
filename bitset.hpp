@@ -9,7 +9,8 @@
 namespace adtp { template <typename __bitset_type> class bitset
 {
     public :
-        void (bitset_init (int unsigned(__bitset_length )))
+        void
+        (bitset_init (int unsigned(__bitset_length )))
         {
             if (__bitset_length < 1) return;
 
@@ -26,7 +27,8 @@ namespace adtp { template <typename __bitset_type> class bitset
             (this-> bitset_list).darr_init(__bitset_length, 1/*depth of array*/);
         }
     
-        void (set_bitset(__bitset_type(* __bitset), int unsigned(__set_type), int unsigned(__ibitset_arr_pos)))
+        void
+        (set_bitset(__bitset_type(* __bitset), int unsigned(__set_type), int unsigned(__ibitset_arr_pos)))
         {
             switch(__set_type)
             {
@@ -43,7 +45,8 @@ namespace adtp { template <typename __bitset_type> class bitset
             }
         }
 
-        __bitset_type(* get_bitset(int unsigned(__get_type), int unsigned(__ibitset_arr_pos)))
+        __bitset_type
+        (* get_bitset(int unsigned(__get_type), int unsigned(__ibitset_arr_pos)))
         {   
             switch(__get_type)
             {
@@ -59,7 +62,8 @@ namespace adtp { template <typename __bitset_type> class bitset
             }
         }
 
-        void (shift_bitset(int unsigned(__shift_direction), int unsigned(__shift_amount) )) 
+        void
+        (shift_bitset(int unsigned(__shift_direction), int unsigned(__shift_amount) )) 
         {
             switch (__shift_direction)
             {
@@ -100,7 +104,8 @@ namespace adtp { template <typename __bitset_type> class bitset
             }
         }
 
-        void (flip_bitset())
+        void
+        (flip_bitset())
         {
             for (int unsigned(x ) = 0; x != (this-> bitset_length); x++)
                  (this-> bitset_temp).set_darr_ilayer((this-> bitset_list).get_darr_ilayer(0, x), 0, x);

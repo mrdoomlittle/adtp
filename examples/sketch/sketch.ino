@@ -1,16 +1,19 @@
 # include <io_service.h>
 
-void (set_digit_pin_mode (uint8_t(__pin_id ), uint8_t(__pin_mode ) ) )
+void
+(set_digit_pin_mode (uint8_t(__pin_id ), uint8_t(__pin_mode ) ) )
 {
     pinMode (__pin_id, __pin_mode);
 }
 
-void (set_digit_pin_state (uint8_t(__pin_id ), uint8_t(__pin_state ) ) )
+void
+(set_digit_pin_state (uint8_t(__pin_id ), uint8_t(__pin_state ) ) )
 {
     digitalWrite (__pin_id, __pin_state);
 }
 
-int (get_digit_pin_state (uint8_t(__pin_id ) ) )
+int
+(get_digit_pin_state (uint8_t(__pin_id ) ) )
 {
     return (digitalRead (__pin_id) );
 }
@@ -21,19 +24,22 @@ int (get_digit_pin_state (uint8_t(__pin_id ) ) )
 
 bool(indicator_led_state ) = false;
 
-void (toggle_iled_state ( ) )
+void
+(toggle_iled_state ( ) )
 {
     indicator_led_state = (indicator_led_state == false? true : false);
 }
 
 # endif
 
-void (external_mlinit (adtp::io_service(* _this ) ) )
+void
+(external_mlinit (adtp::io_service(* _this ) ) )
 {
 
 }
 
-void (external_mltick (adtp::io_service(* _this ) ) )
+void
+(external_mltick (adtp::io_service(* _this ) ) )
 {
 # if LED_INDICATOR == true
     pinMode (13, OUTPUT);
@@ -49,9 +55,11 @@ void (external_mltick (adtp::io_service(* _this ) ) )
     if (serialEventRun) serialEventRun( );
 }
 
-void (setup( ) )
+void
+(setup( ) )
 {
-    adtp::io_service io_service (
+    adtp::io_service io_service 
+    (
         & set_digit_pin_mode,
         & set_digit_pin_state,
         & get_digit_pin_state,
@@ -60,7 +68,8 @@ void (setup( ) )
     );
 }
 
-void (loop( ) )
+void
+(loop( ) )
 {
 // ignore this function as it will not be called
 // untill the io_service main loop it exited

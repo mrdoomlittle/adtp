@@ -1,29 +1,36 @@
 # ifndef ARDUINO
+
 # include "io_service.hpp"
+
 # include <boost/cstdint.hpp>
+
 # include "bitset.hpp"
+
 # include <iostream>
+
 # include "dynamic_array.hpp"
 
+void
+(set_digit_pin_mode (uint8_t (__pin_id ), uint8_t (__pin_mode ) ) ) { }
 
-void(set_digit_pin_mode (uint8_t (__pin_id ), uint8_t (__pin_mode ) ) ) { }
+void
+(set_digit_pin_state (uint8_t (__pin_id ), uint8_t (__pin_state ) ) ) { }
 
-void(set_digit_pin_state (uint8_t (__pin_id ), uint8_t (__pin_state ) ) ) { }
-
-int unsigned (simulated_pin_state_i [3] [8]) = {
+int unsigned(simulated_pin_state_i [3] [8]) = {
     {0x1, 0x0, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}, {0x1, 0x1, 0x0, 0x1, 0x1, 0x1, 0x1, 0x1},
     {0x1, 0x1, 0x1, 0x0, 0x1, 0x1, 0x1, 0x1}/*, {0x1, 0x1, 0x1, 0x1, 0x0, 0x1, 0x1, 0x1} */} ;
 
-int unsigned (simulated_pin_state_c [10]) = {0x1, 0x0, 0x1, 0x0, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1} ;
+int unsigned(simulated_pin_state_c [10]) = {0x1, 0x0, 0x1, 0x0, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1} ;
 
-int unsigned (simulated_return_i ) = 0;
-int unsigned (current_pin_pos_i ) = 0;
-int unsigned (current_arr_pos ) = 0;
+int unsigned(simulated_return_i ) = 0;
+int unsigned(current_pin_pos_i ) = 0;
+int unsigned(current_arr_pos ) = 0;
 
-int unsigned (simulated_return_c ) = 0;
-int unsigned (current_pin_pos_c ) = 0;
+int unsigned(simulated_return_c ) = 0;
+int unsigned(current_pin_pos_c ) = 0;
 
-int(get_digit_pin_state (uint8_t (__pin_id ) ) )
+int
+(get_digit_pin_state (uint8_t(__pin_id ) ) )
 {
     if (__pin_id == 2 || __pin_id == 3)
     {
@@ -52,12 +59,14 @@ int(get_digit_pin_state (uint8_t (__pin_id ) ) )
     } return 0;
 }
 
-void(external_mlinit (adtp::io_service (* _this ) ) )
+void
+(external_mlinit (adtp::io_service(* _this ) ) )
 {
 
 }
 
-void(external_mltick (adtp::io_service (* _this ) ) )
+void
+(external_mltick (adtp::io_service(* _this ) ) )
 {
     for (int unsigned (x ) = 0; x != 8; x ++)
         std::cout << unsigned(* _this-> get_io_bitset(0, 0, x));
@@ -70,27 +79,26 @@ void(external_mltick (adtp::io_service (* _this ) ) )
 
     std::cout << "/O::BITSET\n" << std::endl;
 
-    for (int x = 0; x != 8; x++)
+    for (int unsigned(x ) = 0; x != 8; x ++)
     {
-    for (int y = 0; y != 8; y++)
-    {
-    std::cout << unsigned(*_this-> i_bitset_buffer.get_from_dbuff(2, 0, x, y, false, false, false, true));
+        for (int unsigned(y ) = 0; y != 8; y ++)
+            std::cout << unsigned(*_this-> i_bitset_buffer.get_from_dbuff(2, 0, x, y, false, false, false, true));
 
+        std::cout << std::endl;
     }
-    std::cout << std::endl;
-    }
-
 }
 
-int(main( ) )
+int
+(main( ) )
 {
-    adtp::io_service io_service (
+    adtp::io_service io_service
+    (
         & set_digit_pin_mode,
         & set_digit_pin_state,
         & get_digit_pin_state,
         & external_mlinit,
-        & external_mltick );
-
-
+        & external_mltick
+    );
 }
-# endif
+
+# endif /*ARDUINO*/

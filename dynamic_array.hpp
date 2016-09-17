@@ -9,7 +9,8 @@
 namespace adtp { template <typename __darr_type> class dynamic_array
 {
     public :
-        void (darr_init (int unsigned(__darr_length), int unsigned(__darr_depth ) ) )
+        void
+        (darr_init (int unsigned(__darr_length), int unsigned(__darr_depth ) ) )
         {
             if ((this-> is_darr_init(true)) == true) return;
             if (__darr_length < 1 || __darr_depth < 1) return;
@@ -22,25 +23,29 @@ namespace adtp { template <typename __darr_type> class dynamic_array
             (this-> toggle_darr_init());
         }
 
-        void(set_darr_ilayer(__darr_type(* __ilayer_data), int unsigned(__layer_arr_pos), int unsigned(__ilayer_arr_pos)))
+        void
+        (set_darr_ilayer(__darr_type(* __ilayer_data), int unsigned(__layer_arr_pos), int unsigned(__ilayer_arr_pos)))
         {
             /* we might need to apply somthing to dected if this is not a independent var
             */
             (this-> darr_ilayers [(data_id::__main)] [(__layer_arr_pos * (this-> darr_length)) + __ilayer_arr_pos]) = *__ilayer_data; 
         }
 
-        __darr_type(* get_darr_ilayer(int unsigned(__layer_arr_pos), int unsigned(__ilayer_arr_pos)))
+        __darr_type
+        (* get_darr_ilayer(int unsigned(__layer_arr_pos), int unsigned(__ilayer_arr_pos)))
         {
             return (& (this-> darr_ilayers [(data_id::__main)] [(__layer_arr_pos * (this-> darr_length)) + __ilayer_arr_pos]));
         }
 
-        void(set_darr_layer(__darr_type(* __layer_data), int unsigned(__layer_arr_pos)))
+        void
+        (set_darr_layer(__darr_type(* __layer_data), int unsigned(__layer_arr_pos)))
         {
             for (int unsigned(ilayer_arr_pos) = 0; ilayer_arr_pos != (this-> darr_length); ilayer_arr_pos ++)
                 (this-> set_darr_ilayer((& __layer_data [ilayer_arr_pos]), __layer_arr_pos, ilayer_arr_pos));
         }
 
-        __darr_type(* get_darr_layer(int unsigned(__layer_arr_pos)))
+        __darr_type
+        (* get_darr_layer(int unsigned(__layer_arr_pos)))
         {
             if ((this-> darr_layer_tmp) != nullptr )
             {
@@ -60,18 +65,21 @@ namespace adtp { template <typename __darr_type> class dynamic_array
         // NOTE: add functions to resize the array
 
         dynamic_array() {}
+
         ~dynamic_array()
         {
             std::free(this-> darr_ilayers);
             std::free(this-> darr_layer_tmp);
         }
 
-        void(toggle_darr_init())
+        void
+        (toggle_darr_init())
         {
             (this-> has_darr_init ) = (this-> has_darr_init ) == true? false : true;
         }
 
-        bool(is_darr_init(bool(__is_type)))
+        bool
+        (is_darr_init(bool(__is_type)))
         {
             return (this-> has_darr_init ) == __is_type? true : false;
         }
@@ -81,11 +89,7 @@ namespace adtp { template <typename __darr_type> class dynamic_array
     
         bool(has_darr_init ) = false;
 
-        enum data_id : const int unsigned
-        {
-            __main = 0,
-            __swap = 1
-        } ;
+        enum data_id : const int unsigned { __main = 0, __swap = 1 } ;
 
         int unsigned(darr_length ) = 0;
         int unsigned(darr_depth ) = 0;
