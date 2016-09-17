@@ -89,9 +89,9 @@ adtp::io_service::io_service (
         (this-> update_clock_reading( ) );
       
         // this might be moved or changed 
-        (this-> set_io_bitset((bitset_id::__i_bitset), (this-> get_i_bitset((sg_type::__total_array), 0)), (sg_type::__total_array), 0));
+        //(this-> set_io_bitset((bitset_id::__i_bitset), (this-> get_i_bitset((sg_type::__total_array), 0)), (sg_type::__total_array), 0));
 
-        (this-> set_o_bitset( (this-> get_io_bitset((bitset_id::__o_bitset), (sg_type::__total_array), 0)), (sg_type::__total_array), 0));
+        //(this-> set_o_bitset( (this-> get_io_bitset((bitset_id::__o_bitset), (sg_type::__total_array), 0)), (sg_type::__total_array), 0));
  
         (this-> ibit_read_delay ) = def_ibit_read_delay;
         (this-> obit_write_delay ) = def_obit_write_delay;
@@ -140,11 +140,11 @@ adtp::io_service::io_service (
                 std::cout << "DBUFF_POS: " << i_bitset_buff_pos << std::endl;
                 if ( (this-> i_bitset_buff_pos ) == (this-> ibitset_buff_size ) - 1)
                 {
-                    std::cout << "Delete/ing  BITSET DBUFF" << std::endl;
+                    //std::cout << "Delete/ing  BITSET DBUFF" << std::endl;
                     /* this will mark the data in the buffer as free to use
                     */
-                    for (int unsigned(x ) = 0; x != (this-> ibitset_buff_size ); x ++ )
-                        (this-> i_bitset_buffer).del_from_dbuffer(1, 0, x, 0);
+                    //for (int unsigned(x ) = 0; x != (this-> ibitset_buff_size ); x ++ )
+                    //    (this-> i_bitset_buffer).del_from_dbuffer(1, 0, x, 0);
                     (this-> i_bitset_buff_pos ) = 0;
                 }
                 else

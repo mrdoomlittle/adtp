@@ -236,7 +236,7 @@ namespace adtp { class io_service
                         default : return;
                     }
 
-                break;
+               break;
                 case (bitset_id::__o_bitset) :
                     switch(__shift_direction)
                     {
