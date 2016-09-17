@@ -63,7 +63,7 @@ void(external_mltick (adtp::io_service (* _this ) ) )
     //bitset test(21);
 
     
-
+/*
     for (int x = 0; x != 8; x++)
         std::cout << unsigned(*_this-> get_i_bitset(0, x)) ;
     std::cout << "####################" << std::endl;
@@ -73,7 +73,14 @@ void(external_mltick (adtp::io_service (* _this ) ) )
     for (int x = 0; x != 8; x++)
         std::cout << unsigned(*_this-> get_i_bitset(0, x)) ;
     std::cout << "####################" << std::endl;
-
+*/
+   
+    for (int unsigned (x ) = 0; x != 8; x ++)
+    {
+        std::cout << * _this-> get_io_bitset(0, 0, x);
+    }
+      
+    std::cout << "/IO::BITSET\n" << std::endl;
 
     for (int x = 0; x != 8; x++)
     {
@@ -89,6 +96,7 @@ void(external_mltick (adtp::io_service (* _this ) ) )
 
 int(main( ) )
 {
+/* this code is for debugging stuff
     adtp::dynamic_array <int> arr;
 
 
@@ -125,7 +133,7 @@ int(main( ) )
     for (int unsigned (x) = 0; x != 4; x ++)
        std::cout << "BIT: " << x << " : " << *bit_.get_bitset(0, x) << std::endl;
 
-    /*
+    
     int unsigned dbuff_blocks = 2;
     adtp::dbint_t my_dbuff;
     int * block_0_data = new int [2];
@@ -167,7 +175,7 @@ int(main( ) )
             std::cout << "Pointer Is Nulled" << std::endl;
     }
     */
-/*
+
     adtp::io_service io_service (
         & set_digit_pin_mode,
         & set_digit_pin_state,
@@ -175,6 +183,6 @@ int(main( ) )
         & external_mlinit,
         & external_mltick );
 
-*/
+
 }
 # endif

@@ -2,6 +2,9 @@
 # define __bitset__hpp__
 # include <iostream>
 # include "dynamic_array.hpp"
+
+/* move to cpp file
+*/
 namespace adtp { class bitset
 {
     public :
