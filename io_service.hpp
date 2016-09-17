@@ -142,8 +142,9 @@ namespace adtp { class io_service
             __i_bitset = 0,
             __o_bitset = 1
         } ;
+        typedef uint8_t __bitset_type; 
 
-        void (set_io_bitset(int unsigned(__bitset_id), int unsigned(* __io_bitset), int unsigned(__set_type), int unsigned(__ibitset_arr_pos)))
+        void (set_io_bitset(int unsigned(__bitset_id), __bitset_type(* __io_bitset), int unsigned(__set_type), int unsigned(__ibitset_arr_pos)))
         {
             switch(__bitset_id)
             {
@@ -177,7 +178,7 @@ namespace adtp { class io_service
             }
         }
 
-        int unsigned (* get_io_bitset(int unsigned(__bitset_id), int unsigned(__get_type), int unsigned(__ibitset_arr_pos)))
+        __bitset_type (* get_io_bitset(int unsigned(__bitset_id), int unsigned(__get_type), int unsigned(__ibitset_arr_pos)))
         {
             switch(__bitset_id)
             {
@@ -268,9 +269,74 @@ namespace adtp { class io_service
                 default : return;
             }
         }
-
     private :
-        bitset(* digit_io_bitset ) = new bitset [2];
+        void (set_i_bitset(uint8_t(* __i_bitset), int unsigned(__set_type), int unsigned(__bitset_arr_pos)))
+        {
+            switch(__set_type)
+            {
+                case (sg_type::__individual) :
+                    (this-> digit_i_bitset [__bitset_arr_pos]) = * __i_bitset; 
+                    break;
+
+                case (sg_type::__total_array) :
+                    for (int unsigned(bitset_arr_pos ) = 0; bitset_arr_pos != (this-> i_bitset_size); bitset_arr_pos ++)
+                        (this-> set_i_bitset(&__i_bitset[bitset_arr_pos], (sg_type::__individual), bitset_arr_pos));
+
+                    break;
+
+                default : return;
+            }
+        }
+
+        uint8_t (* get_i_bitset(int unsigned(__get_type), int unsigned(__bitset_arr_pos)))
+        {
+            switch(__get_type)
+            {
+                case (sg_type::__individual) :
+                    return(&(this-> digit_i_bitset [__bitset_arr_pos]));
+                    break;
+
+                case (sg_type::__total_array) :
+                    return((this-> digit_i_bitset)); break;
+
+                default : return(nullptr);
+            }
+        }
+        
+        void (set_o_bitset(uint8_t(* __o_bitset), int unsigned(__set_type), int unsigned(__bitset_arr_pos)))
+        {
+            switch(__set_type)
+            {
+                case (sg_type::__individual) :
+                    (this-> digit_o_bitset [__bitset_arr_pos]) = * __o_bitset;
+                    break;
+                
+                case (sg_type::__total_array) :
+                    for (int unsigned(bitset_arr_pos ) = 0; bitset_arr_pos != (this-> o_bitset_size); bitset_arr_pos ++)
+                        (this-> set_o_bitset(&__o_bitset[bitset_arr_pos], (sg_type::__individual), bitset_arr_pos));
+
+                    break;
+    
+                default : return;
+            }
+        }
+
+        uint8_t (* get_o_bitset(int unsigned(__get_type), int unsigned(__bitset_arr_pos)))
+        {
+            switch(__get_type)
+            {
+                case (sg_type::__individual) :
+                    return(&(this-> digit_o_bitset [__bitset_arr_pos]));
+                    break;
+                
+                case (sg_type::__total_array) :
+                    return((this-> digit_o_bitset)); break;
+
+                default : return(nullptr);
+            }
+        }
+
+        bitset <__bitset_type> (* digit_io_bitset ) = new bitset <__bitset_type> [2];
 
         uint8_t
         (* digit_o_bitset ) = new uint8_t [o_bitset_size];

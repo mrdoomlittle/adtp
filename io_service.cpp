@@ -87,7 +87,12 @@ adtp::io_service::io_service (
         (this-> set_mltick_count ( (this-> real_mltick_count ) ) );
 
         (this-> update_clock_reading( ) );
+      
+        // this might be moved or changed 
+        (this-> set_io_bitset((bitset_id::__i_bitset), (this-> get_i_bitset((sg_type::__total_array), 0)), (sg_type::__total_array), 0));
 
+        (this-> set_o_bitset( (this-> get_io_bitset((bitset_id::__o_bitset), (sg_type::__total_array), 0)), (sg_type::__total_array), 0));
+ 
         (this-> ibit_read_delay ) = def_ibit_read_delay;
         (this-> obit_write_delay ) = def_obit_write_delay;
 

@@ -5,7 +5,8 @@
 
 /* move to cpp file
 */
-namespace adtp { class bitset
+
+namespace adtp { template <typename __bitset_type> class bitset
 {
     public :
         void (bitset_init (int unsigned(__bitset_length )))
@@ -25,7 +26,7 @@ namespace adtp { class bitset
             (this-> bitset_list).darr_init(__bitset_length, 1/*depth of array*/);
         }
     
-        void (set_bitset(int unsigned(* __bitset), int unsigned(__set_type), int unsigned(__ibitset_arr_pos)))
+        void (set_bitset(__bitset_type(* __bitset), int unsigned(__set_type), int unsigned(__ibitset_arr_pos)))
         {
             switch(__set_type)
             {
@@ -42,7 +43,7 @@ namespace adtp { class bitset
             }
         }
 
-        int unsigned(* get_bitset(int unsigned(__get_type), int unsigned(__ibitset_arr_pos)))
+        __bitset_type(* get_bitset(int unsigned(__get_type), int unsigned(__ibitset_arr_pos)))
         {   
             switch(__get_type)
             {
@@ -67,7 +68,7 @@ namespace adtp { class bitset
                     {
                         (this-> bitset_right).set_darr_ilayer((this-> bitset_list).get_darr_ilayer(0, (((this-> bitset_length) - __shift_amount) + y)), 0, y);
                 
-                        int unsigned temp = 0;
+                        __bitset_type temp = 0;
                         (this-> bitset_list).set_darr_ilayer(&temp, 0, (((this-> bitset_length) - __shift_amount) + y)); 
                     }
                     
@@ -83,7 +84,7 @@ namespace adtp { class bitset
                     {
                         (this-> bitset_left).set_darr_ilayer((this-> bitset_list).get_darr_ilayer(0, y), 0, (((this-> bitset_length) - __shift_amount) + y) );
 
-                        int unsigned temp = 0;
+                        __bitset_type temp = 0;
                         (this-> bitset_list).set_darr_ilayer(&temp, 0, y);
                     }
         
@@ -117,10 +118,10 @@ namespace adtp { class bitset
         int unsigned(max_right_shift) = 0;
         int unsigned(max_left_shift) = 0;
 
-        dynamic_array <int unsigned> bitset_right;
-        dynamic_array <int unsigned> bitset_left;
-        dynamic_array <int unsigned> bitset_temp;
-        dynamic_array <int unsigned> bitset_list;
+        dynamic_array <__bitset_type> bitset_right;
+        dynamic_array <__bitset_type> bitset_left;
+        dynamic_array <__bitset_type> bitset_temp;
+        dynamic_array <__bitset_type> bitset_list;
 } ; }
 
 # endif /*__bitset__hpp__*/

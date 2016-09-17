@@ -74,13 +74,17 @@ void(external_mltick (adtp::io_service (* _this ) ) )
         std::cout << unsigned(*_this-> get_i_bitset(0, x)) ;
     std::cout << "####################" << std::endl;
 */
-   
+  
     for (int unsigned (x ) = 0; x != 8; x ++)
-    {
-        std::cout << * _this-> get_io_bitset(0, 0, x);
-    }
+        std::cout << unsigned(* _this-> get_io_bitset(0, 0, x));
+    
       
-    std::cout << "/IO::BITSET\n" << std::endl;
+    std::cout << "/I::BITSET\n" << std::endl;
+
+    for (int unsigned (x ) = 0; x != 8; x ++)
+        std::cout << unsigned(* _this-> get_io_bitset(1, 0, x));
+
+    std::cout << "/O::BITSET\n" << std::endl;
 
     for (int x = 0; x != 8; x++)
     {
