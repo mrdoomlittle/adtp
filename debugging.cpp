@@ -3,6 +3,8 @@
 # include <boost/cstdint.hpp>
 # include "bitset.hpp"
 # include <iostream>
+# include "dynamic_array.hpp"
+
 
 void(set_digit_pin_mode (uint8_t (__pin_id ), uint8_t (__pin_mode ) ) ) { }
 
@@ -58,7 +60,7 @@ void(external_mlinit (adtp::io_service (* _this ) ) )
 //int * * i_bitset = new int * [8];
 void(external_mltick (adtp::io_service (* _this ) ) )
 {
-    bitset test(21);
+    //bitset test(21);
 
     
 
@@ -87,6 +89,42 @@ void(external_mltick (adtp::io_service (* _this ) ) )
 
 int(main( ) )
 {
+    adtp::dynamic_array <int> arr;
+
+
+    arr.darr_init(2,10);
+
+    int * test = new int [2];
+    test[0] = 11;
+    test[1] = 21;
+
+    arr.set_darr_layer(test, 0);
+
+    int * ttt;
+
+    ttt = arr.get_darr_layer(0);
+
+    for (int x = 0; x != 2; x ++)
+        std::cout << ttt[x] << std::endl;
+
+    adtp::bitset bit_;
+
+    bit_.bitset_init(4);
+
+    int unsigned * bits = new int unsigned [4];
+    bits[0] = 1;
+    bits[1] = 2;
+    bits[2] = 3;
+    bits[3] = 4;
+
+    bit_.set_bitset(bits, 1, 0);
+
+    bit_.shift_bitset(1, 2);
+    bit_.shift_bitset(0, 2);
+
+    for (int unsigned (x) = 0; x != 4; x ++)
+       std::cout << "BIT: " << x << " : " << *bit_.get_bitset(0, x) << std::endl;
+
     /*
     int unsigned dbuff_blocks = 2;
     adtp::dbint_t my_dbuff;
@@ -129,12 +167,14 @@ int(main( ) )
             std::cout << "Pointer Is Nulled" << std::endl;
     }
     */
-
+/*
     adtp::io_service io_service (
         & set_digit_pin_mode,
         & set_digit_pin_state,
         & get_digit_pin_state,
         & external_mlinit,
         & external_mltick );
+
+*/
 }
 # endif
