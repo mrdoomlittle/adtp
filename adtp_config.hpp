@@ -25,7 +25,7 @@ constexpr int def_digit_o_pin_id [2] = {4, 5};
     # define def_mltick_delay 300000
     # define def_iltick_delay 300000
 # else
-    # define def_mltick_delay 9000000
+    # define def_mltick_delay 3000000
     # define def_iltick_delay 3000000
 # endif
 

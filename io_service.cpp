@@ -58,11 +58,13 @@ adtp::io_service::io_service (
     (this-> digit_o_bitset [6] ) = 1;
     (this-> digit_o_bitset [7] ) = 1;
 
+    // IO bitset of 8 (00000000)
     (this-> digit_io_bitset [(bitset_id::__i_bitset)]).bitset_init((this-> i_bitset_size));
     (this-> digit_io_bitset [(bitset_id::__o_bitset)]).bitset_init((this-> o_bitset_size));
 
-    (this-> i_bitset_buffer).dbuff_init(1, (this-> ibitset_buff_size), (this-> i_bitset_size));
-    (this-> o_bitset_buffer).dbuff_init(1, (this-> obitset_buff_size), (this-> o_bitset_size));
+    // IO bitset Buffer
+    (this-> i_bitset_buffer).dbuff_init(1/*sectors of data*/, (this-> ibitset_buff_size), (this-> i_bitset_size));
+    (this-> o_bitset_buffer).dbuff_init(1/*sectors of data*/, (this-> obitset_buff_size), (this-> o_bitset_size));
 
     if ( (this-> clock_start_state ) == digit_pin_state_high )
     {
@@ -87,26 +89,27 @@ adtp::io_service::io_service (
         (this-> set_mltick_count ( (this-> real_mltick_count ) ) );
 
         (this-> update_clock_reading( ) );
-      
-        // this might be moved or changed 
+
+        // this might be moved or changed
         //(this-> set_io_bitset((bitset_id::__i_bitset), (this-> get_i_bitset((sg_type::__total_array), 0)), (sg_type::__total_array), 0));
 
         //(this-> set_o_bitset( (this-> get_io_bitset((bitset_id::__o_bitset), (sg_type::__total_array), 0)), (sg_type::__total_array), 0));
- 
+
         (this-> ibit_read_delay ) = def_ibit_read_delay;
         (this-> obit_write_delay ) = def_obit_write_delay;
 
         (this-> ibit_read_delay ) = ( (this-> ibit_read_delay ) + ( ( (this-> ibyte_read_delay ) - 1) * ( (this-> i_bitset_size ) / (this-> digit_i_pin_count ) ) ) );
         (this-> obit_write_delay ) = ( (this-> obit_write_delay ) + ( ( (this-> obyte_write_delay ) - 1) * ( (this-> o_bitset_size ) / (this-> digit_o_pin_count ) ) ) );
 
-        if ( (this-> get_mltick_count( ) ) == 0 ) (this-> call_external_mlinit (this ) );
+        if ( (this-> get_mltick_count( ) ) == 0 ) 
+            (this-> call_external_mlinit (this ) );
 
-        if ( (this-> get_mltick_count( ) ) != 0 ) (this-> call_external_mltick (this ) );
+        (this-> call_external_mltick (this ) );
 
 # ifndef ARDUINO
         for (int unsigned(x ) = 0; x != ( (this-> i_bitset_size ) / (this->digit_i_pin_count ) ); x ++ )
                 std::cout << (this-> i_bitset_finished [x] );
-       
+
         std::cout << " :IFBIT, ";
 
         for (int unsigned(x ) = 0; x != ( (this-> o_bitset_size ) / (this->digit_o_pin_count ) ); x ++ )
@@ -133,22 +136,24 @@ adtp::io_service::io_service (
 # endif
                 for (int unsigned(x ) = 0; x != (this-> i_bitset_size ); x ++ )
                     (this-> i_bitset_buffer).add_to_dbuff(&(this-> digit_i_bitset [x]), 2, 0, 0, 0, true, true, true);
-            
+
                 for (int unsigned(x ) = 0; x != (this-> i_bitset_size ); x ++ )
                     std::cout << "STATE: " << i_bitset_buffer.is_block_smarker(true, 0, x) << ", DBUFF_ID: " << x << std::endl;
-
+               
+                
+ 
                 std::cout << "DBUFF_POS: " << i_bitset_buff_pos << std::endl;
-                if ( (this-> i_bitset_buff_pos ) == (this-> ibitset_buff_size ) - 1)
+                if ( (this-> i_bitset_buff_pos[0] ) == (this-> ibitset_buff_size ) - 1)
                 {
                     //std::cout << "Delete/ing  BITSET DBUFF" << std::endl;
                     /* this will mark the data in the buffer as free to use
                     */
                     //for (int unsigned(x ) = 0; x != (this-> ibitset_buff_size ); x ++ )
                     //    (this-> i_bitset_buffer).del_from_dbuffer(1, 0, x, 0);
-                    (this-> i_bitset_buff_pos ) = 0;
+                    (this-> i_bitset_buff_pos[0] ) = 0;
                 }
                 else
-                    (this-> i_bitset_buff_pos ) ++;
+                    (this-> i_bitset_buff_pos[0] ) ++;
 
                 for (int unsigned(x ) = 0; x != ( (this-> i_bitset_size ) / (this-> digit_i_pin_count ) ); x ++ )
                     (this-> i_bitset_finished [x] ) = false;
@@ -175,6 +180,40 @@ adtp::io_service::io_service (
 # endif
                 for (int unsigned(x ) = 0; x != ( (this-> o_bitset_size ) / (this-> digit_o_pin_count ) ); x ++ )
                     (this-> o_bitset_finished [x] ) = false;
+           
+                //for (int unsigned(x ) = 0; x != (this-> obitset_buff_size ); x++ )
+                //{
+                    if ((this-> o_bitset_buffer).is_block_smarker(true, 0, (this-> o_bitset_buff_pos[0] )) == true)
+                    {
+                        for (int unsigned x = 0; x != 8; x ++)
+                            (this-> digit_o_bitset [x]) = * (this-> o_bitset_buffer).get_from_dbuff(2, 0, (this-> o_bitset_buff_pos[0] ), x, false, false, false, true);
+                        //(this-> o_bitset_buffer).del_from_dbuffer(1, 0, (this-> o_bitset_buff_pos[0] ), 0);
+                        std::cout << "PROSSING: B" << (this-> o_bitset_buff_pos[0] ) << std::endl;
+                        
+                        
+                    }
+
+                //}
+ 
+                if ( (this-> o_bitset_buff_pos[0] ) == (this-> obitset_buff_size ) - 1)
+                {
+                    (this-> o_bitset_buff_pos[0] ) = 0;
+                }
+                else
+                    (this-> o_bitset_buff_pos[0] ) ++;
+            }
+        }
+
+        // if you look up that bit of code only calls when the bitset has been pushed to the output so it wont be called at startup) this is a fix for that
+        
+        if ((this-> get_mltick_count()) == 0)
+        {
+            if ((this-> o_bitset_buffer).is_block_smarker(true, 0, (this-> o_bitset_buff_pos[0] )) == true)
+            {
+                for (int unsigned x = 0; x != 8; x ++)
+                    (this-> digit_o_bitset [x]) = * (this-> o_bitset_buffer).get_from_dbuff(2, 0, (this-> o_bitset_buff_pos[0] ), x, false, false, false, true);
+
+                (this-> o_bitset_buff_pos[0] ) ++;
             }
         }
 
@@ -469,4 +508,210 @@ bool
 (adtp::io_service::is_iloop_running (bool(__is_type ) ) )
 {
     return ( (this-> service_iloop_running ) == __is_type? true : false);
+}
+
+void
+(adtp::io_service::set_io_bitset (int unsigned(__bitset_id), __bitset_type(* __io_bitset), int unsigned(__set_type), int unsigned(__ibitset_arr_pos)))
+{
+    switch(__bitset_id)
+    {
+        case (bitset_id::__i_bitset) :
+            switch(__set_type)
+            {
+                case (sg_type::__individual):
+                    (this-> digit_io_bitset [(bitset_id::__i_bitset)]).set_bitset(__io_bitset, (sg_type::__individual), __ibitset_arr_pos);
+                break;
+                case (sg_type::__total_array):
+                    (this-> digit_io_bitset [(bitset_id::__i_bitset)]).set_bitset(__io_bitset, (sg_type::__total_array), __ibitset_arr_pos/*not needed*/);
+                break;
+                default : return;
+            }
+        break;
+
+        case (bitset_id::__o_bitset) :   
+            switch(__set_type)
+            {
+                case (sg_type::__individual):
+                    (this-> digit_io_bitset [(bitset_id::__o_bitset)]).set_bitset(__io_bitset, (sg_type::__individual), __ibitset_arr_pos);
+                break;
+
+                case (sg_type::__total_array):
+                    (this-> digit_io_bitset [(bitset_id::__o_bitset)]).set_bitset(__io_bitset, (sg_type::__total_array), __ibitset_arr_pos/*not needed*/);
+                break;
+
+                default : return;
+            }
+            
+            for (int unsigned(x ) = 0; x != (this-> obitset_buff_size ); x ++ )
+                (this-> o_bitset_buffer).add_to_dbuff(&__io_bitset[x], 2, 0, 0, x, true, true, false); 
+ 
+            
+
+        default : return;
+    }
+}
+
+adtp::io_service::__bitset_type
+(* adtp::io_service::get_io_bitset (int unsigned(__bitset_id), int unsigned(__get_type), int unsigned(__ibitset_arr_pos)))
+{
+    switch(__bitset_id)
+    {
+        case (bitset_id::__i_bitset) :
+            switch(__get_type)
+            {
+                case (sg_type::__individual) :
+                    return ((this-> digit_io_bitset [(bitset_id::__i_bitset)]).get_bitset((sg_type::__individual), __ibitset_arr_pos));
+                    break;
+
+                case (sg_type::__total_array) :
+                    return ((this-> digit_io_bitset [(bitset_id::__i_bitset)]).get_bitset((sg_type::__total_array), __ibitset_arr_pos/*not needed*/));
+                    break;
+
+                default : return (nullptr);
+            }
+
+            break;
+
+        case (bitset_id::__o_bitset) :
+            switch(__get_type)
+            {
+                case (sg_type::__individual) :
+                    return ((this-> digit_io_bitset [(bitset_id::__o_bitset)]).get_bitset((sg_type::__individual), __ibitset_arr_pos));
+                    break;
+
+                case (sg_type::__total_array) :
+                    return ((this-> digit_io_bitset [(bitset_id::__o_bitset)]).get_bitset((sg_type::__total_array), __ibitset_arr_pos/*not needed*/));
+                    break;
+
+                default : return (nullptr);
+            }
+
+            break;
+
+        default : return(nullptr);
+    }
+}
+
+void
+(adtp::io_service::shift_io_bitset (int unsigned(__bitset_id), int unsigned(__shift_direction), int unsigned(__shift_amount)))
+{
+    switch(__bitset_id)
+    {
+        case (bitset_id::__i_bitset) :
+            switch(__shift_direction)
+            {
+                case (shift_direction::__right):
+                    (this-> digit_io_bitset [(bitset_id::__i_bitset)]).shift_bitset((shift_direction::__right), __shift_amount);
+                    break;
+
+                case (shift_direction::__left):
+                    (this-> digit_io_bitset [(bitset_id::__i_bitset)]).shift_bitset((shift_direction::__left), __shift_amount);
+                    break;
+
+                default : return;
+            }
+
+       break;
+        case (bitset_id::__o_bitset) :
+            switch(__shift_direction)
+            {
+                case (shift_direction::__right):
+                    (this-> digit_io_bitset [(bitset_id::__o_bitset)]).shift_bitset((shift_direction::__right), __shift_amount);
+                    break;
+
+                case (shift_direction::__left):
+                    (this-> digit_io_bitset [(bitset_id::__o_bitset)]).shift_bitset((shift_direction::__left), __shift_amount);
+                    break;
+
+                default : return;
+            }
+        break;
+
+        default : return;
+    }
+}
+
+void
+(adtp::io_service::flip_io_bitset (int unsigned(__bitset_id)))
+{
+    switch(__bitset_id)
+    {
+        case (bitset_id::__i_bitset) :
+            (this-> digit_io_bitset [(bitset_id::__i_bitset)]).flip_bitset();
+        break;
+        case (bitset_id::__o_bitset) :
+            (this-> digit_io_bitset [(bitset_id::__o_bitset)]).flip_bitset();
+        break;
+        default : return;
+    }
+}
+
+void
+(adtp::io_service::set_i_bitset (uint8_t(* __i_bitset), int unsigned(__set_type), int unsigned(__bitset_arr_pos)))
+{
+    switch(__set_type)
+    {
+        case (sg_type::__individual) :
+            (this-> digit_i_bitset [__bitset_arr_pos]) = * __i_bitset;
+            break;
+
+        case (sg_type::__total_array) :
+            for (int unsigned(bitset_arr_pos ) = 0; bitset_arr_pos != (this-> i_bitset_size); bitset_arr_pos ++)
+                (this-> set_i_bitset(&__i_bitset[bitset_arr_pos], (sg_type::__individual), bitset_arr_pos));
+
+            break;
+
+        default : return;
+    }
+}
+
+uint8_t
+(* adtp::io_service::get_i_bitset (int unsigned(__get_type), int unsigned(__bitset_arr_pos)))
+{
+    switch(__get_type)
+    {
+        case (sg_type::__individual) :
+            return(&(this-> digit_i_bitset [__bitset_arr_pos]));
+            break;
+
+        case (sg_type::__total_array) :
+            return((this-> digit_i_bitset)); break;
+
+        default : return(nullptr);
+    }
+}
+
+void
+(adtp::io_service::set_o_bitset (uint8_t(* __o_bitset), int unsigned(__set_type), int unsigned(__bitset_arr_pos)))
+{
+    switch(__set_type)
+    {
+        case (sg_type::__individual) :
+            (this-> digit_o_bitset [__bitset_arr_pos]) = * __o_bitset;
+            break;
+
+        case (sg_type::__total_array) :
+            for (int unsigned(bitset_arr_pos ) = 0; bitset_arr_pos != (this-> o_bitset_size); bitset_arr_pos ++)
+                (this-> set_o_bitset(&__o_bitset[bitset_arr_pos], (sg_type::__individual), bitset_arr_pos));
+
+            break;
+
+        default : return;
+    }
+}
+
+uint8_t
+(* adtp::io_service::get_o_bitset (int unsigned(__get_type), int unsigned(__bitset_arr_pos)))
+{
+    switch(__get_type)
+    {
+        case (sg_type::__individual) :
+            return(&(this-> digit_o_bitset [__bitset_arr_pos]));
+            break;
+
+        case (sg_type::__total_array) :
+            return((this-> digit_o_bitset)); break;
+
+        default : return(nullptr);
+    }
 }
