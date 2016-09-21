@@ -1,3 +1,0 @@
-move the io bitset buffer in io_service.hpp to bitset.hpp STATE: done
-
-NOTE: currently working of the o bitset buffer so its not finished and there many bugs
