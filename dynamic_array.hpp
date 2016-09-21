@@ -5,7 +5,7 @@
 * and isent automatic and has no ids 
 */
 
-# include <stdlib>
+# include <cstdlib>
 namespace adtp { template <typename __darr_type> class dynamic_array
 {
     public :
