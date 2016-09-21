@@ -4,7 +4,7 @@
     # include <iostream>
 # endif
 
-adtp::io_service::io_service (
+itmp::io_service::io_service (
     set_digit_pin_mode_ft(* __set_digit_pin_mode_fptr ),
 
     set_digit_pin_state_ft(* __set_digit_pin_state_fptr ),
@@ -381,138 +381,138 @@ adtp::io_service::io_service (
 }
 
 void
-(adtp::io_service::set_digit_pin_mode (uint8_t(__pin_id ), uint8_t(__pin_mode ) ) )
+(itmp::io_service::set_digit_pin_mode (uint8_t(__pin_id ), uint8_t(__pin_mode ) ) )
 {
     (this-> set_digit_pin_mode_fptr (__pin_id, __pin_mode ) );
 }
 
 void
-(adtp::io_service::set_digit_pin_state (uint8_t(__pin_id ), uint8_t(__pin_state ) ) )
+(itmp::io_service::set_digit_pin_state (uint8_t(__pin_id ), uint8_t(__pin_state ) ) )
 {
     (this-> set_digit_pin_state_fptr (__pin_id, __pin_state ) );
 }
 
 bool
-(adtp::io_service::get_digit_pin_state (uint8_t(__pin_id ) ) )
+(itmp::io_service::get_digit_pin_state (uint8_t(__pin_id ) ) )
 {
     return ( (this-> get_digit_pin_state_fptr (__pin_id ) ) == 1? true: false);
 }
 
 void
-(adtp::io_service::call_external_mlinit (io_service(* __class_ptr ) ) )
+(itmp::io_service::call_external_mlinit (io_service(* __class_ptr ) ) )
 {
     (this-> external_mlinit_fptr (__class_ptr ) );
 }
 
 void
-(adtp::io_service::call_external_mltick (io_service(* __class_ptr ) ) )
+(itmp::io_service::call_external_mltick (io_service(* __class_ptr ) ) )
 {
     (this-> external_mltick_fptr (__class_ptr ) );
 }
 
 void
-(adtp::io_service::update_clock_ptcount (int unsigned(__update_amount ) ) )
+(itmp::io_service::update_clock_ptcount (int unsigned(__update_amount ) ) )
 {
     (this-> external_clock_ptcount ) += __update_amount; }
 
 void
-(adtp::io_service::update_clock_ntcount (int unsigned(__update_amount ) ) )
+(itmp::io_service::update_clock_ntcount (int unsigned(__update_amount ) ) )
 {
     (this-> external_clock_ntcount ) += __update_amount;
 }
 
 void
-(adtp::io_service::set_clock_ptcount (int unsigned(__clock_ptcount ) ) )
+(itmp::io_service::set_clock_ptcount (int unsigned(__clock_ptcount ) ) )
 {
     (this-> external_clock_ptcount ) = __clock_ptcount;
 }
 
 void
-(adtp::io_service::set_clock_ntcount (int unsigned(__clock_ntcount ) ) )
+(itmp::io_service::set_clock_ntcount (int unsigned(__clock_ntcount ) ) )
 {
     (this-> external_clock_ntcount ) = __clock_ntcount;
 }
 
 bool
-(adtp::io_service::is_clock_reading (bool(__is_type ) ) )
+(itmp::io_service::is_clock_reading (bool(__is_type ) ) )
 {
     return ( (this-> external_clock_reading ) == __is_type? true : false);
 }
 
 bool
-(adtp::io_service::is_external_clock (bool(__is_type ) ) )
+(itmp::io_service::is_external_clock (bool(__is_type ) ) )
 {
     return ( (this-> get_digit_pin_state_fptr ( (this-> digit_clock_pin_id ) ) ) == __is_type? true : false);
 }
 
 void
-(adtp::io_service::toggle_mloop_state( ) )
+(itmp::io_service::toggle_mloop_state( ) )
 {
     (this-> service_mloop_running ) = (this-> service_mloop_running ) ? false : true;
 }
 
 void
-(adtp::io_service::toggle_iloop_state( ) )
+(itmp::io_service::toggle_iloop_state( ) )
 {
     (this-> service_iloop_running ) = (this-> service_iloop_running ) ? false : true;
 }
 
 void
-(adtp::io_service::update_clock_reading( ) )
+(itmp::io_service::update_clock_reading( ) )
 {
     (this-> external_clock_reading ) = (this-> get_digit_pin_state_fptr ( (this-> digit_clock_pin_id ) ) ) == 1? true : false;
 }
 
 void
-(adtp::io_service::update_mltick_count (int unsigned(__update_amount ) ) )
+(itmp::io_service::update_mltick_count (int unsigned(__update_amount ) ) )
 {
     (this-> service_mltick_count ) += __update_amount;
 }
 
 void
-(adtp::io_service::update_iltick_count (int unsigned(__update_amount ) ) )
+(itmp::io_service::update_iltick_count (int unsigned(__update_amount ) ) )
 {
     (this-> service_iltick_count ) += __update_amount;
 }
 
 void
-(adtp::io_service::set_mltick_count (int unsigned(__mltick_count ) ) )
+(itmp::io_service::set_mltick_count (int unsigned(__mltick_count ) ) )
 {
     (this-> service_mltick_count ) = __mltick_count;
 }
 
 void
-(adtp::io_service::set_iltick_count (int unsigned(__iltick_count ) ) )
+(itmp::io_service::set_iltick_count (int unsigned(__iltick_count ) ) )
 {
     (this-> service_iltick_count ) = __iltick_count;
 }
 
 int unsigned
-(adtp::io_service::get_mltick_count( ) )
+(itmp::io_service::get_mltick_count( ) )
 {
     return (this-> service_mltick_count );
 }
 
 int unsigned
-(adtp::io_service::get_iltick_count( ) )
+(itmp::io_service::get_iltick_count( ) )
 {
     return (this-> service_iltick_count );
 }
 
 bool
-(adtp::io_service::is_mloop_running (bool(__is_type ) ) )
+(itmp::io_service::is_mloop_running (bool(__is_type ) ) )
 {
     return ( (this-> service_mloop_running ) == __is_type? true : false);
 }
 
 bool
-(adtp::io_service::is_iloop_running (bool(__is_type ) ) )
+(itmp::io_service::is_iloop_running (bool(__is_type ) ) )
 {
     return ( (this-> service_iloop_running ) == __is_type? true : false);
 }
 
 void
-(adtp::io_service::set_io_bitset (int unsigned(__bitset_id), __bitset_type(* __io_bitset), int unsigned(__set_type), int unsigned(__ibitset_arr_pos)))
+(itmp::io_service::set_io_bitset (int unsigned(__bitset_id), __bitset_type(* __io_bitset), int unsigned(__set_type), int unsigned(__ibitset_arr_pos)))
 {
     switch(__bitset_id)
     {
@@ -547,8 +547,8 @@ void
     }
 }
 
-adtp::io_service::__bitset_type
-(* adtp::io_service::get_io_bitset (int unsigned(__bitset_id), int unsigned(__get_type), int unsigned(__ibitset_arr_pos)))
+itmp::io_service::__bitset_type
+(* itmp::io_service::get_io_bitset (int unsigned(__bitset_id), int unsigned(__get_type), int unsigned(__ibitset_arr_pos)))
 {
     switch(__bitset_id)
     {
@@ -589,7 +589,7 @@ adtp::io_service::__bitset_type
 }
 
 void
-(adtp::io_service::shift_io_bitset (int unsigned(__bitset_id), int unsigned(__shift_direction), int unsigned(__shift_amount)))
+(itmp::io_service::shift_io_bitset (int unsigned(__bitset_id), int unsigned(__shift_direction), int unsigned(__shift_amount)))
 {
     switch(__bitset_id)
     {
@@ -628,7 +628,7 @@ void
 }
 
 void
-(adtp::io_service::flip_io_bitset (int unsigned(__bitset_id)))
+(itmp::io_service::flip_io_bitset (int unsigned(__bitset_id)))
 {
     switch(__bitset_id)
     {
@@ -643,7 +643,7 @@ void
 }
 
 void
-(adtp::io_service::set_i_bitset (uint8_t(* __i_bitset), int unsigned(__set_type), int unsigned(__bitset_arr_pos)))
+(itmp::io_service::set_i_bitset (uint8_t(* __i_bitset), int unsigned(__set_type), int unsigned(__bitset_arr_pos)))
 {
     switch(__set_type)
     {
@@ -662,7 +662,7 @@ void
 }
 
 uint8_t
-(* adtp::io_service::get_i_bitset (int unsigned(__get_type), int unsigned(__bitset_arr_pos)))
+(* itmp::io_service::get_i_bitset (int unsigned(__get_type), int unsigned(__bitset_arr_pos)))
 {
     switch(__get_type)
     {
@@ -678,7 +678,7 @@ uint8_t
 }
 
 void
-(adtp::io_service::set_o_bitset (uint8_t(* __o_bitset), int unsigned(__set_type), int unsigned(__bitset_arr_pos)))
+(itmp::io_service::set_o_bitset (uint8_t(* __o_bitset), int unsigned(__set_type), int unsigned(__bitset_arr_pos)))
 {
     switch(__set_type)
     {
@@ -697,7 +697,7 @@ void
 }
 
 uint8_t
-(* adtp::io_service::get_o_bitset (int unsigned(__get_type), int unsigned(__bitset_arr_pos)))
+(* itmp::io_service::get_o_bitset (int unsigned(__get_type), int unsigned(__bitset_arr_pos)))
 {
     switch(__get_type)
     {

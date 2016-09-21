@@ -3,7 +3,7 @@
 
 # include "dynamic_array.hpp"
 
-namespace adtp { template <typename __bitset_type> class bitset
+namespace itmp { template <typename __bitset_type> class bitset
 {
     public :
         void

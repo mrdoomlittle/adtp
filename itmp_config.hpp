@@ -1,5 +1,5 @@
-# ifndef __adtp__config__hpp__
-# define __adtp__config__hpp__
+# ifndef __itmp__config__hpp__
+# define __itmp__config__hpp__
 
 # define digit_pin_mode_output 0x0
 # define digit_pin_mode_input 0x1
@@ -72,4 +72,4 @@ VAR 0 = BITSET 0
 # define def_shared_i_buff_size 5
 # define def_shared_o_buff_size 5
 
-# endif /*__adtp__config__hpp__*/
+# endif /*__itmp__config__hpp__*/

@@ -6,7 +6,7 @@
 # else
     # include <boost/cstdint.hpp>
 # endif
-# include "adtp_config.hpp"
+# include "itmp_config.hpp"
 # include "dynamic_array.hpp"
 # include "dynamic_buffer.hpp"
 # include "bitset.hpp"
@@ -17,7 +17,7 @@
 
 /* example: if the start state is 0x0 then the clock will start ticking when changes to 0x1
 */
-namespace adtp { class io_service
+namespace itmp { class io_service
 {
     private :
         int unsigned(clock_start_state ) = def_clock_start_state;

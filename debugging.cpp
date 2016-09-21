@@ -111,13 +111,13 @@ uint8_t test[8][8] =
 };
 
 void
-(external_mlinit (adtp::io_service(* _this ) ) )
+(external_mlinit (itmp::io_service(* _this ) ) )
 {
 
 }
 
 void
-(external_mltick (adtp::io_service(* _this ) ) )
+(external_mltick (itmp::io_service(* _this ) ) )
 {
     
         std::cout << "SET_IO_BITSET" << std::endl;
@@ -175,7 +175,7 @@ void
 int
 (main( ) )
 {
-    adtp::io_service io_service
+    itmp::io_service io_service
     (
         & set_digit_pin_mode,
         & set_digit_pin_state,

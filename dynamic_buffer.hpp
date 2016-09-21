@@ -6,7 +6,7 @@
 NOTE: this does not work at the moment
 */
 
-namespace adtp { template <typename __dbuff_type> class dynamic_buffer
+namespace itmp { template <typename __dbuff_type> class dynamic_buffer
 {
     private :
         void
