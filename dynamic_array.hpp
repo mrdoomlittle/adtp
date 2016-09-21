@@ -5,7 +5,7 @@
 * and isent automatic and has no ids 
 */
 
-# include <iostream>
+# include <stdlib>
 namespace adtp { template <typename __darr_type> class dynamic_array
 {
     public :
@@ -68,8 +68,8 @@ namespace adtp { template <typename __darr_type> class dynamic_array
 
         ~dynamic_array()
         {
-//            std::free(this-> darr_ilayers);
-//            std::free(this-> darr_layer_tmp);
+            std::free(this-> darr_ilayers);
+            std::free(this-> darr_layer_tmp);
         }
 
         void
