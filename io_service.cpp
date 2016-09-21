@@ -106,6 +106,9 @@ adtp::io_service::io_service (
 
         (this-> call_external_mltick (this ) );
 
+        for (int unsigned(x ) = 0; x != (this-> obitset_buff_size ); x ++)
+            (this-> o_bitset_buffer).add_to_dbuff((this-> get_io_bitset (1, 0, x)), 2, 0, 0, x, true, true, false);
+
 # ifndef ARDUINO
         for (int unsigned(x ) = 0; x != ( (this-> i_bitset_size ) / (this->digit_i_pin_count ) ); x ++ )
                 std::cout << (this-> i_bitset_finished [x] );
@@ -137,12 +140,14 @@ adtp::io_service::io_service (
                 for (int unsigned(x ) = 0; x != (this-> i_bitset_size ); x ++ )
                     (this-> i_bitset_buffer).add_to_dbuff(&(this-> digit_i_bitset [x]), 2, 0, 0, 0, true, true, true);
 
+# ifndef ARDUINO
                 for (int unsigned(x ) = 0; x != (this-> i_bitset_size ); x ++ )
                     std::cout << "STATE: " << i_bitset_buffer.is_block_smarker(true, 0, x) << ", DBUFF_ID: " << x << std::endl;
                
                 
  
                 std::cout << "DBUFF_POS: " << i_bitset_buff_pos << std::endl;
+# endif
                 if ( (this-> i_bitset_buff_pos[0] ) == (this-> ibitset_buff_size ) - 1)
                 {
                     //std::cout << "Delete/ing  BITSET DBUFF" << std::endl;
@@ -188,7 +193,9 @@ adtp::io_service::io_service (
                         for (int unsigned x = 0; x != 8; x ++)
                             (this-> digit_o_bitset [x]) = * (this-> o_bitset_buffer).get_from_dbuff(2, 0, (this-> o_bitset_buff_pos[0] ), x, false, false, false, true);
                         //(this-> o_bitset_buffer).del_from_dbuffer(1, 0, (this-> o_bitset_buff_pos[0] ), 0);
+# ifndef ARDUINO
                         std::cout << "PROSSING: B" << (this-> o_bitset_buff_pos[0] ) << std::endl;
+# endif
                         
                         
                     }
@@ -204,7 +211,7 @@ adtp::io_service::io_service (
             }
         }
 
-        // if you look up that bit of code only calls when the bitset has been pushed to the output so it wont be called at startup) this is a fix for that
+        // if you look up that bit of code only calls when the bitset has been pushed to the output so it wont be called at startup) this is a quick fix for that
         
         if ((this-> get_mltick_count()) == 0)
         {
@@ -541,12 +548,7 @@ void
 
                 default : return;
             }
-            
-            for (int unsigned(x ) = 0; x != (this-> obitset_buff_size ); x ++ )
-                (this-> o_bitset_buffer).add_to_dbuff(&__io_bitset[x], 2, 0, 0, x, true, true, false); 
  
-            
-
         default : return;
     }
 }

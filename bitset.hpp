@@ -1,10 +1,7 @@
 # ifndef __bitset__hpp__
 # define __bitset__hpp__
-# include <iostream>
-# include "dynamic_array.hpp"
 
-/* move to cpp file
-*/
+# include "dynamic_array.hpp"
 
 namespace adtp { template <typename __bitset_type> class bitset
 {
@@ -105,7 +102,7 @@ namespace adtp { template <typename __bitset_type> class bitset
         }
 
         void
-        (flip_bitset())
+        (flip_bitset( ) )
         {
             for (int unsigned(x ) = 0; x != (this-> bitset_length); x++)
                  (this-> bitset_temp).set_darr_ilayer((this-> bitset_list).get_darr_ilayer(0, x), 0, x);

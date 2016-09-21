@@ -13,34 +13,42 @@
 void
 (set_digit_pin_mode (uint8_t (__pin_id ), uint8_t (__pin_mode ) ) ) { }
 
-int unsigned soc = 0;
-uint8_t sim_output[8][8];
-int unsigned pins_call_count = 0;
+int unsigned inner_call_count = 0;
+uint8_t output_buffer[8][8];
+int unsigned set_call_count = 0;
+bool o_buffer_finished = false;
 void
 (set_digit_pin_state (uint8_t (__pin_id ), uint8_t (__pin_state ) ) )
 {
-    //std::cout << "###############################################################" << std::endl;
-    if (pins_call_count == 7)
+//    std::cout << "PIN_ID: " << unsigned(__pin_id) << ", PIN_STATE: " << unsigned(__pin_state)<< std::endl;
+    if (set_call_count == 8)
     {
-        if (soc == 7)
+        if (inner_call_count == 7)
         {
-            std::cout << "###############################################################" << std::endl;
-            for(int unsigned x = 0; x != 8; x++)
-            {
-                for(int unsigned y = 0; y != 8; y++)
-                    std::cout << unsigned(sim_output[x][y]);
-                std::cout << std::endl;
-            }
-            soc = 0;
+            o_buffer_finished = true;
+            inner_call_count = 0;
         }
         else
-            soc ++;
-        pins_call_count = 0;
+            inner_call_count ++;
+
+        set_call_count = 0;
     }
-    else
+     
+    output_buffer[inner_call_count][set_call_count] = __pin_state;
+    set_call_count ++;
+   
+    if (o_buffer_finished == true)
     {
-        sim_output[soc][pins_call_count] = __pin_state;
-        pins_call_count ++; 
+        for (int unsigned y = 0; y != 8; y ++)
+        {
+            std::cout << "OBITSET( ID: " << y << " ): ";
+            for (int unsigned x = 0; x != 8; x ++)
+            {
+                std::cout << unsigned(output_buffer[y][x]);
+            }
+            std::cout << std::endl;
+        }
+        o_buffer_finished = false;
     }
 }
 
@@ -114,22 +122,25 @@ void
     
         std::cout << "SET_IO_BITSET" << std::endl;
         _this-> set_io_bitset(1, test[pos], 1, 0);
+        _this-> flip_io_bitset(1);
         tcount = 0;
         if (pos == 7)
             pos = 0;
         else
             pos ++;
     
-    for (int unsigned (x ) = 0; x != 8; x ++)
-        std::cout << unsigned(* _this-> get_io_bitset(0, 0, x));
+        for (int unsigned (x ) = 0; x != 8; x ++)
+            std::cout << unsigned(* _this-> get_io_bitset(0, 0, x));
 
 
-    std::cout << "/I::BITSET\n" << std::endl;
+        std::cout << "/I::BITSET\n" << std::endl;
 
-    for (int unsigned (x ) = 0; x != 8; x ++)
-        std::cout << unsigned(* _this-> get_io_bitset(1, 0, x));
+        for (int unsigned (x ) = 0; x != 8; x ++)
+            std::cout << unsigned(* _this-> get_io_bitset(1, 0, x));
 
-    std::cout << "/O::BITSET\n" << std::endl;
+        std::cout << "/O::BITSET\n" << std::endl;
+
+    
 
     for (int unsigned(x ) = 0; x != 8; x ++)
     {
