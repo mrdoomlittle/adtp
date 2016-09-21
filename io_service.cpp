@@ -1,11 +1,5 @@
 # include "io_service.hpp"
 
-# define digit_pin_mode_output 0x0
-# define digit_pin_mode_input 0x1
-
-# define digit_pin_state_high 0x1
-# define digit_pin_state_low 0x0
-
 # ifndef ARDUINO
     # include <iostream>
 # endif

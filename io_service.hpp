@@ -15,11 +15,8 @@
 * email: doctordoomlittle@gmail.com
 */
 
-// NOTE: put default defines into a diffrent hpp file
-
 /* example: if the start state is 0x0 then the clock will start ticking when changes to 0x1
 */
-
 namespace adtp { class io_service
 {
     private :
@@ -34,12 +31,23 @@ namespace adtp { class io_service
         int unsigned(digit_i_pin_count ) = def_digit_i_pin_count;
         uint8_t
         (* digit_i_pin_ids ) = new uint8_t [digit_i_pin_count];
+        int unsigned
+        (* i_pin_power_state ) = new int unsigned [2];
 
         int unsigned(digit_o_pin_count ) = def_digit_o_pin_count;
         uint8_t
         (* digit_o_pin_ids ) = new uint8_t [digit_o_pin_count];
+        int unsigned
+        (* o_pin_power_state ) = new int unsigned [2];
+        
+        uint8_t(digit_latch_pin_id ) = def_digit_latch_pin_id;    
+        int unsigned
+        (* latch_power_state ) = new int unsigned [2];
 
         uint8_t(digit_clock_pin_id ) = def_digit_clock_pin_id;
+        int unsigned
+        (* clock_power_state ) = new int unsigned [2];
+        int unsigned(clock_trigger_method ) = def_clock_trigger_method;
 
         int unsigned(ibyte_read_delay ) = def_ibyte_read_delay;
         int unsigned(obyte_write_delay ) = def_obyte_write_delay;
@@ -162,9 +170,109 @@ namespace adtp { class io_service
 
     public :
         dynamic_buffer <uint8_t> (o_bitset_buffer);
-        bool(o_bitset_buff_last_triggered ) = false;
         int unsigned(o_bitset_buff_pos [2]) = {0, 0};
-    private : 
+    private :
+        // NOTE move everything to do with setting/getting/etc of the pin to another source file with its own header file
+  
+        // REMINDER: (is_latch_pin_state) if the pin state is not incheck it need to return an error not false 
+ 
+        bool(is_pin_state_incheck(uint8_t(__digit_pin_state)))
+        {
+            if (__digit_pin_state == digit_pin_state_high) return(true); 
+            if (__digit_pin_state == digit_pin_state_low) return(true);
+            
+            return(false);
+        }
+    
+        bool(is_pin_mode_incheck(uint8_t(__digit_pin_mode)))
+        {
+            if (__digit_pin_mode == digit_pin_mode_output) return(true);
+            if (__digit_pin_mode == digit_pin_mode_input) return(true);
+
+            return(false);
+        }
+
+        void (set_latch_pin_state (uint8_t(__latch_pin_state)))
+        {
+            if (!(this-> is_pin_state_incheck(__latch_pin_state))) return;
+            (this-> latch_pin_state) = __latch_pin_state;
+            (this-> set_digit_pin_state((this-> digit_latch_pin_id), __latch_pin_state));
+        }
+
+        uint8_t (get_latch_pin_state ())
+        {
+            return((this-> latch_pin_state));
+        }
+
+        bool (is_latch_pin_state (uint8_t(__latch_pin_state)))
+        {
+            if (!(this-> is_pin_state_incheck(__latch_pin_state))) return false;
+            return((this-> latch_pin_state) == __latch_pin_state ? true : false);
+        }
+        
+        uint8_t(latch_pin_state ) = digit_pin_state_low;
+
+        void (set_clock_pin_state(uint8_t(__clock_pin_state)))
+        {
+            if (!(this-> is_pin_state_incheck(__clock_pin_state))) return;
+            (this-> clock_pin_state) = __clock_pin_state;
+            (this-> set_digit_pin_state((this-> digit_clock_pin_id), __clock_pin_state));
+        }
+
+        uint8_t (get_clock_pin_state())
+        {
+            return((this-> clock_pin_state));
+        }
+
+        bool (is_clock_pin_state(uint8_t(__clock_pin_state)))
+        {
+            if (!(this-> is_pin_state_incheck(__clock_pin_state))) return false; // NOTE add a value to check if it errored
+            return((this-> clock_pin_state) == __clock_pin_state ? true : false);
+        }
+       
+        uint8_t(clock_pin_state ) = digit_pin_state_low;
+
+        void (set_o_pin_state(uint8_t(__o_pin_id), uint8_t (__o_pin_state)))
+        {
+            if (!(this-> is_pin_state_incheck(__o_pin_state))) return;
+            (this-> o_pin_state [__o_pin_id]) = __o_pin_state;
+            (this-> set_digit_pin_state((this-> digit_o_pin_ids[__o_pin_id]), __o_pin_state));
+        }
+    
+        uint8_t (get_o_pin_state(uint8_t(__o_pin_id)))
+        {
+            return((this-> o_pin_state [__o_pin_id]));
+        }
+
+        bool (is_o_pin_state(uint8_t(__o_pin_id), uint8_t (__o_pin_state)))
+        {
+            if (!(this-> is_pin_state_incheck(__o_pin_state))) return false;
+            return((this-> o_pin_state [__o_pin_id]) == __o_pin_state? true : false);
+        }
+
+        // NOTE: add func to check the pin ids are in range
+        // REMINDER: add the enum vars into the config as defines eg bitset_ids 
+
+        void (set_i_pin_state(uint8_t(__i_pin_id), uint8_t (__i_pin_state)))
+        {
+            if (!(this-> is_pin_state_incheck(__i_pin_state))) return;
+            (this-> i_pin_state [__i_pin_id]) = __i_pin_state;
+            (this-> set_digit_pin_state((this-> digit_i_pin_ids[__i_pin_id]), __i_pin_state));
+        }
+
+        uint8_t (get_i_pin_state(uint8_t(__i_pin_id)))
+        {
+            return((this-> i_pin_state [__i_pin_id]));
+        }
+
+        bool (is_i_pin_state(uint8_t(__i_pin_id), uint8_t (__i_pin_state)))
+        {
+            if (!(this-> is_pin_state_incheck(__i_pin_state))) return false;
+            return((this-> i_pin_state [__i_pin_id]) == __i_pin_state? true : false);
+        }
+
+        uint8_t(* o_pin_state ) = new uint8_t [digit_i_pin_count];
+        uint8_t(* i_pin_state ) = new uint8_t [digit_o_pin_count];
 
         int unsigned(digit_i_buffer_pos ) = 0;
         int unsigned(digit_o_buffer_pos ) = 0;
