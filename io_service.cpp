@@ -32,15 +32,10 @@ itmp::io_service::io_service (
     (this-> toggle_iloop_state( ) );
 
     for (int unsigned x = 0; x != digit_i_pin_count; x++)
-        (this-> digit_i_pin_ids [x] ) = (def_digit_i_pin_id [x]);
+        (this-> digit_i_pin_ids [x] ) = (def_digit_i_pin_ids [x]);
 
     for (int unsigned x = 0; x != digit_o_pin_count; x++)
-        (this-> digit_o_pin_ids [x] ) = (def_digit_o_pin_id [x]);
-
-    (this-> set_digit_pin_mode (
-        (this-> digit_clock_pin_id ),
-        digit_pin_mode_input
-    ) );
+        (this-> digit_o_pin_ids [x] ) = (def_digit_o_pin_ids [x]);
 
     // this is for debugging
     (this-> digit_o_bitset [0] ) = 1;
@@ -52,6 +47,68 @@ itmp::io_service::io_service (
     (this-> digit_o_bitset [6] ) = 1;
     (this-> digit_o_bitset [7] ) = 1;
 
+    // this might be changed later 
+    # ifdef def_digit_clock_pin_id
+        digit_clock_pin_id = def_digit_clock_pin_id;
+    # endif
+
+    # ifdef def_clock_start_state
+        clock_start_state = def_clock_start_state;
+    # endif
+
+    # ifdef def_clock_trigger_method
+        clock_trigger_method = def_clock_trigger_method;
+    # endif
+
+    # ifdef def_digit_latch_pin_id
+        digit_latch_pin_id = def_digit_latch_pin_id;
+    # endif
+
+    # ifdef def_digit_i_pin_count
+        digit_i_pin_count = def_digit_i_pin_count; 
+    # endif
+
+    # ifdef def_i_bitset_size
+        i_bitset_size = def_i_bitset_size;
+    # endif
+
+    # ifdef def_ibit_read_delay
+        ibit_read_delay = def_ibit_read_delay;
+    # endif
+
+    # ifdef def_ibyte_read_delay
+        ibyte_read_delay = def_ibyte_read_delay;
+    # endif
+
+    # ifdef def_ibitset_buff_size
+        ibitset_buff_size = def_ibitset_buff_size;
+    # endif
+
+    # ifdef def_digit_o_pin_count
+        digit_o_pin_count = def_digit_o_pin_count;
+    # endif
+
+    # ifdef def_o_bitset_size
+        o_bitset_size = def_o_bitset_size;
+    # endif
+
+    # ifdef def_obit_write_delay
+        obit_write_delay = def_obit_write_delay;
+    # endif
+    
+    # ifdef def_obyte_write_delay
+        obyte_write_delay = def_obyte_write_delay;
+    # endif
+
+    # ifdef def_obitset_buff_size
+        obitset_buff_size = def_obitset_buff_size;
+    # endif
+
+    (this-> set_digit_pin_mode (
+        (this-> digit_clock_pin_id ),
+        digit_pin_input_mode
+    ) );
+
     // IO bitset of 8 (00000000)
     (this-> digit_io_bitset [(bitset_id::__i_bitset)]).bitset_init((this-> i_bitset_size));
     (this-> digit_io_bitset [(bitset_id::__o_bitset)]).bitset_init((this-> o_bitset_size));
@@ -60,13 +117,13 @@ itmp::io_service::io_service (
     (this-> i_bitset_buffer).dbuff_init(1/*sectors of data*/, (this-> ibitset_buff_size), (this-> i_bitset_size));
     (this-> o_bitset_buffer).dbuff_init(1/*sectors of data*/, (this-> obitset_buff_size), (this-> o_bitset_size));
 
-    if ( (this-> clock_start_state ) == digit_pin_state_high )
+    if ( (this-> clock_start_state ) == digit_pin_high_state )
     {
         (this-> ilclockp_toggled ) = true;
         (this-> ilclockp_tcount ) = 1;
     }
 
-    if ( (this-> clock_start_state ) == digit_pin_state_low )
+    if ( (this-> clock_start_state ) == digit_pin_low_state )
     {
         (this-> ilclockn_toggled ) = true;
         (this-> ilclockn_tcount ) = 1;

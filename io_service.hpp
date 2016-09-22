@@ -20,46 +20,56 @@
 namespace itmp { class io_service
 {
     private :
-        int unsigned(clock_start_state ) = def_clock_start_state;
+        uint8_t(digit_clock_pin_id ) = 0;
 
-        int unsigned(shared_i_var_count ) = def_shared_i_var_count;
-        int unsigned(shared_o_var_count ) = def_shared_o_var_count;
+        bool(is_clock_pin_id_set ) = false;
 
-        int unsigned(shared_i_buff_size ) = def_shared_i_buff_size;
-        int unsigned(shared_o_buff_size ) = def_shared_o_buff_size;
+        int unsigned(clock_start_state ) = 0;
+
+        int unsigned
+        (* clock_power_state ) = new int unsigned [2];
+
+        int unsigned(clock_trigger_method ) = 0;
+
+        uint8_t(digit_latch_pin_id ) = 0;
+
+        int unsigned
+        (* latch_power_state ) = new int unsigned [2];
 
         int unsigned(digit_i_pin_count ) = def_digit_i_pin_count;
+
         uint8_t
         (* digit_i_pin_ids ) = new uint8_t [digit_i_pin_count];
         int unsigned
         (* i_pin_power_state ) = new int unsigned [2];
 
+        int unsigned(ibyte_read_delay ) = 0;
+
+        int unsigned(ibit_read_delay ) = 0;
+
+        int unsigned(i_bitset_size ) = 0;
+
         int unsigned(digit_o_pin_count ) = def_digit_o_pin_count;
+
         uint8_t
         (* digit_o_pin_ids ) = new uint8_t [digit_o_pin_count];
         int unsigned
         (* o_pin_power_state ) = new int unsigned [2];
-        
-        uint8_t(digit_latch_pin_id ) = def_digit_latch_pin_id;    
-        int unsigned
-        (* latch_power_state ) = new int unsigned [2];
 
-        uint8_t(digit_clock_pin_id ) = def_digit_clock_pin_id;
-        int unsigned
-        (* clock_power_state ) = new int unsigned [2];
-        int unsigned(clock_trigger_method ) = def_clock_trigger_method;
+        int unsigned(obyte_write_delay ) = 0;
 
-        int unsigned(ibyte_read_delay ) = def_ibyte_read_delay;
-        int unsigned(obyte_write_delay ) = def_obyte_write_delay;
+        int unsigned(obit_write_delay ) = 0;
 
-        int unsigned(ibit_read_delay ) = def_ibit_read_delay;
-        int unsigned(obit_write_delay ) = def_obit_write_delay;
+        int unsigned(o_bitset_size ) = 0;
 
-        int unsigned(i_bitset_size ) = def_i_bitset_size;
-        int unsigned(o_bitset_size ) = def_o_bitset_size;
+        int unsigned(ibitset_buff_size ) = 0;
+        int unsigned(obitset_buff_size ) = 0;
 
-        int unsigned(ibitset_buff_size ) = def_ibitset_buff_size;
-        int unsigned(obitset_buff_size ) = def_obitset_buff_size;
+        int unsigned(shared_i_var_count ) = 0;
+        int unsigned(shared_o_var_count ) = 0;
+
+        int unsigned(shared_i_buff_size ) = 0;
+        int unsigned(shared_o_buff_size ) = 0;
     protected :
         typedef void( (set_digit_pin_mode_ft ) (uint8_t, uint8_t) );
         set_digit_pin_mode_ft(* set_digit_pin_mode_fptr ) = nullptr;
@@ -173,21 +183,21 @@ namespace itmp { class io_service
         int unsigned(o_bitset_buff_pos [2]) = {0, 0};
     private :
         // NOTE move everything to do with setting/getting/etc of the pin to another source file with its own header file
-  
-        // REMINDER: (is_latch_pin_state) if the pin state is not incheck it need to return an error not false 
- 
+
+        // REMINDER: (is_latch_pin_state) if the pin state is not incheck it need to return an error not false
+
         bool(is_pin_state_incheck(uint8_t(__digit_pin_state)))
         {
-            if (__digit_pin_state == digit_pin_state_high) return(true); 
-            if (__digit_pin_state == digit_pin_state_low) return(true);
-            
+            if (__digit_pin_state == digit_pin_high_state) return(true);
+            if (__digit_pin_state == digit_pin_low_state) return(true);
+
             return(false);
         }
-    
+
         bool(is_pin_mode_incheck(uint8_t(__digit_pin_mode)))
         {
-            if (__digit_pin_mode == digit_pin_mode_output) return(true);
-            if (__digit_pin_mode == digit_pin_mode_input) return(true);
+            if (__digit_pin_mode == digit_pin_output_mode) return(true);
+            if (__digit_pin_mode == digit_pin_input_mode) return(true);
 
             return(false);
         }
@@ -209,8 +219,8 @@ namespace itmp { class io_service
             if (!(this-> is_pin_state_incheck(__latch_pin_state))) return false;
             return((this-> latch_pin_state) == __latch_pin_state ? true : false);
         }
-        
-        uint8_t(latch_pin_state ) = digit_pin_state_low;
+
+        uint8_t(latch_pin_state ) = digit_pin_low_state;
 
         void (set_clock_pin_state(uint8_t(__clock_pin_state)))
         {
@@ -229,8 +239,8 @@ namespace itmp { class io_service
             if (!(this-> is_pin_state_incheck(__clock_pin_state))) return false; // NOTE add a value to check if it errored
             return((this-> clock_pin_state) == __clock_pin_state ? true : false);
         }
-       
-        uint8_t(clock_pin_state ) = digit_pin_state_low;
+
+        uint8_t(clock_pin_state ) = digit_pin_low_state;
 
         void (set_o_pin_state(uint8_t(__o_pin_id), uint8_t (__o_pin_state)))
         {
@@ -238,7 +248,7 @@ namespace itmp { class io_service
             (this-> o_pin_state [__o_pin_id]) = __o_pin_state;
             (this-> set_digit_pin_state((this-> digit_o_pin_ids[__o_pin_id]), __o_pin_state));
         }
-    
+
         uint8_t (get_o_pin_state(uint8_t(__o_pin_id)))
         {
             return((this-> o_pin_state [__o_pin_id]));
@@ -251,7 +261,7 @@ namespace itmp { class io_service
         }
 
         // NOTE: add func to check the pin ids are in range
-        // REMINDER: add the enum vars into the config as defines eg bitset_ids 
+        // REMINDER: add the enum vars into the config as defines eg bitset_ids
 
         void (set_i_pin_state(uint8_t(__i_pin_id), uint8_t (__i_pin_state)))
         {
