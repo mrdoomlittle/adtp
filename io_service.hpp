@@ -1,6 +1,11 @@
 # ifndef __io__service__hpp__
 # define __io__service__hpp__
 
+/* Created and Designed by mrdoomlittle
+* Github: https://github.com/mrdoomlittle
+* Email: doctordoomlittle@gmail.com
+*/
+
 # ifdef ARDUINO
     # include <stdint.h>
 # else
@@ -13,15 +18,12 @@
 # include "pin_manager.hpp"
 # include "bitset.hpp"
 
-/* created by mrdoomlittle / daniel robson
-* github: https://github.com/mrdoomlittle
-* email: doctordoomlittle@gmail.com
-*/
-
 /* example: if the start state is 0x0 then the clock will start ticking when changes to 0x1
 */
 namespace itmp { class io_service : public pin_manager
 {
+    protected :
+        //pin_manager(* pin_manager_cptr ) = new pin_manager();
     private :
         int unsigned(digit_i_pin_count ) = def_digit_i_pin_count;
         int unsigned(digit_o_pin_count ) = def_digit_o_pin_count;
@@ -75,9 +77,11 @@ namespace itmp { class io_service : public pin_manager
     private :
         int unsigned(mltick_delay) = def_mltick_delay;
         int unsigned(iltick_delay) = def_iltick_delay;
+
         int unsigned(real_mltick_count) = 0;
         int unsigned(real_iltick_count) = 0;
         int unsigned(temp_iltick_count) = 0;
+
         int unsigned(i_iltick_count) = 0;
         int unsigned(o_iltick_count) = 0;
 

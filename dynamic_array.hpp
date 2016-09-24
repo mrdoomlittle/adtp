@@ -1,8 +1,13 @@
 # ifndef __dynamic__array__hpp__
 # define __dynamic__array__hpp__
 
+/* Created and Designed by mrdoomlittle
+* Github: https://github.com/mrdoomlittle
+* Email: doctordoomlittle@gmail.com
+*/
+
 /* NOTE: this works the same way as the dynamic buffer but its more light wight
-* and isent automatic and has no ids 
+* and isent automatic and has no ids
 */
 
 # include <cstdlib>
@@ -28,7 +33,7 @@ namespace itmp { template <typename __darr_type> class dynamic_array
         {
             /* we might need to apply somthing to dected if this is not a independent var
             */
-            (this-> darr_ilayers [(data_id::__main)] [(__layer_arr_pos * (this-> darr_length)) + __ilayer_arr_pos]) = *__ilayer_data; 
+            (this-> darr_ilayers [(data_id::__main)] [(__layer_arr_pos * (this-> darr_length)) + __ilayer_arr_pos]) = *__ilayer_data;
         }
 
         __darr_type
@@ -54,12 +59,12 @@ namespace itmp { template <typename __darr_type> class dynamic_array
             }
 
             (this-> darr_layer_tmp) = new __darr_type [(this-> darr_length)];
-            
+
             for (int unsigned(ilayer_arr_pos ) = 0; ilayer_arr_pos != (this-> darr_length); ilayer_arr_pos ++)
                 (this-> darr_layer_tmp [ilayer_arr_pos]) = *(this-> get_darr_ilayer (__layer_arr_pos, ilayer_arr_pos));
-  
 
-            return((this-> darr_layer_tmp));  
+
+            return((this-> darr_layer_tmp));
         }
 
         // NOTE: add functions to resize the array
@@ -86,7 +91,7 @@ namespace itmp { template <typename __darr_type> class dynamic_array
 
     private :
         __darr_type(* darr_layer_tmp ) = nullptr;
-    
+
         bool(has_darr_init ) = false;
 
         enum data_id : const int unsigned { __main = 0, __swap = 1 } ;

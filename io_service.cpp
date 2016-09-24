@@ -1,5 +1,10 @@
 # include "io_service.hpp"
 
+/* Created and Designed by mrdoomlittle
+* Github: https://github.com/mrdoomlittle
+* Email: doctordoomlittle@gmail.com
+*/
+
 # ifndef ARDUINO
     # include <iostream>
 # endif
@@ -39,11 +44,12 @@ io_service::io_service (
     for (int unsigned x = 0; x != (this-> get_info_pcount()); x++)
         (this-> set_info_pid((def_digit_o_pin_ids [x]), x));
 
-    (this-> set_infi_clock_pid(6));
-    (this-> set_info_clock_pid(7));
+    (this-> set_mio_clock_pid(6));
+    (this-> set_infi_clock_pid(7));
+    (this-> set_info_clock_pid(8));
 
-    (this-> set_infi_latch_pid(8));
-    (this-> set_info_latch_pid(9));
+    (this-> set_infi_latch_pid(9));
+    (this-> set_info_latch_pid(10));
 
     // this is for debugging
     (this-> digit_info_bitset [0] ) = 1;
@@ -88,12 +94,17 @@ io_service::io_service (
     # endif
 
     (this-> set_digit_pmode (
-        (this-> get_infi_clock_pid( ) ),
+        (this-> get_mio_clock_pid( ) ),
         digit_pin_input_mode
     ) );
 
     (this-> set_digit_pmode (
         (this-> get_infi_clock_pid( ) ),
+        digit_pin_input_mode
+    ) );
+
+    (this-> set_digit_pmode (
+        (this-> get_info_clock_pid( ) ),
         digit_pin_output_mode
     ) );
 
@@ -128,6 +139,10 @@ io_service::io_service (
         (this-> set_mltick_count ( (this-> real_mltick_count ) ) );
 
         (this-> update_clock_reading( ) );
+
+        (this-> update_infi_clock_pstate((this-> get_digit_pstate((this-> get_infi_clock_pid())))));
+
+        (this-> set_digit_pstate((this-> get_info_clock_pid()), (this-> get_info_clock_pstate())));
 
         // this might be moved or changed
         //(this-> set_io_bitset((bitset_id::__i_bitset), (this-> get_i_bitset((sg_type::__total_array), 0)), (sg_type::__total_array), 0));
@@ -211,6 +226,12 @@ io_service::io_service (
             if ( (this-> o_bitset_finished [o_bitsetf_pos] ) == true) (this-> o_bitsetf_truec ) ++;
             if ( (this-> o_bitsetf_truec ) == ( (this-> info_bitset_length ) / (this-> get_info_pcount()) ) )
             {
+                (this-> set_digit_pstate((this-> get_info_latch_pid()), digit_pin_high_state));
+
+                for (int x = 0; x != 1000; x++){} // this is only temporary
+
+                (this-> set_digit_pstate((this-> get_info_latch_pid()), digit_pin_low_state));
+
                 (this-> o_bitsetf_truec ) = 0;
 # ifndef ARDUINO
                 std::cout << "OBITSET: Finished, TrueC: " << (this-> o_bitsetf_truec) << ", MTickC: " << (this-> get_mltick_count()) << std::endl;
@@ -308,6 +329,8 @@ io_service::io_service (
 
             if ( (this-> get_iltick_count( ) ) <= ( ((this-> get_infi_pcount()) - 1) + ((this-> ibit_read_delay) - 1) ) && ( (this-> get_iltick_count( ) ) ) >= ((this-> ibit_read_delay) - 1) )
             {
+                if ((this-> get_infi_clock_pstate()) != 0x1) goto skip_if;
+                
                 (this-> digit_i_buffer [(this-> digit_i_buffer_pos)] ) = (this-> get_digit_pstate ( (this-> get_infi_pid((this-> digit_i_buffer_pos))) ) );
 
                 if ( (this-> get_iltick_count( ) ) == ( ( ((this-> get_infi_pcount()) - 1) + ((this-> ibit_read_delay) - 1) ) + (this-> ibp_pcount_multiplier) ) )
@@ -330,13 +353,17 @@ io_service::io_service (
                         (this-> digit_infi_bitset [( (this-> i_bitset_fcount ) * (this-> get_infi_pcount()) + i_bitset_pos)] ) = (this-> digit_i_buffer [i_bitset_pos] );
 
                     if ( (this-> i_bitset_finished [(this-> i_bitset_fcount )] ) == false)
+                    {
                         (this-> i_bitset_finished [(this-> i_bitset_fcount )] ) = true;
+                    }
 
                     if ( (this-> i_bitset_fcount ) == ((this-> infi_bitset_length ) / (this-> get_infi_pcount()) ) - 1)
                         (this-> i_bitset_fcount ) = 0;
                     else
                         (this-> i_bitset_fcount ) ++;
                 }
+                skip_if:
+                std::cout << "" << std::endl;
             }
 
             (this-> set_iltick_count ( (this-> o_iltick_count ) ) );
@@ -349,7 +376,10 @@ io_service::io_service (
                         (this-> digit_o_buffer [o_bitset_pos] ) = (this-> digit_info_bitset [( (this-> o_bitset_fcount ) * (this-> get_info_pcount()) + o_bitset_pos )] );
 
                     if ( (this-> o_bitset_finished [(this-> o_bitset_fcount )] ) == false)
+                    {
+                        //(this-> set_digit_pstate((this-> get_info_latch_pid()), digit_pin_high_state));
                         (this-> o_bitset_finished [(this-> o_bitset_fcount )] ) = true;
+                    }
 
                     if ( (this-> o_bitset_fcount ) == ( (this-> info_bitset_length ) / (this-> get_info_pcount()) ) - 1)
                         (this-> o_bitset_fcount ) = 0;
@@ -537,7 +567,7 @@ bool
 bool
 (io_service::is_external_clock (bool(__is_type ) ) )
 {
-    return ( (this-> get_digit_pstate_fptr ( (this-> get_infi_clock_pid() ) ) ) == __is_type? true : false);
+    return ( (this-> get_digit_pstate_fptr ( (this-> get_mio_clock_pid() ) ) ) == __is_type? true : false);
 }
 
 void
@@ -555,7 +585,7 @@ void
 void
 (io_service::update_clock_reading( ) )
 {
-    (this-> external_clock_reading ) = (this-> get_digit_pstate_fptr ( (this-> get_infi_clock_pid() ) ) ) == 1? true : false;
+    (this-> external_clock_reading ) = (this-> get_digit_pstate_fptr ( (this-> get_mio_clock_pid() ) ) ) == 1? true : false;
 }
 
 void

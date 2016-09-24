@@ -1,5 +1,10 @@
 # ifndef ARDUINO
 
+/* Created and Designed by mrdoomlittle
+* Github: https://github.com/mrdoomlittle
+* Email: doctordoomlittle@gmail.com
+*/
+
 # include "io_service.hpp"
 
 # include <boost/cstdint.hpp>
@@ -20,7 +25,8 @@ bool o_buffer_finished = false;
 void
 (set_digit_pin_state (uint8_t (__pin_id ), uint8_t (__pin_state ) ) )
 {
-//    std::cout << "PIN_ID: " << unsigned(__pin_id) << ", PIN_STATE: " << unsigned(__pin_state)<< std::endl;
+    std::cout << "PIN_ID: " << unsigned(__pin_id) << ", PIN_STATE: " << unsigned(__pin_state)<< std::endl;
+if (__pin_id == 4 || __pin_id == 5) {
     if (set_call_count == 8)
     {
         if (inner_call_count == 7)
@@ -36,9 +42,11 @@ void
 
     output_buffer[inner_call_count][set_call_count] = __pin_state;
     set_call_count ++;
+}
 
-    if (o_buffer_finished == true)
+    if ((__pin_id == 9 && __pin_state == 0x1))
     {
+        std::cout << "SCC: " << set_call_count << ", ICC: " << inner_call_count << std::endl;
         for (int unsigned y = 0; y != 8; y ++)
         {
             std::cout << "OBITSET( ID: " << y << " ): ";
@@ -65,6 +73,10 @@ int unsigned(current_arr_pos ) = 0;
 int unsigned(simulated_return_c ) = 0;
 int unsigned(current_pin_pos_c ) = 0;
 
+
+int unsigned tttt [4] = {0x1, 0x0, 0x1, 0x0};
+int unsigned xcc = 0;
+int unsigned out = 0;
 int
 (get_digit_pin_state (uint8_t(__pin_id ) ) )
 {
@@ -92,7 +104,19 @@ int
         else
             current_pin_pos_c ++;
         return simulated_return_c;
-    } return 0;
+    }
+    if (__pin_id = 7 )
+    {
+        out = tttt[xcc];
+        if (xcc == 3)
+        {
+            xcc = 0;
+        } else xcc ++;
+
+        return  out;
+    }
+
+
 }
 
 int unsigned tcount = 0;

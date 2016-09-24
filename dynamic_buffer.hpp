@@ -1,5 +1,11 @@
 # ifndef __dynamic__buffer__hpp__
 # define __dynamic__buffer__hpp__
+
+/* Created and Designed by mrdoomlittle
+* Github: https://github.com/mrdoomlittle
+* Email: doctordoomlittle@gmail.com
+*/
+
 // this sill have many bugs and some things are not working
 
 /*
