@@ -11,36 +11,49 @@
 namespace itmp { class pin_manager
 {
     private :
-        uint8_t(digit_clock_pid ) = def_digit_clock_pin_id;
+        uint8_t(digit_infi_clock_pid ) = def_digit_infi_clock_pid;
+        uint8_t(digit_info_clock_pid ) = def_digit_info_clock_pid;
 
-        bool
-        (clock_pid_sstate ); // allowing multi clocks will be added later
-        int unsigned
-        (* clock_pin_pstate ) = new int unsigned [2];
+        bool(infi_clock_pid_sstate ) = false;
+        bool(info_clock_pid_sstate ) = false;
 
-        uint8_t(digit_latch_pid ) = def_digit_latch_pin_id;
-        bool
-        (latch_pid_sstate );
-        int unsigned
-        (* latch_pin_pstate ) = new int unsigned [2];
+        int(infi_clock_pstate ) = digit_pin_low_state;
+        int(info_clock_pstate ) = digit_pin_low_state;
+
+        int(infi_clock_pmode ) = digit_pin_input_mode;
+        int(info_clock_pmode ) = digit_pin_output_mode;
+
+        uint8_t(digit_infi_latch_pid ) = def_digit_infi_latch_pid;
+        uint8_t(digit_info_latch_pid ) = def_digit_info_latch_pid;
+
+        bool(infi_latch_pid_sstate ) = false;
+        bool(info_latch_pid_sstate ) = false;
+
+        int(infi_latch_pstate ) = digit_pin_low_state;
+        int(info_latch_pstate ) = digit_pin_low_state;
+
+        int(infi_latch_pmode ) = digit_pin_input_mode;
+        int(info_latch_pmode ) = digit_pin_output_mode;
 
         int unsigned(digit_infi_pcount ) = def_digit_i_pin_count;
 
         dynamic_array <bool> infi_pid_sstate_list;
 
-        dynamic_array <uint8_t> digit_infi_pid_list;
+        dynamic_array <int> infi_pstate_list;
 
-        int unsigned
-        (* * i_pin_pstate ) = new int unsigned * [(digit_infi_pcount)];
+        dynamic_array <int> infi_pmode_list;
+
+        dynamic_array <uint8_t> digit_infi_pid_list;
 
         int unsigned(digit_info_pcount ) = def_digit_o_pin_count;
 
         dynamic_array <bool> info_pid_sstate_list;
 
-        dynamic_array <uint8_t> digit_info_pid_list;
+        dynamic_array <int> info_pstate_list;
 
-        int unsigned
-        (* * o_pin_pstate ) = new int unsigned * [(digit_info_pcount)];
+        dynamic_array <int> info_pmode_list;
+
+        dynamic_array <uint8_t> digit_info_pid_list;
     public :
         pin_manager ( );
         ~pin_manager( ) { }
@@ -59,30 +72,80 @@ namespace itmp { class pin_manager
         */
 
         void
-        (set_clock_pid (uint8_t(__digit_pid ) ) );
+        (set_infi_clock_pid (uint8_t(__digit_pid ) ) );
         uint8_t
-        (get_clock_pid( ) );
+        (get_infi_clock_pid( ) );
         void
-        (uset_clock_pid( ) );
+        (uset_infi_clock_pid( ) );
         void
-        (set_clock_pid_sstate (bool(__pid_sstate ) ) );
+        (set_infi_clock_pid_sstate (bool(__pid_sstate ) ) );
         bool
-        (get_clock_pid_sstate( ) );
+        (get_infi_clock_pid_sstate( ) );
         bool
-        (is_clock_pid_sstate (bool(__pid_sstate ) ) );
+        (is_infi_clock_pid_sstate (bool(__pid_sstate ) ) );
+        void
+        (update_infi_clock_pstate (int(__infi_clock_pstate ) ) );
+        int
+        (get_infi_clock_pstate( ) );
+        int
+        (get_infi_clock_pmode( ) );
 
         void
-        (set_latch_pid (uint8_t(__digit_pid ) ) );
+        (set_info_clock_pid (uint8_t(__digit_pid ) ) );
         uint8_t
-        (get_latch_pid( ) );
+        (get_info_clock_pid( ) );
         void
-        (uset_latch_pid( ) );
+        (uset_info_clock_pid( ) );
         void
-        (set_latch_pid_sstate (bool(__pid_sstate ) ) );
+        (set_info_clock_pid_sstate (bool(__pid_sstate ) ) );
         bool
-        (get_latch_pid_sstate( ) );
+        (get_info_clock_pid_sstate( ) );
         bool
-        (is_latch_pid_sstate (bool(__pid_sstate ) ) );
+        (is_info_clock_pid_sstate (bool(__pid_sstate ) ) );
+        void
+        (update_info_clock_pstate (int(__info_clock_pstate ) ) );
+        int
+        (get_info_clock_pstate( ) );
+        int
+        (get_info_clock_pmode( ) );
+
+        void
+        (set_infi_latch_pid (uint8_t(__digit_pid ) ) );
+        uint8_t
+        (get_infi_latch_pid( ) );
+        void
+        (uset_infi_latch_pid( ) );
+        void
+        (set_infi_latch_pid_sstate (bool(__pid_sstate ) ) );
+        bool
+        (get_infi_latch_pid_sstate( ) );
+        bool
+        (is_infi_latch_pid_sstate (bool(__pid_sstate ) ) );
+        void
+        (update_infi_latch_pstate (int(__infi_latch_pstate ) ) );
+        int
+        (get_infi_latch_pstate( ) );
+        int
+        (get_infi_latch_pmode( ) );
+
+        void
+        (set_info_latch_pid (uint8_t(__digit_pid ) ) );
+        uint8_t
+        (get_info_latch_pid( ) );
+        void
+        (uset_info_latch_pid( ) );
+        void
+        (set_info_latch_pid_sstate (bool(__pid_sstate ) ) );
+        bool
+        (get_info_latch_pid_sstate( ) );
+        bool
+        (is_info_latch_pid_sstate (bool(__pid_sstate ) ) );
+        void
+        (update_info_latch_pstate (int(__info_latch_pstate ) ) );
+        int
+        (get_info_latch_pstate( ) );
+        int
+        (get_info_latch_pmode( ) );
 
         void
         (set_infi_pid(uint8_t(__digit_pid), int unsigned(__infi_pid_pos)));
@@ -96,6 +159,11 @@ namespace itmp { class pin_manager
         (get_infi_pid_sstate(int unsigned(__infi_pid_pos)));
         bool
         (is_infi_pid_sstate(bool(__pid_sstate ) ,int unsigned(__infi_pid_pos)));
+        int unsigned
+        (get_infi_pcount( ) )
+        {
+            return(this-> digit_infi_pcount);
+        }
 
         void
         (set_info_pid(uint8_t(__digit_pid), int unsigned(__info_pid_pos)));
@@ -109,6 +177,11 @@ namespace itmp { class pin_manager
         (get_info_pid_sstate(int unsigned(__info_pid_pos)));
         bool
         (is_info_pid_sstate(bool(__pid_sstate ), int unsigned(__info_pid_pos)));
+        int unsigned
+        (get_info_pcount( ) )
+        {
+            return(this-> digit_info_pcount);
+        }
 } ; }
 
 # endif /*__pin__manager__hpp__*/

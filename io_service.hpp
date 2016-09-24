@@ -6,11 +6,13 @@
 # else
     # include <boost/cstdint.hpp>
 # endif
+
 # include "itmp_config.hpp"
 # include "dynamic_array.hpp"
 # include "dynamic_buffer.hpp"
-# include "bitset.hpp"
 # include "pin_manager.hpp"
+# include "bitset.hpp"
+
 /* created by mrdoomlittle / daniel robson
 * github: https://github.com/mrdoomlittle
 * email: doctordoomlittle@gmail.com
@@ -28,49 +30,48 @@ namespace itmp { class io_service : public pin_manager
 
         int unsigned(ibit_read_delay ) = 0;
 
-        int unsigned(i_bitset_size ) = 0;
+        int unsigned(infi_bitset_length ) = 0;
 
         int unsigned(obyte_write_delay ) = 0;
 
         int unsigned(obit_write_delay ) = 0;
 
-        int unsigned(o_bitset_size ) = 0;
+        int unsigned(info_bitset_length ) = 0;
 
         int unsigned(ibitset_buff_size ) = 0;
         int unsigned(obitset_buff_size ) = 0;
+
         int unsigned(shared_i_var_count ) = 0;
-int unsigned(shared_o_var_count ) = 0;
+        int unsigned(shared_o_var_count ) = 0;
 
-int unsigned(shared_i_buff_size ) = 0;
-int unsigned(shared_o_buff_size ) = 0;
+        int unsigned(shared_i_buff_size ) = 0;
+        int unsigned(shared_o_buff_size ) = 0;
     protected :
-        typedef void( (set_digit_pin_mode_ft ) (uint8_t, uint8_t) );
-        set_digit_pin_mode_ft(* set_digit_pin_mode_fptr ) = nullptr;
+        typedef void( (set_digit_pmode_ft ) (uint8_t, uint8_t) );
+        set_digit_pmode_ft(* set_digit_pmode_fptr ) = nullptr;
 
-        typedef void( (set_digit_pin_state_ft) (uint8_t, uint8_t) );
-        set_digit_pin_state_ft(* set_digit_pin_state_fptr ) = nullptr;
+        typedef void( (set_digit_pstate_ft) (uint8_t, uint8_t) );
+        set_digit_pstate_ft(* set_digit_pstate_fptr ) = nullptr;
 
-        typedef int( (get_digit_pin_state_ft ) (uint8_t) );
-        get_digit_pin_state_ft(* get_digit_pin_state_fptr ) = nullptr;
+        typedef int( (get_digit_pstate_ft ) (uint8_t) );
+        get_digit_pstate_ft(* get_digit_pstate_fptr ) = nullptr;
 
-        typedef void( (external_mlinit_ft ) (io_service *) );
-        external_mlinit_ft(* external_mlinit_fptr ) = nullptr;
+        typedef void( (extern_mlinit_ft ) (io_service *) );
+        extern_mlinit_ft(* extern_mlinit_fptr ) = nullptr;
 
-        typedef void( (external_mltick_ft ) (io_service *) );
-        external_mltick_ft(* external_mltick_fptr ) = nullptr;
+        typedef void( (extern_mltick_ft ) (io_service *) );
+        extern_mltick_ft(* extern_mltick_fptr ) = nullptr;
     public :
-        io_service (
-            set_digit_pin_mode_ft(* __set_digit_pin_mode_fptr) = nullptr,
-            set_digit_pin_state_ft(* __set_digit_pin_state_fptr) = nullptr,
-            get_digit_pin_state_ft(* __get_digit_pin_state_fptr) = nullptr,
-            external_mlinit_ft(* __external_mlinit_fptr) = nullptr,
-            external_mltick_ft(* __external_mltick_fptr) = nullptr
+        io_service
+        (
+            set_digit_pmode_ft(* __set_digit_pmode_fptr) = nullptr,
+            set_digit_pstate_ft(* __set_digit_pstate_fptr) = nullptr,
+            get_digit_pstate_ft(* __get_digit_pstate_fptr) = nullptr,
+            extern_mlinit_ft(* __extern_mlinit_fptr) = nullptr,
+            extern_mltick_ft(* __extern_mltick_fptr) = nullptr
         );
 
-        ~io_service( )
-        {
-
-        }
+        ~io_service( ) { }
     private :
         int unsigned(mltick_delay) = def_mltick_delay;
         int unsigned(iltick_delay) = def_iltick_delay;
@@ -80,18 +81,10 @@ int unsigned(shared_o_buff_size ) = 0;
         int unsigned(i_iltick_count) = 0;
         int unsigned(o_iltick_count) = 0;
 
-        // NOTE: move this to the cpp file
         void
-        (update_rmltick_count (int unsigned(__update_amount ) ) )
-        {
-            (this-> real_mltick_count ) += __update_amount;
-        }
-
+        (update_rmltick_count (int unsigned(__update_amount ) ) );
         void
-        (update_rimltick_count (int unsigned(__update_amount ) ) )
-        {
-            (this-> real_iltick_count ) += __update_amount;
-        }
+        (update_rimltick_count (int unsigned(__update_amount ) ) );
 
         bool(ilclockp_toggled) = false;
         int unsigned(ilclockp_tcount) = 0;
@@ -100,10 +93,10 @@ int unsigned(shared_o_buff_size ) = 0;
         int unsigned(ilclockn_tcount ) = 0;
 
         uint8_t
-        (* digit_i_bitset ) = new uint8_t [i_bitset_size];
+        (* digit_infi_bitset ) = new uint8_t [infi_bitset_length];
 
         bool
-        (* i_bitset_finished ) = new bool [(i_bitset_size / digit_i_pin_count)];
+        (* i_bitset_finished ) = new bool [(infi_bitset_length / digit_i_pin_count)];
 
         int unsigned(i_bitset_fcount ) = 0;
     public :
@@ -144,10 +137,10 @@ int unsigned(shared_o_buff_size ) = 0;
         bitset <__bitset_type> (* digit_io_bitset ) = new bitset <__bitset_type> [2];
 
         uint8_t
-        (* digit_o_bitset ) = new uint8_t [o_bitset_size];
+        (* digit_info_bitset ) = new uint8_t [info_bitset_length];
 
         bool
-        (* o_bitset_finished ) = new bool [(o_bitset_size / digit_o_pin_count)];
+        (* o_bitset_finished ) = new bool [(info_bitset_length / digit_o_pin_count)];
 
         int unsigned(o_bitset_fcount ) = 0;
 
@@ -155,9 +148,6 @@ int unsigned(shared_o_buff_size ) = 0;
         dynamic_buffer <uint8_t> (o_bitset_buffer);
         int unsigned(o_bitset_buff_pos [2]) = {0, 0};
     private :
-        // NOTE move everything to do with setting/getting/etc of the pin to another source file with its own header file
-
-
         int unsigned(digit_i_buffer_pos ) = 0;
         int unsigned(digit_o_buffer_pos ) = 0;
 
@@ -180,20 +170,20 @@ int unsigned(shared_o_buff_size ) = 0;
         (* shared_o_variable ) = new uint8_t [shared_o_var_count];
 
         void
-        (set_digit_pin_mode (uint8_t(__pin_id ), uint8_t(__pin_mode ) ) );
+        (set_digit_pmode (uint8_t(__pin_id ), uint8_t(__pin_mode ) ) );
         void
-        (set_digit_pin_state (uint8_t(__pin_id ), uint8_t(__pin_state ) ) );
+        (set_digit_pstate (uint8_t(__pin_id ), uint8_t(__pin_state ) ) );
         bool
-        (get_digit_pin_state (uint8_t(__pin_id ) ));
+        (get_digit_pstate (uint8_t(__pin_id ) ));
 
         void
-        (call_external_mlinit (io_service(* __class_ptr ) ) );
+        (call_extern_mlinit (io_service(* __class_ptr ) ) );
         void
-        (call_external_mltick (io_service(* __class_ptr ) ) );
+        (call_extern_mltick (io_service(* __class_ptr ) ) );
 
         int unsigned(external_clock_ptcount ) = 0;
         int unsigned(external_clock_ntcount ) = 0;
-        // NOTE
+
         bool(external_clock_reading ) = false;
 
         void

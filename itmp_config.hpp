@@ -8,17 +8,21 @@
 # define digit_pin_low_state 0x0
 
 # define def_digit_clock_pin_id 6
+# define def_digit_infi_clock_pid 6
+# define def_digit_info_clock_pid 7
+
 # define def_clock_start_state 0x1
 const int(def_clock_power_state [2]) = { 0x1, 0x0 } ;
 # define def_clock_trigger_method 0
 
-# define def_digit_latch_pin_id 7
+# define def_digit_infi_latch_pid 8
+# define def_digit_info_latch_pid 9
 
 # define def_digit_i_pin_count 2
 const int unsigned def_digit_i_pin_ids [def_digit_i_pin_count] = { 2, 3 } ;
 const int(def_i_pin_power_state [def_digit_i_pin_count] [2]) = { {0x1, 0x0}, {0x1, 0x0} };
 
-# define def_i_bitset_size 8
+# define def_infi_bitset_length 8
 # define def_ibit_read_delay 1
 # define def_ibyte_read_delay 1
 # define def_ibitset_buff_size 8
@@ -27,7 +31,7 @@ const int(def_i_pin_power_state [def_digit_i_pin_count] [2]) = { {0x1, 0x0}, {0x
 const int unsigned def_digit_o_pin_ids [def_digit_o_pin_count] = { 2, 3 } ;
 const int(def_o_pin_power_state [def_digit_o_pin_count] [2]) = { {0x1, 0x0}, {0x1, 0x0} };
 
-# define def_o_bitset_size 8
+# define def_info_bitset_length 8
 # define def_obit_write_delay 1
 # define def_obyte_write_delay 1
 # define def_obitset_buff_size 8
