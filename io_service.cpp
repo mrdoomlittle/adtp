@@ -32,10 +32,13 @@ itmp::io_service::io_service (
     (this-> toggle_iloop_state( ) );
 
     for (int unsigned x = 0; x != digit_i_pin_count; x++)
-        (this-> digit_i_pin_ids [x] ) = (def_digit_i_pin_ids [x]);
+        (this-> set_infi_pid((def_digit_i_pin_ids [x]), x));
 
     for (int unsigned x = 0; x != digit_o_pin_count; x++)
-        (this-> digit_o_pin_ids [x] ) = (def_digit_o_pin_ids [x]);
+        (this-> set_info_pid((def_digit_o_pin_ids [x]), x));
+
+    (this-> set_clock_pid(6));
+    (this-> set_latch_pid(7));
 
     // this is for debugging
     (this-> digit_o_bitset [0] ) = 1;
@@ -47,25 +50,8 @@ itmp::io_service::io_service (
     (this-> digit_o_bitset [6] ) = 1;
     (this-> digit_o_bitset [7] ) = 1;
 
-    // this might be changed later 
-    # ifdef def_digit_clock_pin_id
-        digit_clock_pin_id = def_digit_clock_pin_id;
-    # endif
-
-    # ifdef def_clock_start_state
-        clock_start_state = def_clock_start_state;
-    # endif
-
-    # ifdef def_clock_trigger_method
-        clock_trigger_method = def_clock_trigger_method;
-    # endif
-
-    # ifdef def_digit_latch_pin_id
-        digit_latch_pin_id = def_digit_latch_pin_id;
-    # endif
-
     # ifdef def_digit_i_pin_count
-        digit_i_pin_count = def_digit_i_pin_count; 
+        digit_i_pin_count = def_digit_i_pin_count;
     # endif
 
     # ifdef def_i_bitset_size
@@ -95,7 +81,7 @@ itmp::io_service::io_service (
     # ifdef def_obit_write_delay
         obit_write_delay = def_obit_write_delay;
     # endif
-    
+
     # ifdef def_obyte_write_delay
         obyte_write_delay = def_obyte_write_delay;
     # endif
@@ -105,7 +91,7 @@ itmp::io_service::io_service (
     # endif
 
     (this-> set_digit_pin_mode (
-        (this-> digit_clock_pin_id ),
+        (this-> get_clock_pid( ) ),
         digit_pin_input_mode
     ) );
 
@@ -152,7 +138,7 @@ itmp::io_service::io_service (
         (this-> ibit_read_delay ) = ( (this-> ibit_read_delay ) + ( ( (this-> ibyte_read_delay ) - 1) * ( (this-> i_bitset_size ) / (this-> digit_i_pin_count ) ) ) );
         (this-> obit_write_delay ) = ( (this-> obit_write_delay ) + ( ( (this-> obyte_write_delay ) - 1) * ( (this-> o_bitset_size ) / (this-> digit_o_pin_count ) ) ) );
 
-        if ( (this-> get_mltick_count( ) ) == 0 ) 
+        if ( (this-> get_mltick_count( ) ) == 0 )
             (this-> call_external_mlinit (this ) );
 
         (this-> call_external_mltick (this ) );
@@ -161,12 +147,12 @@ itmp::io_service::io_service (
             (this-> o_bitset_buffer).add_to_dbuff((this-> get_io_bitset (1, 0, x)), 2, 0, 0, x, true, true, false);
 
 # ifndef ARDUINO
-        for (int unsigned(x ) = 0; x != ( (this-> i_bitset_size ) / (this->digit_i_pin_count ) ); x ++ )
+        for (int unsigned(x ) = 0; x != ( (this-> i_bitset_size ) / (this-> digit_i_pin_count ) ); x ++ )
                 std::cout << (this-> i_bitset_finished [x] );
 
         std::cout << " :IFBIT, ";
 
-        for (int unsigned(x ) = 0; x != ( (this-> o_bitset_size ) / (this->digit_o_pin_count ) ); x ++ )
+        for (int unsigned(x ) = 0; x != ( (this-> o_bitset_size ) / (this-> digit_o_pin_count ) ); x ++ )
             std::cout << (this-> o_bitset_finished [x] );
         std::cout << " :OFBIT";
 
@@ -194,9 +180,9 @@ itmp::io_service::io_service (
 # ifndef ARDUINO
                 for (int unsigned(x ) = 0; x != (this-> i_bitset_size ); x ++ )
                     std::cout << "STATE: " << i_bitset_buffer.is_block_smarker(true, 0, x) << ", DBUFF_ID: " << x << std::endl;
-               
-                
- 
+
+
+
                 std::cout << "DBUFF_POS: " << i_bitset_buff_pos << std::endl;
 # endif
                 if ( (this-> i_bitset_buff_pos[0] ) == (this-> ibitset_buff_size ) - 1)
@@ -236,7 +222,7 @@ itmp::io_service::io_service (
 # endif
                 for (int unsigned(x ) = 0; x != ( (this-> o_bitset_size ) / (this-> digit_o_pin_count ) ); x ++ )
                     (this-> o_bitset_finished [x] ) = false;
-           
+
                 //for (int unsigned(x ) = 0; x != (this-> obitset_buff_size ); x++ )
                 //{
                     if ((this-> o_bitset_buffer).is_block_smarker(true, 0, (this-> o_bitset_buff_pos[0] )) == true)
@@ -247,12 +233,12 @@ itmp::io_service::io_service (
 # ifndef ARDUINO
                         std::cout << "PROSSING: B" << (this-> o_bitset_buff_pos[0] ) << std::endl;
 # endif
-                        
-                        
+
+
                     }
 
                 //}
- 
+
                 if ( (this-> o_bitset_buff_pos[0] ) == (this-> obitset_buff_size ) - 1)
                 {
                     (this-> o_bitset_buff_pos[0] ) = 0;
@@ -263,7 +249,7 @@ itmp::io_service::io_service (
         }
 
         // if you look up that bit of code only calls when the bitset has been pushed to the output so it wont be called at startup) this is a quick fix for that
-        
+
         if ((this-> get_mltick_count()) == 0)
         {
             if ((this-> o_bitset_buffer).is_block_smarker(true, 0, (this-> o_bitset_buff_pos[0] )) == true)
@@ -320,7 +306,7 @@ itmp::io_service::io_service (
 
             if ( (this-> get_iltick_count( ) ) <= ( ((this-> digit_i_pin_count) - 1) + ((this-> ibit_read_delay) - 1) ) && ( (this-> get_iltick_count( ) ) ) >= ((this-> ibit_read_delay) - 1) )
             {
-                (this-> digit_i_buffer [(this-> digit_i_buffer_pos)] ) = (this-> get_digit_pin_state ( (this-> digit_i_pin_ids [(this-> digit_i_buffer_pos)] ) ) );
+                (this-> digit_i_buffer [(this-> digit_i_buffer_pos)] ) = (this-> get_digit_pin_state ( (this-> get_infi_pid((this-> digit_i_buffer_pos))) ) );
 
                 if ( (this-> get_iltick_count( ) ) == ( ( ((this-> digit_i_pin_count ) - 1) + ((this-> ibit_read_delay) - 1) ) + (this-> ibp_pcount_multiplier) ) )
                 {
@@ -370,7 +356,7 @@ itmp::io_service::io_service (
                 }
 
                 (this-> set_digit_pin_state (
-                    (this-> digit_o_pin_ids [(this-> digit_o_buffer_pos )] ),
+                    (this-> get_info_pid((this-> digit_o_buffer_pos))),
                     (this-> digit_o_buffer [(this-> digit_o_buffer_pos )] )
                 ) );
 
@@ -499,7 +485,7 @@ bool
 bool
 (itmp::io_service::is_external_clock (bool(__is_type ) ) )
 {
-    return ( (this-> get_digit_pin_state_fptr ( (this-> digit_clock_pin_id ) ) ) == __is_type? true : false);
+    return ( (this-> get_digit_pin_state_fptr ( (this-> get_clock_pid() ) ) ) == __is_type? true : false);
 }
 
 void
@@ -517,7 +503,7 @@ void
 void
 (itmp::io_service::update_clock_reading( ) )
 {
-    (this-> external_clock_reading ) = (this-> get_digit_pin_state_fptr ( (this-> digit_clock_pin_id ) ) ) == 1? true : false;
+    (this-> external_clock_reading ) = (this-> get_digit_pin_state_fptr ( (this-> get_clock_pid() ) ) ) == 1? true : false;
 }
 
 void
@@ -556,6 +542,18 @@ int unsigned
     return (this-> service_iltick_count );
 }
 
+void
+(itmp::io_service::reset_mltick_count( ) )
+{
+    (this-> service_mltick_count) = 0;
+}
+
+void
+(itmp::io_service::reset_iltick_count( ) )
+{
+    (this-> service_iltick_count) = 0;
+}
+
 bool
 (itmp::io_service::is_mloop_running (bool(__is_type ) ) )
 {
@@ -586,7 +584,7 @@ void
             }
         break;
 
-        case (bitset_id::__o_bitset) :   
+        case (bitset_id::__o_bitset) :
             switch(__set_type)
             {
                 case (sg_type::__individual):
@@ -599,7 +597,7 @@ void
 
                 default : return;
             }
- 
+
         default : return;
     }
 }

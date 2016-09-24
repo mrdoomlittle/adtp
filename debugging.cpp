@@ -33,10 +33,10 @@ void
 
         set_call_count = 0;
     }
-     
+
     output_buffer[inner_call_count][set_call_count] = __pin_state;
     set_call_count ++;
-   
+
     if (o_buffer_finished == true)
     {
         for (int unsigned y = 0; y != 8; y ++)
@@ -98,7 +98,7 @@ int
 int unsigned tcount = 0;
 int unsigned ltime = 1;
 int unsigned pos = 0;
-uint8_t test[8][8] = 
+uint8_t test[8][8] =
 {
     {0, 1, 1, 1, 1, 1, 1, 1},
     {1, 0, 1, 1, 1, 1, 1, 1},
@@ -119,7 +119,7 @@ void
 void
 (external_mltick (itmp::io_service(* _this ) ) )
 {
-    
+
         std::cout << "SET_IO_BITSET" << std::endl;
         _this-> set_io_bitset(1, test[pos], 1, 0);
         _this-> flip_io_bitset(1);
@@ -128,7 +128,7 @@ void
             pos = 0;
         else
             pos ++;
-    
+
         for (int unsigned (x ) = 0; x != 8; x ++)
             std::cout << unsigned(* _this-> get_io_bitset(0, 0, x));
 
@@ -140,18 +140,18 @@ void
 
         std::cout << "/O::BITSET\n" << std::endl;
 
-    
+
 
     for (int unsigned(x ) = 0; x != 8; x ++)
     {
         for (int unsigned(y ) = 0; y != 8; y ++)
             std::cout << unsigned(*_this-> i_bitset_buffer.get_from_dbuff(2, 0, x, y, false, false, false, true));
-       
+
         if (_this-> i_bitset_buffer.is_block_smarker(true, 0, x) == true)
             std::cout << " & SM: " << "USED";
         else
             std::cout << " & SM: " << "FREE";
- 
+
         std::cout << " : : ";
 
         for (int unsigned(y ) = 0; y != 8; y ++)
@@ -171,18 +171,23 @@ void
     }
     tcount++;
 }
-
+# include "pin_manager.hpp"
+# include "itmp_config.hpp"
 int
 (main( ) )
 {
+
+
     itmp::io_service io_service
     (
         & set_digit_pin_mode,
         & set_digit_pin_state,
         & get_digit_pin_state,
         & external_mlinit,
-        & external_mltick 
+        & external_mltick
     );
+
+
 }
 
 # endif /*ARDUINO*/
