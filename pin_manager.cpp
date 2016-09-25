@@ -79,6 +79,38 @@ int unsigned
 }
 
 void
+(pin_manager::set_mio_clock_pneg_count(int unsigned(__clock_pneg_count)))
+{
+    (this-> mio_clock_pneg_count) = __clock_pneg_count;
+}
+void
+(pin_manager::set_infi_clock_pneg_count(int unsigned(__clock_pneg_count)))
+{
+    (this-> infi_clock_pneg_count) = __clock_pneg_count;
+}
+void
+(pin_manager::set_info_clock_pneg_count(int unsigned(__clock_pneg_count)))
+{
+    (this-> info_clock_pneg_count) = __clock_pneg_count;
+}
+
+int unsigned
+(pin_manager::get_mio_clock_pneg_count())
+{
+    return((this-> mio_clock_pneg_count));
+}
+int unsigned
+(pin_manager::get_infi_clock_pneg_count())
+{
+    return((this-> infi_clock_pneg_count));
+}
+int unsigned
+(pin_manager::get_info_clock_pneg_count())
+{
+    return((this-> info_clock_pneg_count));
+}
+
+void
 (pin_manager::set_mio_clock_pid (uint8_t(__digit_pid ) ) )
 {
     if (!(this-> is_pid_irange (__digit_pid) ) ) return;

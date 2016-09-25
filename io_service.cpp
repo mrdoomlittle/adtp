@@ -329,8 +329,22 @@ io_service::io_service (
 
             if ( (this-> get_iltick_count( ) ) <= ( ((this-> get_infi_pcount()) - 1) + ((this-> ibit_read_delay) - 1) ) && ( (this-> get_iltick_count( ) ) ) >= ((this-> ibit_read_delay) - 1) )
             {
-                if ((this-> get_infi_clock_pstate()) != 0x1) goto skip_if;
-                
+                if ((this-> get_infi_clock_pstate()) != 0x1)
+                {
+                    (this-> is_infi_clock_ppos) = true;
+                    (this-> set_infi_clock_ppos_count((this-> get_infi_clock_ppos_count()) + 1));
+                }
+
+                if ((this-> get_infi_clock_pstate()) != 0x0)
+                {
+                    (this-> is_infi_clock_ppos) = false;
+                    (this-> set_infi_clock_pneg_count((this-> get_infi_clock_pneg_count()) + 1));
+                }
+
+                if ((this-> is_infi_clock_ppos) == true) 
+                {
+                    std::cout << ": " << (this-> get_infi_clock_ppos_count())  << std::endl;
+    
                 (this-> digit_i_buffer [(this-> digit_i_buffer_pos)] ) = (this-> get_digit_pstate ( (this-> get_infi_pid((this-> digit_i_buffer_pos))) ) );
 
                 if ( (this-> get_iltick_count( ) ) == ( ( ((this-> get_infi_pcount()) - 1) + ((this-> ibit_read_delay) - 1) ) + (this-> ibp_pcount_multiplier) ) )
@@ -362,8 +376,11 @@ io_service::io_service (
                     else
                         (this-> i_bitset_fcount ) ++;
                 }
-                skip_if:
-                std::cout << "" << std::endl;
+
+                (this-> infi_clock_ltcount) ++ ;
+
+                (this-> is_infi_clock_ppos) = false;
+                }
             }
 
             (this-> set_iltick_count ( (this-> o_iltick_count ) ) );

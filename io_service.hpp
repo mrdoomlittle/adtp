@@ -160,6 +160,12 @@ namespace itmp { class io_service : public pin_manager
         int unsigned(i_bitsetf_truec ) = 0;
         int unsigned(o_bitsetf_truec ) = 0;
 
+        int unsigned(infi_clock_ltcount ) = 0;
+        bool(is_infi_clock_ppos) = false;
+
+        //int unsigned(infi_clock_ltcount ) = 0;    
+
+
         uint8_t
         (* digit_i_buffer ) = new uint8_t [digit_i_pin_count];
         uint8_t

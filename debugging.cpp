@@ -14,7 +14,7 @@
 # include <iostream>
 
 # include "dynamic_array.hpp"
-
+# include "carg_filter.hpp"
 void
 (set_digit_pin_mode (uint8_t (__pin_id ), uint8_t (__pin_mode ) ) ) { }
 
@@ -105,18 +105,18 @@ int
             current_pin_pos_c ++;
         return simulated_return_c;
     }
-    if (__pin_id = 7 )
+    if (__pin_id == 7 )
     {
         out = tttt[xcc];
         if (xcc == 3)
         {
             xcc = 0;
-        } else xcc ++;
+        } else { xcc ++; }
 
-        return  out;
+        return (out);
     }
 
-
+    return(0);
 }
 
 int unsigned tcount = 0;
@@ -200,7 +200,14 @@ void
 int
 (main( ) )
 {
+    itmp::carg_filter g;
+    char const ** args;
+    args = g.filter_list_in("Hello,I,O,P,Pelpoj", ",", 21);
 
+    for (int unsigned x = 0; x != g.get_sub_counter( ); x ++)
+    {
+        std::cout << args[x] << std::endl; 
+    }
 
     itmp::io_service io_service
     (
