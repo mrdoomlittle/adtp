@@ -23,12 +23,13 @@ namespace tmp { template <typename __darr_type> class dynamic_array
         (darr_init (int unsigned(__darr_length), int unsigned(__darr_depth ) ) )
         {
             if ((this-> is_darr_init(true)) == true) return;
-            if (__darr_length < 1 || __darr_depth < 1) return;
+            if (__darr_length < 1) return;
 
             (this-> darr_length) = __darr_length;
             (this-> darr_depth) = __darr_depth;
 
-            (this-> darr_ilayers [(data_id::__main)]) = new __darr_type [__darr_length * __darr_depth];
+            if (__darr_depth != 0)
+                (this-> darr_ilayers [(data_id::__main)]) = new __darr_type [__darr_length * __darr_depth];
 
             (this-> toggle_darr_init());
         }
@@ -73,6 +74,77 @@ namespace tmp { template <typename __darr_type> class dynamic_array
         }
 
         // NOTE: add functions to resize the array
+        void(resize_darr(int unsigned(__resize_type), int unsigned(__layer_arr_pos), int unsigned(__resize_to)))
+        {
+            switch(__resize_type)
+            {
+                case (resize_t::__single_layer) :
+                    
+                    break;
+                case (resize_t::__all_layers) :
+                    
+                    if (__resize_to <= (this-> darr_length)) return;
+
+                    (this-> darr_ilayers [(data_id::__swap)]) = new __darr_type [__resize_to * (this-> darr_depth)];
+
+                    for (int unsigned(x ) = 0; x != ((this-> darr_length) * (this-> darr_depth)); x ++)
+                        (this-> darr_ilayers [(data_id::__swap)] [x]) = (this-> darr_ilayers [(data_id::__main)] [x]);
+
+                    std::free((this-> darr_ilayers [(data_id::__main)]));
+
+                    (this-> darr_ilayers [(data_id::__main)]) = new __darr_type [__resize_to * (this-> darr_depth)];
+
+                    for (int unsigned(x ) = 0; x != (__resize_to * (this-> darr_depth)); x ++)
+                        (this-> darr_ilayers [(data_id::__main)] [x]) = (this-> darr_ilayers [(data_id::__swap)] [x]);
+
+                    std::free((this-> darr_ilayers [(data_id::__swap)]));
+
+                    (this-> darr_length ) = __resize_to;
+
+                    break;
+                default : return;
+            }
+        }
+
+        void(add_darr_layer())
+        {
+            if ((this-> darr_depth) != 0)
+            {
+                (this-> darr_ilayers [(data_id::__swap)]) = new __darr_type [(this-> darr_length) * (this-> darr_depth)];
+
+                for (int unsigned(x ) = 0; x != ((this-> darr_length) * (this-> darr_depth)); x ++)
+                    (this-> darr_ilayers [(data_id::__swap)] [x]) = (this-> darr_ilayers [(data_id::__main)] [x]);
+
+                std::free((this-> darr_ilayers [(data_id::__main)]));
+            }
+            
+            if ((this-> darr_depth) == 0)
+            {
+                (this-> darr_depth) ++;
+
+                (this-> darr_ilayers [(data_id::__main)]) = new __darr_type [(this-> darr_length) * (this-> darr_depth)];
+
+                return;
+            }
+
+            if ((this-> darr_depth) != 0) 
+            {
+                for (int unsigned(x ) = 0; x != ((this-> darr_length) * (this-> darr_depth)); x ++)
+                    (this-> darr_ilayers [(data_id::__main)] [x]) = (this-> darr_ilayers [(data_id::__swap)] [x]);
+
+                std::free((this-> darr_ilayers [(data_id::__swap)]));
+            }
+        }
+
+        int unsigned(get_darr_length())
+        {
+            return((this-> darr_length));
+        }
+
+        int unsigned(get_darr_depth())
+        {
+            return((this-> darr_depth));
+        }
 
         dynamic_array() {}
 
@@ -100,6 +172,7 @@ namespace tmp { template <typename __darr_type> class dynamic_array
         bool(has_darr_init ) = false;
 
         enum data_id : const int unsigned { __main = 0, __swap = 1 } ;
+        enum resize_t : const int unsigned { __single_layer = 0, __all_layers = 1 };
 
         int unsigned(darr_length ) = 0;
         int unsigned(darr_depth ) = 0;

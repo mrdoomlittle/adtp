@@ -21,7 +21,7 @@
 
 /* example: if the start state is 0x0 then the clock will start ticking when changes to 0x1
 */
-namespace tmp { class io_service : public pin_manager//, public data_packet for later
+namespace tmp { class io_service : public pin_manager, public data_packet
 {
 
     private :

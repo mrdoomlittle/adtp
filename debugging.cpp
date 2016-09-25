@@ -198,18 +198,27 @@ void
     tcount++;
 }
 
+# include "shift_reg.hpp"
+
 int
 (main( ) )
 {
     tmp::io_service io;
 
-    io.service_init(
+
+    tmp::shift_reg reg;
+
+    std::cout << "" << std::endl;
+    reg.add_shift_register();
+/*
+    io.service_init
+    (
         & set_digit_pin_mode,
         & set_digit_pin_state,
         & get_digit_pin_state,
         & external_mlinit,
         & external_mltick
-    );
+    );*/
 }
 
 # endif /*ARDUINO*/
