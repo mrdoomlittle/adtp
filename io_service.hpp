@@ -12,7 +12,7 @@
     # include <boost/cstdint.hpp>
 # endif
 
-# include "itmp_config.hpp"
+# include "dtmp_config.hpp"
 # include "dynamic_array.hpp"
 # include "dynamic_buffer.hpp"
 # include "pin_manager.hpp"
@@ -20,7 +20,7 @@
 
 /* example: if the start state is 0x0 then the clock will start ticking when changes to 0x1
 */
-namespace itmp { class io_service : public pin_manager
+namespace dtmp { class io_service : public pin_manager
 {
     protected :
         //pin_manager(* pin_manager_cptr ) = new pin_manager();
@@ -32,13 +32,13 @@ namespace itmp { class io_service : public pin_manager
 
         int unsigned(ibit_read_delay ) = 0;
 
-        int unsigned(infi_bitset_length ) = 0;
+        int unsigned(dtai_bitset_length ) = 0;
 
         int unsigned(obyte_write_delay ) = 0;
 
         int unsigned(obit_write_delay ) = 0;
 
-        int unsigned(info_bitset_length ) = 0;
+        int unsigned(dtao_bitset_length ) = 0;
 
         int unsigned(ibitset_buff_size ) = 0;
         int unsigned(obitset_buff_size ) = 0;
@@ -97,10 +97,10 @@ namespace itmp { class io_service : public pin_manager
         int unsigned(ilclockn_tcount ) = 0;
 
         uint8_t
-        (* digit_infi_bitset ) = new uint8_t [infi_bitset_length];
+        (* digit_dtai_bitset ) = new uint8_t [dtai_bitset_length];
 
         bool
-        (* i_bitset_finished ) = new bool [(infi_bitset_length / digit_i_pin_count)];
+        (* i_bitset_finished ) = new bool [(dtai_bitset_length / digit_i_pin_count)];
 
         int unsigned(i_bitset_fcount ) = 0;
     public :
@@ -141,10 +141,10 @@ namespace itmp { class io_service : public pin_manager
         bitset <__bitset_type> (* digit_io_bitset ) = new bitset <__bitset_type> [2];
 
         uint8_t
-        (* digit_info_bitset ) = new uint8_t [info_bitset_length];
+        (* digit_dtao_bitset ) = new uint8_t [dtao_bitset_length];
 
         bool
-        (* o_bitset_finished ) = new bool [(info_bitset_length / digit_o_pin_count)];
+        (* o_bitset_finished ) = new bool [(dtao_bitset_length / digit_o_pin_count)];
 
         int unsigned(o_bitset_fcount ) = 0;
 
@@ -160,10 +160,10 @@ namespace itmp { class io_service : public pin_manager
         int unsigned(i_bitsetf_truec ) = 0;
         int unsigned(o_bitsetf_truec ) = 0;
 
-        int unsigned(infi_clock_ltcount ) = 0;
-        bool(is_infi_clock_ppos) = false;
+        int unsigned(dtai_clock_ltcount ) = 0;
+        bool(is_dtai_clock_ppos) = false;
 
-        //int unsigned(infi_clock_ltcount ) = 0;    
+        //int unsigned(dtai_clock_ltcount ) = 0;    
 
 
         uint8_t

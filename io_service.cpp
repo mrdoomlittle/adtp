@@ -9,7 +9,7 @@
     # include <iostream>
 # endif
 
-namespace itmp
+namespace dtmp
 {
 io_service::io_service (
     set_digit_pmode_ft(* __set_digit_pmode_fptr ),
@@ -38,31 +38,31 @@ io_service::io_service (
     (this-> toggle_mloop_state( ) );
     (this-> toggle_iloop_state( ) );
 
-    for (int unsigned x = 0; x != (this-> get_infi_pcount()); x++)
-        (this-> set_infi_pid((def_digit_i_pin_ids [x]), x));
+    for (int unsigned x = 0; x != (this-> get_dtai_pcount()); x++)
+        (this-> set_dtai_pid((def_digit_i_pin_ids [x]), x));
 
-    for (int unsigned x = 0; x != (this-> get_info_pcount()); x++)
-        (this-> set_info_pid((def_digit_o_pin_ids [x]), x));
+    for (int unsigned x = 0; x != (this-> get_dtao_pcount()); x++)
+        (this-> set_dtao_pid((def_digit_o_pin_ids [x]), x));
 
     (this-> set_mio_clock_pid(6));
-    (this-> set_infi_clock_pid(7));
-    (this-> set_info_clock_pid(8));
+    (this-> set_dtai_clock_pid(7));
+    (this-> set_dtao_clock_pid(8));
 
-    (this-> set_infi_latch_pid(9));
-    (this-> set_info_latch_pid(10));
+    (this-> set_dtai_latch_pid(9));
+    (this-> set_dtao_latch_pid(10));
 
     // this is for debugging
-    (this-> digit_info_bitset [0] ) = 1;
-    (this-> digit_info_bitset [1] ) = 1;
-    (this-> digit_info_bitset [2] ) = 0;
-    (this-> digit_info_bitset [3] ) = 1;
-    (this-> digit_info_bitset [4] ) = 1;
-    (this-> digit_info_bitset [5] ) = 1;
-    (this-> digit_info_bitset [6] ) = 1;
-    (this-> digit_info_bitset [7] ) = 1;
+    (this-> digit_dtao_bitset [0] ) = 1;
+    (this-> digit_dtao_bitset [1] ) = 1;
+    (this-> digit_dtao_bitset [2] ) = 0;
+    (this-> digit_dtao_bitset [3] ) = 1;
+    (this-> digit_dtao_bitset [4] ) = 1;
+    (this-> digit_dtao_bitset [5] ) = 1;
+    (this-> digit_dtao_bitset [6] ) = 1;
+    (this-> digit_dtao_bitset [7] ) = 1;
 
-    # ifdef def_infi_bitset_length
-        infi_bitset_length = def_infi_bitset_length;
+    # ifdef def_dtai_bitset_length
+        dtai_bitset_length = def_dtai_bitset_length;
     # endif
 
     # ifdef def_ibit_read_delay
@@ -77,8 +77,8 @@ io_service::io_service (
         ibitset_buff_size = def_ibitset_buff_size;
     # endif
 
-    # ifdef def_info_bitset_length
-        info_bitset_length = def_info_bitset_length;
+    # ifdef def_dtao_bitset_length
+        dtao_bitset_length = def_dtao_bitset_length;
     # endif
 
     # ifdef def_obit_write_delay
@@ -99,22 +99,22 @@ io_service::io_service (
     ) );
 
     (this-> set_digit_pmode (
-        (this-> get_infi_clock_pid( ) ),
+        (this-> get_dtai_clock_pid( ) ),
         digit_pin_input_mode
     ) );
 
     (this-> set_digit_pmode (
-        (this-> get_info_clock_pid( ) ),
+        (this-> get_dtao_clock_pid( ) ),
         digit_pin_output_mode
     ) );
 
     // IO bitset of 8 (00000000)
-    (this-> digit_io_bitset [(bitset_id::__i_bitset)]).bitset_init((this-> infi_bitset_length));
-    (this-> digit_io_bitset [(bitset_id::__o_bitset)]).bitset_init((this-> info_bitset_length));
+    (this-> digit_io_bitset [(bitset_id::__i_bitset)]).bitset_init((this-> dtai_bitset_length));
+    (this-> digit_io_bitset [(bitset_id::__o_bitset)]).bitset_init((this-> dtao_bitset_length));
 
     // IO bitset Buffer
-    (this-> i_bitset_buffer).dbuff_init(1/*sectors of data*/, (this-> ibitset_buff_size), (this-> infi_bitset_length));
-    (this-> o_bitset_buffer).dbuff_init(1/*sectors of data*/, (this-> obitset_buff_size), (this-> info_bitset_length));
+    (this-> i_bitset_buffer).dbuff_init(1/*sectors of data*/, (this-> ibitset_buff_size), (this-> dtai_bitset_length));
+    (this-> o_bitset_buffer).dbuff_init(1/*sectors of data*/, (this-> obitset_buff_size), (this-> dtao_bitset_length));
 
     if ( (this-> clock_start_state ) == digit_pin_high_state )
     {
@@ -140,9 +140,9 @@ io_service::io_service (
 
         (this-> update_clock_reading( ) );
 
-        (this-> update_infi_clock_pstate((this-> get_digit_pstate((this-> get_infi_clock_pid())))));
+        (this-> update_dtai_clock_pstate((this-> get_digit_pstate((this-> get_dtai_clock_pid())))));
 
-        (this-> set_digit_pstate((this-> get_info_clock_pid()), (this-> get_info_clock_pstate())));
+        (this-> set_digit_pstate((this-> get_dtao_clock_pid()), (this-> get_dtao_clock_pstate())));
 
         // this might be moved or changed
         //(this-> set_io_bitset((bitset_id::__i_bitset), (this-> get_i_bitset((sg_type::__total_array), 0)), (sg_type::__total_array), 0));
@@ -152,8 +152,8 @@ io_service::io_service (
         (this-> ibit_read_delay ) = def_ibit_read_delay;
         (this-> obit_write_delay ) = def_obit_write_delay;
 
-        (this-> ibit_read_delay ) = ( (this-> ibit_read_delay ) + ( ( (this-> ibyte_read_delay ) - 1) * ( (this-> infi_bitset_length ) / (this-> get_infi_pcount()) ) ) );
-        (this-> obit_write_delay ) = ( (this-> obit_write_delay ) + ( ( (this-> obyte_write_delay ) - 1) * ( (this-> info_bitset_length ) / (this-> get_info_pcount()) ) ) );
+        (this-> ibit_read_delay ) = ( (this-> ibit_read_delay ) + ( ( (this-> ibyte_read_delay ) - 1) * ( (this-> dtai_bitset_length ) / (this-> get_dtai_pcount()) ) ) );
+        (this-> obit_write_delay ) = ( (this-> obit_write_delay ) + ( ( (this-> obyte_write_delay ) - 1) * ( (this-> dtao_bitset_length ) / (this-> get_dtao_pcount()) ) ) );
 
         if ( (this-> get_mltick_count( ) ) == 0 )
             (this-> call_extern_mlinit (this ) );
@@ -164,21 +164,21 @@ io_service::io_service (
             (this-> o_bitset_buffer).add_to_dbuff((this-> get_io_bitset (1, 0, x)), 2, 0, 0, x, true, true, false);
 
 # ifndef ARDUINO
-        for (int unsigned(x ) = 0; x != ( (this-> infi_bitset_length ) / (this-> get_infi_pcount()) ); x ++ )
+        for (int unsigned(x ) = 0; x != ( (this-> dtai_bitset_length ) / (this-> get_dtai_pcount()) ); x ++ )
                 std::cout << (this-> i_bitset_finished [x] );
 
         std::cout << " :IFBIT, ";
 
-        for (int unsigned(x ) = 0; x != ( (this-> info_bitset_length ) / (this-> get_info_pcount()) ); x ++ )
+        for (int unsigned(x ) = 0; x != ( (this-> dtao_bitset_length ) / (this-> get_dtao_pcount()) ); x ++ )
             std::cout << (this-> o_bitset_finished [x] );
         std::cout << " :OFBIT";
 
         std::cout << std::endl;
 # endif
-        for (int unsigned(i_bitsetf_pos ) = 0; i_bitsetf_pos != ( (this-> infi_bitset_length ) / (this-> get_infi_pcount()) ); i_bitsetf_pos ++ )
+        for (int unsigned(i_bitsetf_pos ) = 0; i_bitsetf_pos != ( (this-> dtai_bitset_length ) / (this-> get_dtai_pcount()) ); i_bitsetf_pos ++ )
         {
             if ( (this-> i_bitset_finished [i_bitsetf_pos] ) == true) (this-> i_bitsetf_truec ) ++;
-            if ((this-> i_bitsetf_truec ) == ( (this-> infi_bitset_length ) / (this-> get_infi_pcount()) ) )
+            if ((this-> i_bitsetf_truec ) == ( (this-> dtai_bitset_length ) / (this-> get_dtai_pcount()) ) )
             {
                 (this-> i_bitsetf_truec ) = 0;
 # ifndef ARDUINO
@@ -186,16 +186,16 @@ io_service::io_service (
 
                 std::cout << "IBITSET_DUMP: ";
 
-                for (int unsigned(x ) = 0; x != (this-> infi_bitset_length ); x ++ )
-                    std::cout << unsigned( (this-> digit_infi_bitset [x] ) );
+                for (int unsigned(x ) = 0; x != (this-> dtai_bitset_length ); x ++ )
+                    std::cout << unsigned( (this-> digit_dtai_bitset [x] ) );
 
                 std::cout << std::endl << std::endl;
 # endif
-                for (int unsigned(x ) = 0; x != (this-> infi_bitset_length ); x ++ )
-                    (this-> i_bitset_buffer).add_to_dbuff(&(this-> digit_infi_bitset [x]), 2, 0, 0, 0, true, true, true);
+                for (int unsigned(x ) = 0; x != (this-> dtai_bitset_length ); x ++ )
+                    (this-> i_bitset_buffer).add_to_dbuff(&(this-> digit_dtai_bitset [x]), 2, 0, 0, 0, true, true, true);
 
 # ifndef ARDUINO
-                for (int unsigned(x ) = 0; x != (this-> infi_bitset_length ); x ++ )
+                for (int unsigned(x ) = 0; x != (this-> dtai_bitset_length ); x ++ )
                     std::cout << "STATE: " << i_bitset_buffer.is_block_smarker(true, 0, x) << ", DBUFF_ID: " << x << std::endl;
 
 
@@ -214,23 +214,23 @@ io_service::io_service (
                 else
                     (this-> i_bitset_buff_pos[0] ) ++;
 
-                for (int unsigned(x ) = 0; x != ( (this-> infi_bitset_length ) / (this-> get_infi_pcount()) ); x ++ )
+                for (int unsigned(x ) = 0; x != ( (this-> dtai_bitset_length ) / (this-> get_dtai_pcount()) ); x ++ )
                     (this-> i_bitset_finished [x] ) = false;
             }
         }
 
         (this-> i_bitsetf_truec ) = 0;
 
-        for (int unsigned(o_bitsetf_pos ) = 0; o_bitsetf_pos != ( (this-> info_bitset_length ) / (this-> get_info_pcount()) ); o_bitsetf_pos ++ )
+        for (int unsigned(o_bitsetf_pos ) = 0; o_bitsetf_pos != ( (this-> dtao_bitset_length ) / (this-> get_dtao_pcount()) ); o_bitsetf_pos ++ )
         {
             if ( (this-> o_bitset_finished [o_bitsetf_pos] ) == true) (this-> o_bitsetf_truec ) ++;
-            if ( (this-> o_bitsetf_truec ) == ( (this-> info_bitset_length ) / (this-> get_info_pcount()) ) )
+            if ( (this-> o_bitsetf_truec ) == ( (this-> dtao_bitset_length ) / (this-> get_dtao_pcount()) ) )
             {
-                (this-> set_digit_pstate((this-> get_info_latch_pid()), digit_pin_high_state));
+                (this-> set_digit_pstate((this-> get_dtao_latch_pid()), digit_pin_high_state));
 
                 for (int x = 0; x != 1000; x++){} // this is only temporary
 
-                (this-> set_digit_pstate((this-> get_info_latch_pid()), digit_pin_low_state));
+                (this-> set_digit_pstate((this-> get_dtao_latch_pid()), digit_pin_low_state));
 
                 (this-> o_bitsetf_truec ) = 0;
 # ifndef ARDUINO
@@ -238,12 +238,12 @@ io_service::io_service (
 
                 std::cout << "OBITSET_DUMP: ";
 
-                for (int unsigned(x ) = 0; x != (this-> info_bitset_length ); x++ )
-                    std::cout << unsigned( (this-> digit_info_bitset [x] ) );
+                for (int unsigned(x ) = 0; x != (this-> dtao_bitset_length ); x++ )
+                    std::cout << unsigned( (this-> digit_dtao_bitset [x] ) );
 
                 std::cout << std::endl << std::endl;
 # endif
-                for (int unsigned(x ) = 0; x != ( (this-> info_bitset_length ) / (this-> get_info_pcount()) ); x ++ )
+                for (int unsigned(x ) = 0; x != ( (this-> dtao_bitset_length ) / (this-> get_dtao_pcount()) ); x ++ )
                     (this-> o_bitset_finished [x] ) = false;
 
                 //for (int unsigned(x ) = 0; x != (this-> obitset_buff_size ); x++ )
@@ -251,7 +251,7 @@ io_service::io_service (
                     if ((this-> o_bitset_buffer).is_block_smarker(true, 0, (this-> o_bitset_buff_pos[0] )) == true)
                     {
                         for (int unsigned x = 0; x != 8; x ++)
-                            (this-> digit_info_bitset [x]) = * (this-> o_bitset_buffer).get_from_dbuff(2, 0, (this-> o_bitset_buff_pos[0] ), x, false, false, false, true);
+                            (this-> digit_dtao_bitset [x]) = * (this-> o_bitset_buffer).get_from_dbuff(2, 0, (this-> o_bitset_buff_pos[0] ), x, false, false, false, true);
                         //(this-> o_bitset_buffer).del_from_dbuffer(1, 0, (this-> o_bitset_buff_pos[0] ), 0);
 # ifndef ARDUINO
                         std::cout << "PROSSING: B" << (this-> o_bitset_buff_pos[0] ) << std::endl;
@@ -278,7 +278,7 @@ io_service::io_service (
             if ((this-> o_bitset_buffer).is_block_smarker(true, 0, (this-> o_bitset_buff_pos[0] )) == true)
             {
                 for (int unsigned x = 0; x != 8; x ++)
-                    (this-> digit_info_bitset [x]) = * (this-> o_bitset_buffer).get_from_dbuff(2, 0, (this-> o_bitset_buff_pos[0] ), x, false, false, false, true);
+                    (this-> digit_dtao_bitset [x]) = * (this-> o_bitset_buffer).get_from_dbuff(2, 0, (this-> o_bitset_buff_pos[0] ), x, false, false, false, true);
 
                 (this-> o_bitset_buff_pos[0] ) ++;
             }
@@ -327,29 +327,29 @@ io_service::io_service (
 
             (this-> set_iltick_count ( (this-> i_iltick_count ) ) );
 
-            if ( (this-> get_iltick_count( ) ) <= ( ((this-> get_infi_pcount()) - 1) + ((this-> ibit_read_delay) - 1) ) && ( (this-> get_iltick_count( ) ) ) >= ((this-> ibit_read_delay) - 1) )
+            if ( (this-> get_iltick_count( ) ) <= ( ((this-> get_dtai_pcount()) - 1) + ((this-> ibit_read_delay) - 1) ) && ( (this-> get_iltick_count( ) ) ) >= ((this-> ibit_read_delay) - 1) )
             {
-                if ((this-> get_infi_clock_pstate()) != 0x1)
+                if ((this-> get_dtai_clock_pstate()) != 0x1)
                 {
-                    (this-> is_infi_clock_ppos) = true;
-                    (this-> set_infi_clock_ppos_count((this-> get_infi_clock_ppos_count()) + 1));
+                    (this-> is_dtai_clock_ppos) = true;
+                    (this-> set_dtai_clock_ppos_count((this-> get_dtai_clock_ppos_count()) + 1));
                 }
 
-                if ((this-> get_infi_clock_pstate()) != 0x0)
+                if ((this-> get_dtai_clock_pstate()) != 0x0)
                 {
-                    (this-> is_infi_clock_ppos) = false;
-                    (this-> set_infi_clock_pneg_count((this-> get_infi_clock_pneg_count()) + 1));
+                    (this-> is_dtai_clock_ppos) = false;
+                    (this-> set_dtai_clock_pneg_count((this-> get_dtai_clock_pneg_count()) + 1));
                 }
 
-                if ((this-> is_infi_clock_ppos) == true) 
+                if ((this-> is_dtai_clock_ppos) == true)
                 {
-                    std::cout << ": " << (this-> get_infi_clock_ppos_count())  << std::endl;
-    
-                (this-> digit_i_buffer [(this-> digit_i_buffer_pos)] ) = (this-> get_digit_pstate ( (this-> get_infi_pid((this-> digit_i_buffer_pos))) ) );
+                    std::cout << ": " << (this-> get_dtai_clock_ppos_count())  << std::endl;
 
-                if ( (this-> get_iltick_count( ) ) == ( ( ((this-> get_infi_pcount()) - 1) + ((this-> ibit_read_delay) - 1) ) + (this-> ibp_pcount_multiplier) ) )
+                (this-> digit_i_buffer [(this-> digit_i_buffer_pos)] ) = (this-> get_digit_pstate ( (this-> get_dtai_pid((this-> digit_i_buffer_pos))) ) );
+
+                if ( (this-> get_iltick_count( ) ) == ( ( ((this-> get_dtai_pcount()) - 1) + ((this-> ibit_read_delay) - 1) ) + (this-> ibp_pcount_multiplier) ) )
                 {
-                    (this-> ibp_pcount_multiplier ) += (this-> get_infi_pcount());
+                    (this-> ibp_pcount_multiplier ) += (this-> get_dtai_pcount());
                     (this-> digit_i_buffer_pos ) = 0;
                     if ( (this-> get_iltick_count( ) ) == 0)
                         (this-> ibp_pcount_multiplier ) = 0;
@@ -357,61 +357,61 @@ io_service::io_service (
                 else
                 {
                     (this-> digit_i_buffer_pos) ++;
-                    if ( (this-> ibp_pcount_multiplier) == (this-> get_infi_pcount()) )
+                    if ( (this-> ibp_pcount_multiplier) == (this-> get_dtai_pcount()) )
                         (this-> ibp_pcount_multiplier ) = 0;
                 }
 
-                if ( (this-> get_iltick_count( ) ) == ( ((this-> ibit_read_delay ) - 1) + ((this-> get_infi_pcount()) - 1) ) )
+                if ( (this-> get_iltick_count( ) ) == ( ((this-> ibit_read_delay ) - 1) + ((this-> get_dtai_pcount()) - 1) ) )
                 {
-                    for (int unsigned(i_bitset_pos ) = 0; i_bitset_pos != (this-> get_infi_pcount()); i_bitset_pos ++)
-                        (this-> digit_infi_bitset [( (this-> i_bitset_fcount ) * (this-> get_infi_pcount()) + i_bitset_pos)] ) = (this-> digit_i_buffer [i_bitset_pos] );
+                    for (int unsigned(i_bitset_pos ) = 0; i_bitset_pos != (this-> get_dtai_pcount()); i_bitset_pos ++)
+                        (this-> digit_dtai_bitset [( (this-> i_bitset_fcount ) * (this-> get_dtai_pcount()) + i_bitset_pos)] ) = (this-> digit_i_buffer [i_bitset_pos] );
 
                     if ( (this-> i_bitset_finished [(this-> i_bitset_fcount )] ) == false)
                     {
                         (this-> i_bitset_finished [(this-> i_bitset_fcount )] ) = true;
                     }
 
-                    if ( (this-> i_bitset_fcount ) == ((this-> infi_bitset_length ) / (this-> get_infi_pcount()) ) - 1)
+                    if ( (this-> i_bitset_fcount ) == ((this-> dtai_bitset_length ) / (this-> get_dtai_pcount()) ) - 1)
                         (this-> i_bitset_fcount ) = 0;
                     else
                         (this-> i_bitset_fcount ) ++;
                 }
 
-                (this-> infi_clock_ltcount) ++ ;
+                (this-> dtai_clock_ltcount) ++ ;
 
-                (this-> is_infi_clock_ppos) = false;
+                (this-> is_dtai_clock_ppos) = false;
                 }
             }
 
             (this-> set_iltick_count ( (this-> o_iltick_count ) ) );
 
-            if ( (this-> get_iltick_count( ) ) <= ( ( (this-> get_info_pcount()) - 1) + (this-> obit_write_delay - 1) ) && (this-> get_iltick_count( ) ) >= (this-> obit_write_delay - 1) )
+            if ( (this-> get_iltick_count( ) ) <= ( ( (this-> get_dtao_pcount()) - 1) + (this-> obit_write_delay - 1) ) && (this-> get_iltick_count( ) ) >= (this-> obit_write_delay - 1) )
             {
-                if ( (this-> get_iltick_count( ) ) == ( ( (this-> obit_write_delay ) - 1) + ( (this-> get_info_pcount()) ) ) || (this-> get_iltick_count( ) ) == (this-> obit_write_delay - 1) )
+                if ( (this-> get_iltick_count( ) ) == ( ( (this-> obit_write_delay ) - 1) + ( (this-> get_dtao_pcount()) ) ) || (this-> get_iltick_count( ) ) == (this-> obit_write_delay - 1) )
                 {
-                    for (int unsigned(o_bitset_pos ) = 0; o_bitset_pos != (this-> get_info_pcount()); o_bitset_pos ++)
-                        (this-> digit_o_buffer [o_bitset_pos] ) = (this-> digit_info_bitset [( (this-> o_bitset_fcount ) * (this-> get_info_pcount()) + o_bitset_pos )] );
+                    for (int unsigned(o_bitset_pos ) = 0; o_bitset_pos != (this-> get_dtao_pcount()); o_bitset_pos ++)
+                        (this-> digit_o_buffer [o_bitset_pos] ) = (this-> digit_dtao_bitset [( (this-> o_bitset_fcount ) * (this-> get_dtao_pcount()) + o_bitset_pos )] );
 
                     if ( (this-> o_bitset_finished [(this-> o_bitset_fcount )] ) == false)
                     {
-                        //(this-> set_digit_pstate((this-> get_info_latch_pid()), digit_pin_high_state));
+                        //(this-> set_digit_pstate((this-> get_dtao_latch_pid()), digit_pin_high_state));
                         (this-> o_bitset_finished [(this-> o_bitset_fcount )] ) = true;
                     }
 
-                    if ( (this-> o_bitset_fcount ) == ( (this-> info_bitset_length ) / (this-> get_info_pcount()) ) - 1)
+                    if ( (this-> o_bitset_fcount ) == ( (this-> dtao_bitset_length ) / (this-> get_dtao_pcount()) ) - 1)
                         (this-> o_bitset_fcount ) = 0;
                     else
                         (this-> o_bitset_fcount ) ++;
                 }
 
                 (this-> set_digit_pstate (
-                    (this-> get_info_pid((this-> digit_o_buffer_pos))),
+                    (this-> get_dtao_pid((this-> digit_o_buffer_pos))),
                     (this-> digit_o_buffer [(this-> digit_o_buffer_pos )] )
                 ) );
 
-                if ( (this-> get_iltick_count( ) ) == ( ( ( (this-> get_info_pcount()) - 1) + (this-> obit_write_delay - 1) ) + (this-> obp_pcount_multiplier ) ) )
+                if ( (this-> get_iltick_count( ) ) == ( ( ( (this-> get_dtao_pcount()) - 1) + (this-> obit_write_delay - 1) ) + (this-> obp_pcount_multiplier ) ) )
                 {
-                    (this-> obp_pcount_multiplier ) += (this-> get_info_pcount());
+                    (this-> obp_pcount_multiplier ) += (this-> get_dtao_pcount());
                     (this-> digit_o_buffer_pos ) = 0;
                     if ( (this-> get_iltick_count( ) ) == 0)
                         (this-> obp_pcount_multiplier ) = 0;
@@ -419,16 +419,16 @@ io_service::io_service (
                 else
                 {
                     (this-> digit_o_buffer_pos ) ++;
-                    if ( (this-> obp_pcount_multiplier ) == (this-> get_info_pcount()) )
+                    if ( (this-> obp_pcount_multiplier ) == (this-> get_dtao_pcount()) )
                         (this-> obp_pcount_multiplier ) = 0;
                 }
             }
 
             (this-> set_iltick_count ( (this-> temp_iltick_count ) ) );
 
-            if ( ( ((this-> get_infi_pcount()) - 1) + (this-> ibit_read_delay - 1) ) == ( ((this-> get_info_pcount()) - 1) + (this-> obit_write_delay - 1) ) )
+            if ( ( ((this-> get_dtai_pcount()) - 1) + (this-> ibit_read_delay - 1) ) == ( ((this-> get_dtao_pcount()) - 1) + (this-> obit_write_delay - 1) ) )
             {
-                if ( (this-> get_iltick_count( ) ) == ( ( ((this-> get_infi_pcount()) - 1) + (this-> ibit_read_delay - 1) ) + ( ((this-> get_info_pcount()) - 1) + (this-> obit_write_delay - 1) ) ) )
+                if ( (this-> get_iltick_count( ) ) == ( ( ((this-> get_dtai_pcount()) - 1) + (this-> ibit_read_delay - 1) ) + ( ((this-> get_dtao_pcount()) - 1) + (this-> obit_write_delay - 1) ) ) )
                 {
                     (this-> i_iltick_count ) = 0;
                     (this-> o_iltick_count ) = 0;
@@ -437,13 +437,13 @@ io_service::io_service (
             }
             else
             {
-                if ( (this-> i_iltick_count ) == ( ((this-> get_infi_pcount()) - 1) + (this-> ibit_read_delay - 1) ) )
+                if ( (this-> i_iltick_count ) == ( ((this-> get_dtai_pcount()) - 1) + (this-> ibit_read_delay - 1) ) )
                 {
                     (this-> i_iltick_count ) = 0;
                     break;
                 }
 
-                if ( (this-> o_iltick_count ) == ( ((this-> get_info_pcount()) - 1) + (this-> obit_write_delay - 1) ) )
+                if ( (this-> o_iltick_count ) == ( ((this-> get_dtao_pcount()) - 1) + (this-> obit_write_delay - 1) ) )
                 {
                     (this-> o_iltick_count ) = 0;
                     break;
@@ -488,19 +488,19 @@ void
 (io_service::set_digit_pmode (uint8_t(__pin_id ), uint8_t(__pin_mode ) ) )
 {
     (this-> set_digit_pmode_fptr (__pin_id, __pin_mode ) );
-    if (__pin_id == (this-> get_infi_clock_pid( ) ))
+    if (__pin_id == (this-> get_dtai_clock_pid( ) ))
     {
 
     }
-    else if (__pin_id == (this-> get_info_clock_pid( ) ))
+    else if (__pin_id == (this-> get_dtao_clock_pid( ) ))
     {
 
     }
-    else if (__pin_id == (this-> get_infi_latch_pid( ) ))
+    else if (__pin_id == (this-> get_dtai_latch_pid( ) ))
     {
 
     }
-    else if (__pin_id == (this-> get_info_latch_pid( ) ))
+    else if (__pin_id == (this-> get_dtao_latch_pid( ) ))
     {
 
     }
@@ -516,17 +516,17 @@ void
 {
     (this-> set_digit_pstate_fptr (__pin_id, __pin_state ) );
 
-    if (__pin_id == (this-> get_info_clock_pid( ) ))
-        (this-> update_info_clock_pstate(__pin_state));
+    if (__pin_id == (this-> get_dtao_clock_pid( ) ))
+        (this-> update_dtao_clock_pstate(__pin_state));
 
-    else if (__pin_id == (this-> get_info_latch_pid( ) ))
-        (this-> update_info_latch_pstate(__pin_state));
+    else if (__pin_id == (this-> get_dtao_latch_pid( ) ))
+        (this-> update_dtao_latch_pstate(__pin_state));
 
     else
     {
-        for (int unsigned(x ) = 0; x != (this-> get_info_pcount()); x ++)
+        for (int unsigned(x ) = 0; x != (this-> get_dtao_pcount()); x ++)
         {
-            if (__pin_id == (this-> get_infi_pid (x) ) )
+            if (__pin_id == (this-> get_dtai_pid (x) ) )
             {
                 return;
             }
@@ -802,11 +802,11 @@ void
     switch(__set_type)
     {
         case (sg_type::__individual) :
-            (this-> digit_infi_bitset [__bitset_arr_pos]) = * __i_bitset;
+            (this-> digit_dtai_bitset [__bitset_arr_pos]) = * __i_bitset;
             break;
 
         case (sg_type::__total_array) :
-            for (int unsigned(bitset_arr_pos ) = 0; bitset_arr_pos != (this-> infi_bitset_length); bitset_arr_pos ++)
+            for (int unsigned(bitset_arr_pos ) = 0; bitset_arr_pos != (this-> dtai_bitset_length); bitset_arr_pos ++)
                 (this-> set_i_bitset(&__i_bitset[bitset_arr_pos], (sg_type::__individual), bitset_arr_pos));
 
             break;
@@ -821,11 +821,11 @@ uint8_t
     switch(__get_type)
     {
         case (sg_type::__individual) :
-            return(&(this-> digit_infi_bitset [__bitset_arr_pos]));
+            return(&(this-> digit_dtai_bitset [__bitset_arr_pos]));
             break;
 
         case (sg_type::__total_array) :
-            return((this-> digit_infi_bitset)); break;
+            return((this-> digit_dtai_bitset)); break;
 
         default : return(nullptr);
     }
@@ -837,11 +837,11 @@ void
     switch(__set_type)
     {
         case (sg_type::__individual) :
-            (this-> digit_info_bitset [__bitset_arr_pos]) = * __o_bitset;
+            (this-> digit_dtao_bitset [__bitset_arr_pos]) = * __o_bitset;
             break;
 
         case (sg_type::__total_array) :
-            for (int unsigned(bitset_arr_pos ) = 0; bitset_arr_pos != (this-> info_bitset_length); bitset_arr_pos ++)
+            for (int unsigned(bitset_arr_pos ) = 0; bitset_arr_pos != (this-> dtao_bitset_length); bitset_arr_pos ++)
                 (this-> set_o_bitset(&__o_bitset[bitset_arr_pos], (sg_type::__individual), bitset_arr_pos));
 
             break;
@@ -856,11 +856,11 @@ uint8_t
     switch(__get_type)
     {
         case (sg_type::__individual) :
-            return(&(this-> digit_info_bitset [__bitset_arr_pos]));
+            return(&(this-> digit_dtao_bitset [__bitset_arr_pos]));
             break;
 
         case (sg_type::__total_array) :
-            return((this-> digit_info_bitset)); break;
+            return((this-> digit_dtao_bitset)); break;
 
         default : return(nullptr);
     }

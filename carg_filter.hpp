@@ -8,7 +8,7 @@
     # include <stdint.h>
 # endif
 
-namespace itmp { class carg_filter
+namespace dtmp { class carg_filter
 {
     private :
         char const (* char_list_in ) = nullptr;

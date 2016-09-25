@@ -1,6 +1,6 @@
 /*this code is from another one of my projects i will get this working the next day*/
 # include "carg_filter.hpp"
-namespace itmp {
+namespace dtmp {
 char const (* * carg_filter::filter_list_in (char const (* _char_list_in ),
     char const (* _separator_char ), size_t (_char_list_length ) ) )
 {

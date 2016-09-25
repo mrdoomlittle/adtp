@@ -135,13 +135,13 @@ uint8_t test[8][8] =
 };
 
 void
-(external_mlinit (itmp::io_service(* _this ) ) )
+(external_mlinit (dtmp::io_service(* _this ) ) )
 {
 
 }
 
 void
-(external_mltick (itmp::io_service(* _this ) ) )
+(external_mltick (dtmp::io_service(* _this ) ) )
 {
 
         std::cout << "SET_IO_BITSET" << std::endl;
@@ -196,11 +196,11 @@ void
     tcount++;
 }
 # include "pin_manager.hpp"
-# include "itmp_config.hpp"
+# include "dtmp_config.hpp"
 int
 (main( ) )
 {
-    itmp::carg_filter g;
+    dtmp::carg_filter g;
     char const ** args;
     args = g.filter_list_in("Hello,I,O,P,Pelpoj", ",", 21);
 
@@ -209,7 +209,7 @@ int
         std::cout << args[x] << std::endl; 
     }
 
-    itmp::io_service io_service
+    dtmp::io_service io_service
     (
         & set_digit_pin_mode,
         & set_digit_pin_state,
