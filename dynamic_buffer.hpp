@@ -12,7 +12,7 @@
 NOTE: this does not work at the moment
 */
 
-namespace dtmp { template <typename __dbuff_type> class dynamic_buffer
+namespace tmp { template <typename __dbuff_type> class dynamic_buffer
 {
     private :
         void

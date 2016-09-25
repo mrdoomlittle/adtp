@@ -9,7 +9,7 @@
     # include <iostream>
 # endif
 
-namespace dtmp
+namespace tmp
 {
 io_service::io_service (
     set_digit_pmode_ft(* __set_digit_pmode_fptr ),

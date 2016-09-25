@@ -12,7 +12,7 @@
     # include <boost/cstdint.hpp>
 # endif
 
-# include "dtmp_config.hpp"
+# include "tmp_config.hpp"
 # include "dynamic_array.hpp"
 # include "dynamic_buffer.hpp"
 # include "pin_manager.hpp"
@@ -20,7 +20,7 @@
 
 /* example: if the start state is 0x0 then the clock will start ticking when changes to 0x1
 */
-namespace dtmp { class io_service : public pin_manager
+namespace tmp { class io_service : public pin_manager
 {
     protected :
         //pin_manager(* pin_manager_cptr ) = new pin_manager();

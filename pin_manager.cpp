@@ -5,7 +5,7 @@
 * Email: doctordoomlittle@gmail.com
 */
 
-namespace dtmp
+namespace tmp
 {
 pin_manager::pin_manager()
 {

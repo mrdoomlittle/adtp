@@ -11,7 +11,7 @@
 */
 
 # include <cstdlib>
-namespace dtmp { template <typename __darr_type> class dynamic_array
+namespace tmp { template <typename __darr_type> class dynamic_array
 {
     public :
         void

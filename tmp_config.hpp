@@ -1,5 +1,5 @@
-# ifndef __dtmp__config__hpp__
-# define __dtmp__config__hpp__
+# ifndef __tmp__config__hpp__
+# define __tmp__config__hpp__
 
 /* Created and Designed by mrdoomlittle
 * Github: https://github.com/mrdoomlittle
@@ -56,4 +56,4 @@ const int(def_o_pin_power_state [def_digit_o_pin_count] [2]) = { {0x1, 0x0}, {0x
 # define def_shared_i_buff_size 5
 # define def_shared_o_buff_size 5
 
-# endif /*__dtmp__config__hpp__*/
+# endif /*__tmp__config__hpp__*/

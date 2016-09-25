@@ -6,7 +6,7 @@
 * Email: doctordoomlittle@gmail.com
 */
 
-# include "dtmp_config.hpp"
+# include "tmp_config.hpp"
 # include "dynamic_array.hpp"
 
 # ifndef ARDUINO
@@ -15,7 +15,7 @@
     # include <stdint.h>
 # endif
 
-namespace dtmp { class pin_manager
+namespace tmp { class pin_manager
 {
     private :
         uint8_t(digit_mio_clock_pid ) = def_digit_mio_clock_pid;

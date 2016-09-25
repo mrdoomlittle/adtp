@@ -33,13 +33,13 @@ void
 # endif
 
 void
-(external_mlinit (dtmp::io_service(* _this ) ) )
+(external_mlinit (tmp::io_service(* _this ) ) )
 {
 
 }
 
 void
-(external_mltick (dtmp::io_service(* _this ) ) )
+(external_mltick (tmp::io_service(* _this ) ) )
 {
 # if LED_INDICATOR == true
     pinMode (13, OUTPUT);
@@ -58,7 +58,7 @@ void
 void
 (setup( ) )
 {
-    dtmp::io_service io_service 
+    tmp::io_service io_service 
     (
         & set_digit_pin_mode,
         & set_digit_pin_state,
