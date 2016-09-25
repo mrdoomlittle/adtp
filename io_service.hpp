@@ -17,66 +17,92 @@
 # include "dynamic_buffer.hpp"
 # include "pin_manager.hpp"
 # include "bitset.hpp"
+# include "data_packet.hpp"
 
 /* example: if the start state is 0x0 then the clock will start ticking when changes to 0x1
 */
-namespace tmp { class io_service : public pin_manager
+namespace tmp { class io_service : public pin_manager//, public data_packet for later
 {
-    protected :
-        //pin_manager(* pin_manager_cptr ) = new pin_manager();
+
     private :
         int unsigned(digit_i_pin_count ) = def_digit_i_pin_count;
         int unsigned(digit_o_pin_count ) = def_digit_o_pin_count;
-        int unsigned(clock_start_state ) = 0x0;
-        int unsigned(ibyte_read_delay ) = 0;
 
-        int unsigned(ibit_read_delay ) = 0;
+        int unsigned(clock_sstate_ignore ) = 0x0;
 
-        int unsigned(dtai_bitset_length ) = 0;
+        int unsigned(dati_bitset_length ) = 0;
+        int unsigned(dato_bitset_length ) = 0;
 
-        int unsigned(obyte_write_delay ) = 0;
+        int unsigned(ibyte_read_holdup ) = 0;
+        int unsigned(obyte_write_holdup ) = 0;
 
-        int unsigned(obit_write_delay ) = 0;
-
-        int unsigned(dtao_bitset_length ) = 0;
+        int unsigned(ibit_read_holdup ) = 0;
+        int unsigned(obit_write_holdup ) = 0;
 
         int unsigned(ibitset_buff_size ) = 0;
         int unsigned(obitset_buff_size ) = 0;
-
-        int unsigned(shared_i_var_count ) = 0;
-        int unsigned(shared_o_var_count ) = 0;
-
-        int unsigned(shared_i_buff_size ) = 0;
-        int unsigned(shared_o_buff_size ) = 0;
     protected :
         typedef void( (set_digit_pmode_ft ) (uint8_t, uint8_t) );
-        set_digit_pmode_ft(* set_digit_pmode_fptr ) = nullptr;
+        set_digit_pmode_ft
+            (* set_digit_pmode_fptr ) = nullptr;
 
         typedef void( (set_digit_pstate_ft) (uint8_t, uint8_t) );
-        set_digit_pstate_ft(* set_digit_pstate_fptr ) = nullptr;
+        set_digit_pstate_ft
+            (* set_digit_pstate_fptr ) = nullptr;
 
         typedef int( (get_digit_pstate_ft ) (uint8_t) );
-        get_digit_pstate_ft(* get_digit_pstate_fptr ) = nullptr;
+        get_digit_pstate_ft
+            (* get_digit_pstate_fptr ) = nullptr;
 
         typedef void( (extern_mlinit_ft ) (io_service *) );
-        extern_mlinit_ft(* extern_mlinit_fptr ) = nullptr;
+        extern_mlinit_ft
+            (* extern_mlinit_fptr ) = nullptr;
 
         typedef void( (extern_mltick_ft ) (io_service *) );
-        extern_mltick_ft(* extern_mltick_fptr ) = nullptr;
+        extern_mltick_ft
+            (* extern_mltick_fptr ) = nullptr;
     public :
-        io_service
-        (
-            set_digit_pmode_ft(* __set_digit_pmode_fptr) = nullptr,
-            set_digit_pstate_ft(* __set_digit_pstate_fptr) = nullptr,
-            get_digit_pstate_ft(* __get_digit_pstate_fptr) = nullptr,
-            extern_mlinit_ft(* __extern_mlinit_fptr) = nullptr,
-            extern_mltick_ft(* __extern_mltick_fptr) = nullptr
-        );
+        io_service( );
+        ~io_service( );
 
-        ~io_service( ) { }
+        void
+        (service_init (
+            set_digit_pmode_ft
+                (* __set_digit_pmode_fptr) = nullptr,
+            set_digit_pstate_ft
+                (* __set_digit_pstate_fptr) = nullptr,
+            get_digit_pstate_ft
+                (* __get_digit_pstate_fptr) = nullptr,
+            extern_mlinit_ft
+                (* __extern_mlinit_fptr) = nullptr,
+            extern_mltick_ft
+                (* __extern_mltick_fptr) = nullptr
+        ) );
+
+        void
+        (set_ptr_to_sdigit_pmode_f (set_digit_pmode_ft(* __set_digit_pmode_fptr) ) );
+        void
+        (set_ptr_to_sdigit_pstate_f (set_digit_pstate_ft(* __set_digit_pstate_fptr) ) );
+        void
+        (set_ptr_to_gdigit_pstate_f (get_digit_pstate_ft(* __get_digit_pstate_fptr) ) );
+        void
+        (set_ptr_to_extern_mlinit_f (extern_mlinit_ft(* __extern_mlinit_fptr) ) );
+        void
+        (set_ptr_to_extern_mltick_f (extern_mltick_ft(* __extern_mltick_fptr) ) );
+
+        bool
+        (is_ptr_to_sdigit_pmode_f (set_digit_pmode_ft(* __is_type) ) );
+        bool
+        (is_ptr_to_sdigit_pstate_f (set_digit_pstate_ft(* __is_type) ) );
+        bool
+        (is_ptr_to_gdigit_pstate_f (get_digit_pstate_ft(* __is_type) ) );
+        bool
+        (is_ptr_to_extern_mlinit_f (extern_mlinit_ft(* __is_type) ) );
+        bool
+        (is_ptr_to_extern_mltick_f (extern_mltick_ft(* __is_type) ) );
     private :
-        int unsigned(mltick_delay) = def_mltick_delay;
-        int unsigned(iltick_delay) = def_iltick_delay;
+        int unsigned(mltick_holdup) = def_mltick_holdup;
+        int unsigned(iltick_holdup) = def_iltick_holdup;
 
         int unsigned(real_mltick_count) = 0;
         int unsigned(real_iltick_count) = 0;
@@ -93,20 +119,14 @@ namespace tmp { class io_service : public pin_manager
         bool(ilclockp_toggled) = false;
         int unsigned(ilclockp_tcount) = 0;
 
-        bool(ilclockn_toggled ) = false;
-        int unsigned(ilclockn_tcount ) = 0;
+        bool(ilclockn_toggled) = false;
+        int unsigned(ilclockn_tcount) = 0;
 
-        uint8_t
-        (* digit_dtai_bitset ) = new uint8_t [dtai_bitset_length];
 
-        bool
-        (* i_bitset_finished ) = new bool [(dtai_bitset_length / digit_i_pin_count)];
 
-        int unsigned(i_bitset_fcount ) = 0;
+
     public :
-        dynamic_buffer <uint8_t> (i_bitset_buffer );
-        int unsigned(i_bitset_buff_pos [2]) = {0, 0};
-
+    // NOTE: change this
         enum sg_type : int unsigned { __individual = 0, __total_array = 1 } ;
         enum shift_direction : int unsigned { __right = 0, __left = 1 } ;
         enum bitset_id : int unsigned { __i_bitset = 0, __o_bitset = 1 } ;
@@ -128,28 +148,34 @@ namespace tmp { class io_service : public pin_manager
     private :
         void
         (set_i_bitset (uint8_t(* __i_bitset), int unsigned(__set_type), int unsigned(__bitset_arr_pos)));
-
-        uint8_t
-        (* get_i_bitset (int unsigned(__get_type), int unsigned(__bitset_arr_pos)));
-
         void
         (set_o_bitset (uint8_t(* __o_bitset), int unsigned(__set_type), int unsigned(__bitset_arr_pos)));
 
+        uint8_t
+        (* get_i_bitset (int unsigned(__get_type), int unsigned(__bitset_arr_pos)));
         uint8_t
         (* get_o_bitset (int unsigned(__get_type), int unsigned(__bitset_arr_pos)));
 
         bitset <__bitset_type> (* digit_io_bitset ) = new bitset <__bitset_type> [2];
 
         uint8_t
-        (* digit_dtao_bitset ) = new uint8_t [dtao_bitset_length];
+        (* digit_dati_bitset ) = new uint8_t [dati_bitset_length];
+        uint8_t
+        (* digit_dato_bitset ) = new uint8_t [dato_bitset_length];
 
         bool
-        (* o_bitset_finished ) = new bool [(dtao_bitset_length / digit_o_pin_count)];
+        (* i_bitset_finished ) = new bool [(dati_bitset_length / digit_i_pin_count)];
+        bool
+        (* o_bitset_finished ) = new bool [(dato_bitset_length / digit_o_pin_count)];
 
+        int unsigned(i_bitset_fcount ) = 0;
         int unsigned(o_bitset_fcount ) = 0;
 
     public :
+        dynamic_buffer <uint8_t> (i_bitset_buffer);
         dynamic_buffer <uint8_t> (o_bitset_buffer);
+
+        int unsigned(i_bitset_buff_pos [2]) = {0, 0};
         int unsigned(o_bitset_buff_pos [2]) = {0, 0};
     private :
         int unsigned(digit_i_buffer_pos ) = 0;
@@ -157,14 +183,12 @@ namespace tmp { class io_service : public pin_manager
 
         int unsigned(ibp_pcount_multiplier ) = 0;
         int unsigned(obp_pcount_multiplier ) = 0;
+
         int unsigned(i_bitsetf_truec ) = 0;
         int unsigned(o_bitsetf_truec ) = 0;
 
-        int unsigned(dtai_clock_ltcount ) = 0;
-        bool(is_dtai_clock_ppos) = false;
-
-        //int unsigned(dtai_clock_ltcount ) = 0;    
-
+        int unsigned(dati_clock_ltcount ) = 0;
+        bool(is_dati_clock_ppos) = false;
 
         uint8_t
         (* digit_i_buffer ) = new uint8_t [digit_i_pin_count];
@@ -174,17 +198,12 @@ namespace tmp { class io_service : public pin_manager
         bool(i_buffer_finished ) = false;
         bool(o_buffer_finished ) = false;
 
-        uint8_t
-        (* shared_i_variable ) = new uint8_t [shared_i_var_count];
-        uint8_t
-        (* shared_o_variable ) = new uint8_t [shared_o_var_count];
-
         void
-        (set_digit_pmode (uint8_t(__pin_id ), uint8_t(__pin_mode ) ) );
+        (set_digit_pmode (uint8_t(__digit_pid ), uint8_t(__digit_pmode ) ) );
         void
-        (set_digit_pstate (uint8_t(__pin_id ), uint8_t(__pin_state ) ) );
+        (set_digit_pstate (uint8_t(__digit_pid ), uint8_t(__digit_pstate ) ) );
         bool
-        (get_digit_pstate (uint8_t(__pin_id ) ));
+        (get_digit_pstate (uint8_t(__digit_pid ) ));
 
         void
         (call_extern_mlinit (io_service(* __class_ptr ) ) );

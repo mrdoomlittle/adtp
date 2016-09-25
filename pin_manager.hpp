@@ -19,51 +19,51 @@ namespace tmp { class pin_manager
 {
     private :
         uint8_t(digit_mio_clock_pid ) = def_digit_mio_clock_pid;
-        uint8_t(digit_dtai_clock_pid ) = def_digit_dtai_clock_pid;
-        uint8_t(digit_dtao_clock_pid ) = def_digit_dtao_clock_pid;
-        uint8_t(digit_dtai_latch_pid ) = def_digit_dtai_latch_pid;
-        uint8_t(digit_dtao_latch_pid ) = def_digit_dtao_latch_pid;
+        uint8_t(digit_dati_clock_pid ) = def_digit_dati_clock_pid;
+        uint8_t(digit_dato_clock_pid ) = def_digit_dato_clock_pid;
+        uint8_t(digit_dati_latch_pid ) = def_digit_dati_latch_pid;
+        uint8_t(digit_dato_latch_pid ) = def_digit_dato_latch_pid;
 
         bool(mio_clock_pid_sstate ) = false;
-        bool(dtai_clock_pid_sstate ) = false;
-        bool(dtao_clock_pid_sstate ) = false;
-        bool(dtai_latch_pid_sstate ) = false;
-        bool(dtao_latch_pid_sstate ) = false;
+        bool(dati_clock_pid_sstate ) = false;
+        bool(dato_clock_pid_sstate ) = false;
+        bool(dati_latch_pid_sstate ) = false;
+        bool(dato_latch_pid_sstate ) = false;
 
         int unsigned(mio_clock_ppos_count ) = 0;
-        int unsigned(dtai_clock_ppos_count ) = 0;
-        int unsigned(dtao_clock_ppos_count ) = 0;
+        int unsigned(dati_clock_ppos_count ) = 0;
+        int unsigned(dato_clock_ppos_count ) = 0;
 
         int unsigned(mio_clock_pneg_count ) = 0;
-        int unsigned(dtai_clock_pneg_count ) = 0;
-        int unsigned(dtao_clock_pneg_count ) = 0;
+        int unsigned(dati_clock_pneg_count ) = 0;
+        int unsigned(dato_clock_pneg_count ) = 0;
 
         int(mio_clock_pstate ) = digit_pin_low_state;
-        int(dtai_clock_pstate ) = digit_pin_low_state;
-        int(dtao_clock_pstate ) = digit_pin_low_state;
-        int(dtai_latch_pstate ) = digit_pin_low_state;
-        int(dtao_latch_pstate ) = digit_pin_low_state;
+        int(dati_clock_pstate ) = digit_pin_low_state;
+        int(dato_clock_pstate ) = digit_pin_low_state;
+        int(dati_latch_pstate ) = digit_pin_low_state;
+        int(dato_latch_pstate ) = digit_pin_low_state;
 
         int(mio_clock_pmode ) = digit_pin_input_mode;
-        int(dtai_clock_pmode ) = digit_pin_input_mode;
-        int(dtao_clock_pmode ) = digit_pin_output_mode;
-        int(dtai_latch_pmode ) = digit_pin_input_mode;
-        int(dtao_latch_pmode ) = digit_pin_output_mode;
+        int(dati_clock_pmode ) = digit_pin_input_mode;
+        int(dato_clock_pmode ) = digit_pin_output_mode;
+        int(dati_latch_pmode ) = digit_pin_input_mode;
+        int(dato_latch_pmode ) = digit_pin_output_mode;
 
-        int unsigned(digit_dtai_pcount ) = def_digit_i_pin_count;
-        int unsigned(digit_dtao_pcount ) = def_digit_o_pin_count;
+        int unsigned(digit_dati_pcount ) = def_digit_i_pin_count;
+        int unsigned(digit_dato_pcount ) = def_digit_o_pin_count;
 
-        dynamic_array <bool> dtai_pid_sstate_list;
-        dynamic_array <bool> dtao_pid_sstate_list;
+        dynamic_array <bool> dati_pid_sstate_list;
+        dynamic_array <bool> dato_pid_sstate_list;
 
-        dynamic_array <int> dtai_pstate_list;
-        dynamic_array <int> dtao_pstate_list;
+        dynamic_array <int> dati_pstate_list;
+        dynamic_array <int> dato_pstate_list;
 
-        dynamic_array <int> dtai_pmode_list;
-        dynamic_array <int> dtao_pmode_list;
+        dynamic_array <int> dati_pmode_list;
+        dynamic_array <int> dato_pmode_list;
 
-        dynamic_array <uint8_t> digit_dtai_pid_list;
-        dynamic_array <uint8_t> digit_dtao_pid_list;
+        dynamic_array <uint8_t> digit_dati_pid_list;
+        dynamic_array <uint8_t> digit_dato_pid_list;
     public :
         pin_manager ( );
         ~pin_manager( ) { }
@@ -80,169 +80,169 @@ namespace tmp { class pin_manager
         void
         (set_mio_clock_ppos_count(int unsigned(__clock_ppos_count)));
         void
-        (set_dtai_clock_ppos_count(int unsigned(__clock_ppos_count)));
+        (set_dati_clock_ppos_count(int unsigned(__clock_ppos_count)));
         void
-        (set_dtao_clock_ppos_count(int unsigned(__clock_ppos_count)));
+        (set_dato_clock_ppos_count(int unsigned(__clock_ppos_count)));
 
         int unsigned
         (get_mio_clock_ppos_count());
         int unsigned
-        (get_dtai_clock_ppos_count());
+        (get_dati_clock_ppos_count());
         int unsigned
-        (get_dtao_clock_ppos_count());
+        (get_dato_clock_ppos_count());
 
         void
         (set_mio_clock_pneg_count(int unsigned(__clock_pneg_count)));
         void
-        (set_dtai_clock_pneg_count(int unsigned(__clock_pneg_count)));
+        (set_dati_clock_pneg_count(int unsigned(__clock_pneg_count)));
         void
-        (set_dtao_clock_pneg_count(int unsigned(__clock_pneg_count)));
+        (set_dato_clock_pneg_count(int unsigned(__clock_pneg_count)));
 
         int unsigned
         (get_mio_clock_pneg_count());
         int unsigned
-        (get_dtai_clock_pneg_count());
+        (get_dati_clock_pneg_count());
         int unsigned
-        (get_dtao_clock_pneg_count());
+        (get_dato_clock_pneg_count());
 
         void
         (set_mio_clock_pid (uint8_t(__digit_pid ) ) );
         void
-        (set_dtai_clock_pid (uint8_t(__digit_pid ) ) );
+        (set_dati_clock_pid (uint8_t(__digit_pid ) ) );
         void
-        (set_dtao_clock_pid (uint8_t(__digit_pid ) ) );
+        (set_dato_clock_pid (uint8_t(__digit_pid ) ) );
         void
-        (set_dtai_latch_pid (uint8_t(__digit_pid ) ) );
+        (set_dati_latch_pid (uint8_t(__digit_pid ) ) );
         void
-        (set_dtao_latch_pid (uint8_t(__digit_pid ) ) );
+        (set_dato_latch_pid (uint8_t(__digit_pid ) ) );
 
         uint8_t
         (get_mio_clock_pid( ) );
         uint8_t
-        (get_dtai_clock_pid( ) );
+        (get_dati_clock_pid( ) );
         uint8_t
-        (get_dtao_clock_pid( ) );
+        (get_dato_clock_pid( ) );
         uint8_t
-        (get_dtai_latch_pid( ) );
+        (get_dati_latch_pid( ) );
         uint8_t
-        (get_dtao_latch_pid( ) );
+        (get_dato_latch_pid( ) );
 
         void
         (uset_mio_clock_pid( ) );
         void
-        (uset_dtai_clock_pid( ) );
+        (uset_dati_clock_pid( ) );
         void
-        (uset_dtao_clock_pid( ) );
+        (uset_dato_clock_pid( ) );
         void
-        (uset_dtai_latch_pid( ) );
+        (uset_dati_latch_pid( ) );
         void
-        (uset_dtao_latch_pid( ) );
+        (uset_dato_latch_pid( ) );
 
         void
         (set_mio_clock_pid_sstate (bool(__pid_sstate ) ) );
         void
-        (set_dtai_clock_pid_sstate (bool(__pid_sstate ) ) );
+        (set_dati_clock_pid_sstate (bool(__pid_sstate ) ) );
         void
-        (set_dtao_clock_pid_sstate (bool(__pid_sstate ) ) );
+        (set_dato_clock_pid_sstate (bool(__pid_sstate ) ) );
         void
-        (set_dtai_latch_pid_sstate (bool(__pid_sstate ) ) );
+        (set_dati_latch_pid_sstate (bool(__pid_sstate ) ) );
         void
-        (set_dtao_latch_pid_sstate (bool(__pid_sstate ) ) );
+        (set_dato_latch_pid_sstate (bool(__pid_sstate ) ) );
 
         bool
         (get_mio_clock_pid_sstate( ) );
         bool
-        (get_dtai_clock_pid_sstate( ) );
+        (get_dati_clock_pid_sstate( ) );
         bool
-        (get_dtao_clock_pid_sstate( ) );
+        (get_dato_clock_pid_sstate( ) );
         bool
-        (get_dtai_latch_pid_sstate( ) );
+        (get_dati_latch_pid_sstate( ) );
         bool
-        (get_dtao_latch_pid_sstate( ) );
+        (get_dato_latch_pid_sstate( ) );
 
         bool
         (is_mio_clock_pid_sstate (bool(__pid_sstate ) ) );
         bool
-        (is_dtai_clock_pid_sstate (bool(__pid_sstate ) ) );
+        (is_dati_clock_pid_sstate (bool(__pid_sstate ) ) );
         bool
-        (is_dtao_clock_pid_sstate (bool(__pid_sstate ) ) );
+        (is_dato_clock_pid_sstate (bool(__pid_sstate ) ) );
         bool
-        (is_dtai_latch_pid_sstate (bool(__pid_sstate ) ) );
+        (is_dati_latch_pid_sstate (bool(__pid_sstate ) ) );
         bool
-        (is_dtao_latch_pid_sstate (bool(__pid_sstate ) ) );
+        (is_dato_latch_pid_sstate (bool(__pid_sstate ) ) );
 
         void
         (update_mio_clock_pstate (int(__mio_clock_pstate ) ) );
         void
-        (update_dtai_clock_pstate (int(__dtai_clock_pstate ) ) );
+        (update_dati_clock_pstate (int(__dati_clock_pstate ) ) );
         void
-        (update_dtao_clock_pstate (int(__dtao_clock_pstate ) ) );
+        (update_dato_clock_pstate (int(__dato_clock_pstate ) ) );
         void
-        (update_dtai_latch_pstate (int(__dtai_latch_pstate ) ) );
+        (update_dati_latch_pstate (int(__dati_latch_pstate ) ) );
         void
-        (update_dtao_latch_pstate (int(__dtao_latch_pstate ) ) );
+        (update_dato_latch_pstate (int(__dato_latch_pstate ) ) );
 
         int
         (get_mio_clock_pstate( ) );
         int
-        (get_dtai_clock_pstate( ) );
+        (get_dati_clock_pstate( ) );
         int
-        (get_dtao_clock_pstate( ) );
+        (get_dato_clock_pstate( ) );
         int
-        (get_dtai_latch_pstate( ) );
+        (get_dati_latch_pstate( ) );
         int
-        (get_dtao_latch_pstate( ) );
+        (get_dato_latch_pstate( ) );
 
         int
         (get_mio_clock_pmode( ) );
         int
-        (get_dtai_clock_pmode( ) );
+        (get_dati_clock_pmode( ) );
         int
-        (get_dtao_clock_pmode( ) );
+        (get_dato_clock_pmode( ) );
         int
-        (get_dtai_latch_pmode( ) );
+        (get_dati_latch_pmode( ) );
         int
-        (get_dtao_latch_pmode( ) );
+        (get_dato_latch_pmode( ) );
 
         void
-        (set_dtai_pid(uint8_t(__digit_pid), int unsigned(__dtai_pid_pos)));
+        (set_dati_pid(uint8_t(__digit_pid), int unsigned(__dati_pid_pos)));
         void
-        (set_dtao_pid(uint8_t(__digit_pid), int unsigned(__dtao_pid_pos)));
+        (set_dato_pid(uint8_t(__digit_pid), int unsigned(__dato_pid_pos)));
 
         uint8_t
-        (get_dtai_pid(int unsigned(__dtai_pid_pos)));
+        (get_dati_pid(int unsigned(__dati_pid_pos)));
         uint8_t
-        (get_dtao_pid(int unsigned(__dtao_pid_pos)));
+        (get_dato_pid(int unsigned(__dato_pid_pos)));
 
         void
-        (uset_dtai_pid(int unsigned(__dtai_pid_pos)));
+        (uset_dati_pid(int unsigned(__dati_pid_pos)));
         void
-        (uset_dtao_pid(int unsigned(__dtao_pid_pos)));
+        (uset_dato_pid(int unsigned(__dato_pid_pos)));
 
         void
-        (set_dtai_pid_sstate(bool(__pid_sstate ), int unsigned(__dtai_pid_pos)));
+        (set_dati_pid_sstate(bool(__pid_sstate ), int unsigned(__dati_pid_pos)));
         void
-        (set_dtao_pid_sstate(bool(__pid_sstate ), int unsigned(__dtao_pid_pos)));
+        (set_dato_pid_sstate(bool(__pid_sstate ), int unsigned(__dato_pid_pos)));
 
         bool
-        (get_dtai_pid_sstate(int unsigned(__dtai_pid_pos)));
+        (get_dati_pid_sstate(int unsigned(__dati_pid_pos)));
         bool
-        (get_dtao_pid_sstate(int unsigned(__dtao_pid_pos)));
+        (get_dato_pid_sstate(int unsigned(__dato_pid_pos)));
 
         bool
-        (is_dtai_pid_sstate(bool(__pid_sstate ) ,int unsigned(__dtai_pid_pos)));
+        (is_dati_pid_sstate(bool(__pid_sstate ) ,int unsigned(__dati_pid_pos)));
         bool
-        (is_dtao_pid_sstate(bool(__pid_sstate ), int unsigned(__dtao_pid_pos)));
+        (is_dato_pid_sstate(bool(__pid_sstate ), int unsigned(__dato_pid_pos)));
 
         int unsigned
-        (get_dtai_pcount( ) )
+        (get_dati_pcount( ) )
         {
-            return(this-> digit_dtai_pcount);
+            return(this-> digit_dati_pcount);
         }
         int unsigned
-        (get_dtao_pcount( ) )
+        (get_dato_pcount( ) )
         {
-            return(this-> digit_dtao_pcount);
+            return(this-> digit_dato_pcount);
         }
 } ; }
 

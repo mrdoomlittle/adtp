@@ -10,7 +10,12 @@
 * and isent automatic and has no ids
 */
 
-# include <cstdlib>
+# ifdef ARDUINO
+    # include <stdlib.h>
+# else
+    # include <boost/cstdlib.hpp>
+# endif
+
 namespace tmp { template <typename __darr_type> class dynamic_array
 {
     public :

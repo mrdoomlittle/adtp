@@ -6,12 +6,6 @@
 * Email: doctordoomlittle@gmail.com
 */
 
-// this sill have many bugs and some things are not working
-
-/*
-NOTE: this does not work at the moment
-*/
-
 namespace tmp { template <typename __dbuff_type> class dynamic_buffer
 {
     private :
