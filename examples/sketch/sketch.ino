@@ -1,21 +1,21 @@
 # include <io_service.h>
 
 void
-(set_digit_pin_mode (uint8_t(__pin_id ), uint8_t(__pin_mode ) ) )
+(set_digit_pin_mode (uint8_t(__digit_pid ), uint8_t(__digit_pmode ) ) )
 {
-    pinMode (__pin_id, __pin_mode);
+    pinMode (__digit_pid, __digit_pmode);
 }
 
 void
-(set_digit_pin_state (uint8_t(__pin_id ), uint8_t(__pin_state ) ) )
+(set_digit_pin_state (uint8_t(__digit_pid ), uint8_t(__digit_pstate ) ) )
 {
-    digitalWrite (__pin_id, __pin_state);
+    digitalWrite (__digit_pid, __digit_pstate);
 }
 
 int
-(get_digit_pin_state (uint8_t(__pin_id ) ) )
+(get_digit_pin_state (uint8_t(__digit_pid ) ) )
 {
-    return (digitalRead (__pin_id) );
+    return (digitalRead (__digit_pid) );
 }
 
 # define LED_INDICATOR true
@@ -33,13 +33,13 @@ void
 # endif
 
 void
-(external_mlinit (tmp::io_service(* _this ) ) )
+(external_mlinit (tmp::io_service(* __io_service ) ) )
 {
 
 }
 
 void
-(external_mltick (tmp::io_service(* _this ) ) )
+(external_mltick (tmp::io_service(* __io_service ) ) )
 {
 # if LED_INDICATOR == true
     pinMode (13, OUTPUT);
@@ -58,7 +58,9 @@ void
 void
 (setup( ) )
 {
-    tmp::io_service io_service 
+    tmp::io_service io;
+
+    io.service_init
     (
         & set_digit_pin_mode,
         & set_digit_pin_state,

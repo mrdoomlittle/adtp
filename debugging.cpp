@@ -209,7 +209,7 @@ int
     tmp::shift_reg reg;
 
     std::cout << "" << std::endl;
-    reg.add_shift_register();
+    reg.add_shift_register(0, 0, 0, 0, 0, 0);
 /*
     io.service_init
     (

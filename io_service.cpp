@@ -45,18 +45,21 @@ void
 
     (this-> toggle_iloop_state( ) );
 
-    for (int unsigned x = 0; x != (this-> get_dati_pcount()); x++)
-        (this-> set_dati_pid((def_digit_dati_pids [x]), x));
+    (this-> init_pmanager_cinst());
+    (this-> init_sregister_cinst());
 
-    for (int unsigned x = 0; x != (this-> get_dato_pcount()); x++)
-        (this-> set_dato_pid((def_digit_dato_pids [x]), x));
+    for (int unsigned x = 0; x != (this-> get_pmanager_cinst_ptr())-> get_dati_pcount(); x++)
+        (this-> get_pmanager_cinst_ptr())-> set_dati_pid((def_digit_dati_pids [x]), x);
 
-    (this-> set_mio_clock_pid (def_digit_mio_clock_pid) );
-    (this-> set_dati_clock_pid (def_digit_dati_clock_pid) );
-    (this-> set_dato_clock_pid (def_digit_dato_clock_pid) );
+    for (int unsigned x = 0; x != (this-> get_pmanager_cinst_ptr())-> get_dato_pcount(); x++)
+        (this-> get_pmanager_cinst_ptr())-> set_dato_pid((def_digit_dato_pids [x]), x);
 
-    (this-> set_dati_latch_pid (def_digit_dati_latch_pid) );
-    (this-> set_dato_latch_pid (def_digit_dato_latch_pid) );
+    (this-> get_pmanager_cinst_ptr())-> set_mio_clock_pid (def_digit_mio_clock_pid);
+    (this-> get_pmanager_cinst_ptr())-> set_dati_clock_pid (def_digit_dati_clock_pid);
+    (this-> get_pmanager_cinst_ptr())-> set_dato_clock_pid (def_digit_dato_clock_pid);
+
+    (this-> get_pmanager_cinst_ptr())-> set_dati_latch_pid (def_digit_dati_latch_pid);
+    (this-> get_pmanager_cinst_ptr())-> set_dato_latch_pid (def_digit_dato_latch_pid);
 
     /* this is a simulated output so i can test if its working right
     */
@@ -97,17 +100,17 @@ void
         obitset_buff_size = def_obitset_buff_size;
     # endif
 
-    (this-> set_digit_pmode ( (this-> get_mio_clock_pid( ) ), digit_pin_input_mode) );
+    (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr())-> get_mio_clock_pid( ), digit_pin_input_mode) );
 
-    (this-> set_digit_pmode ( (this-> get_dati_clock_pid( ) ), digit_pin_input_mode) );
+    (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr())-> get_dati_clock_pid( ), digit_pin_input_mode) );
 
-    (this-> set_digit_pmode ( (this-> get_dato_clock_pid( ) ), digit_pin_output_mode) );
+    (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr())-> get_dato_clock_pid( ), digit_pin_output_mode) );
 
     for (int unsigned(x ) = 0; x != (this-> digit_i_pin_count); x ++)
-        (this-> set_digit_pmode ((this-> get_dati_pid(x)), digit_pin_input_mode));
+        (this-> set_digit_pmode ((this-> get_pmanager_cinst_ptr())-> get_dati_pid(x), digit_pin_input_mode));
 
     for (int unsigned(x ) = 0; x != (this-> digit_o_pin_count); x ++)
-        (this-> set_digit_pmode ((this-> get_dato_pid(x)), digit_pin_output_mode));
+        (this-> set_digit_pmode ((this-> get_pmanager_cinst_ptr())-> get_dato_pid(x), digit_pin_output_mode));
 
     (this-> digit_io_bitset [(bitset_id::__i_bitset)]).bitset_init((this-> dati_bitset_length));
     (this-> digit_io_bitset [(bitset_id::__o_bitset)]).bitset_init((this-> dato_bitset_length));
@@ -139,15 +142,15 @@ void
 
         (this-> update_clock_reading( ) );
 
-        (this-> update_dati_clock_pstate((this-> get_digit_pstate((this-> get_dati_clock_pid())))));
+        ((this-> get_pmanager_cinst_ptr())-> update_dati_clock_pstate((this-> get_digit_pstate((this-> get_pmanager_cinst_ptr())-> get_dati_clock_pid()))));
 
-        (this-> set_digit_pstate((this-> get_dato_clock_pid()), (this-> get_dato_clock_pstate())));
+        (this-> set_digit_pstate((this-> get_pmanager_cinst_ptr())-> get_dato_clock_pid(), (this-> get_pmanager_cinst_ptr())-> get_dato_clock_pstate()));
 
         (this-> ibit_read_holdup ) = def_ibit_read_holdup;
         (this-> obit_write_holdup ) = def_obit_write_holdup;
 
-        (this-> ibit_read_holdup ) = ( (this-> ibit_read_holdup ) + ( ( (this-> ibyte_read_holdup ) - 1) * ( (this-> dati_bitset_length ) / (this-> get_dati_pcount()) ) ) );
-        (this-> obit_write_holdup ) = ( (this-> obit_write_holdup ) + ( ( (this-> obyte_write_holdup ) - 1) * ( (this-> dato_bitset_length ) / (this-> get_dato_pcount()) ) ) );
+        (this-> ibit_read_holdup ) = ( (this-> ibit_read_holdup ) + ( ( (this-> ibyte_read_holdup ) - 1) * ( (this-> dati_bitset_length ) / ((this-> get_pmanager_cinst_ptr())-> get_dati_pcount()) ) ) );
+        (this-> obit_write_holdup ) = ( (this-> obit_write_holdup ) + ( ( (this-> obyte_write_holdup ) - 1) * ( (this-> dato_bitset_length ) / ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount()) ) ) );
 
         if ( (this-> get_mltick_count( ) ) == 0 )
             (this-> call_extern_mlinit (this ) );
@@ -158,22 +161,22 @@ void
             (this-> o_bitset_buffer).add_to_dbuff((this-> get_io_bitset (1, 0, x)), 2, 0, 0, x, true, true, false);
 
 # ifndef ARDUINO
-        for (int unsigned(x ) = 0; x != ( (this-> dati_bitset_length ) / (this-> get_dati_pcount()) ); x ++ )
+        for (int unsigned(x ) = 0; x != ( (this-> dati_bitset_length ) / ((this-> get_pmanager_cinst_ptr())-> get_dati_pcount()) ); x ++ )
                 std::cout << (this-> i_bitset_finished [x] );
 
         std::cout << " :IFBIT, ";
 
-        for (int unsigned(x ) = 0; x != ( (this-> dato_bitset_length ) / (this-> get_dato_pcount()) ); x ++ )
+        for (int unsigned(x ) = 0; x != ( (this-> dato_bitset_length ) / ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount()) ); x ++ )
             std::cout << (this-> o_bitset_finished [x] );
         std::cout << " :OFBIT";
 
         std::cout << std::endl;
 # endif
 
-        for (int unsigned(i_bitsetf_pos ) = 0; i_bitsetf_pos != ( (this-> dati_bitset_length ) / (this-> get_dati_pcount()) ); i_bitsetf_pos ++ )
+        for (int unsigned(i_bitsetf_pos ) = 0; i_bitsetf_pos != ( (this-> dati_bitset_length ) / ((this-> get_pmanager_cinst_ptr())-> get_dati_pcount()) ); i_bitsetf_pos ++ )
         {
             if ( (this-> i_bitset_finished [i_bitsetf_pos] ) == true) (this-> i_bitsetf_truec ) ++;
-            if ((this-> i_bitsetf_truec ) == ( (this-> dati_bitset_length ) / (this-> get_dati_pcount()) ) )
+            if ((this-> i_bitsetf_truec ) == ( (this-> dati_bitset_length ) / ((this-> get_pmanager_cinst_ptr())-> get_dati_pcount()) ) )
             {
                 (this-> i_bitsetf_truec ) = 0;
 
@@ -201,23 +204,23 @@ void
 
                 else (this-> i_bitset_buff_pos[0] ) ++;
 
-                for (int unsigned(x ) = 0; x != ( (this-> dati_bitset_length ) / (this-> get_dati_pcount()) ); x ++ )
+                for (int unsigned(x ) = 0; x != ( (this-> dati_bitset_length ) / ((this-> get_pmanager_cinst_ptr())-> get_dati_pcount()) ); x ++ )
                     (this-> i_bitset_finished [x] ) = false;
             }
         }
 
         (this-> i_bitsetf_truec ) = 0;
 
-        for (int unsigned(o_bitsetf_pos ) = 0; o_bitsetf_pos != ( (this-> dato_bitset_length ) / (this-> get_dato_pcount()) ); o_bitsetf_pos ++ )
+        for (int unsigned(o_bitsetf_pos ) = 0; o_bitsetf_pos != ( (this-> dato_bitset_length ) / (this-> get_pmanager_cinst_ptr())-> get_dato_pcount() ); o_bitsetf_pos ++ )
         {
             if ( (this-> o_bitset_finished [o_bitsetf_pos] ) == true) (this-> o_bitsetf_truec ) ++;
-            if ( (this-> o_bitsetf_truec ) == ( (this-> dato_bitset_length ) / (this-> get_dato_pcount()) ) )
+            if ( (this-> o_bitsetf_truec ) == ( (this-> dato_bitset_length ) / (this-> get_pmanager_cinst_ptr())-> get_dato_pcount() ) )
             {
-                (this-> set_digit_pstate((this-> get_dato_latch_pid()), digit_pin_high_state));
+                (this-> set_digit_pstate((this-> get_pmanager_cinst_ptr())-> get_dato_latch_pid(), digit_pin_high_state));
 
                 for (int x = 0; x != 1000; x++){} // this is only temporary
 
-                (this-> set_digit_pstate((this-> get_dato_latch_pid()), digit_pin_low_state));
+                (this-> set_digit_pstate((this-> get_pmanager_cinst_ptr())-> get_dato_latch_pid(), digit_pin_low_state));
 
                 (this-> o_bitsetf_truec ) = 0;
 # ifndef ARDUINO
@@ -230,7 +233,7 @@ void
 
                 std::cout << std::endl << std::endl;
 # endif
-                for (int unsigned(x ) = 0; x != ( (this-> dato_bitset_length ) / (this-> get_dato_pcount()) ); x ++ )
+                for (int unsigned(x ) = 0; x != ( (this-> dato_bitset_length ) / (this-> get_pmanager_cinst_ptr())->get_dato_pcount() ); x ++ )
                     (this-> o_bitset_finished [x] ) = false;
 
                 if ((this-> o_bitset_buffer).is_block_smarker(true, 0, (this-> o_bitset_buff_pos[0] )) == true)
@@ -309,29 +312,29 @@ void
 
             (this-> set_iltick_count ( (this-> i_iltick_count ) ) );
 
-            if ( (this-> get_iltick_count( ) ) <= ( ((this-> get_dati_pcount()) - 1) + ((this-> ibit_read_holdup) - 1) ) && ( (this-> get_iltick_count( ) ) ) >= ((this-> ibit_read_holdup) - 1) )
+            if ( (this-> get_iltick_count( ) ) <= ( (((this-> get_pmanager_cinst_ptr())-> get_dati_pcount()) - 1) + ((this-> ibit_read_holdup) - 1) ) && ( (this-> get_iltick_count( ) ) ) >= ((this-> ibit_read_holdup) - 1) )
             {
-                if ((this-> get_dati_clock_pstate()) != 0x1)
+                if (((this-> get_pmanager_cinst_ptr())-> get_dati_clock_pstate()) != 0x1)
                 {
                     (this-> is_dati_clock_ppos) = true;
-                    (this-> set_dati_clock_ppos_count((this-> get_dati_clock_ppos_count()) + 1));
+                    ((this-> get_pmanager_cinst_ptr())-> set_dati_clock_ppos_count(((this-> get_pmanager_cinst_ptr())-> get_dati_clock_ppos_count()) + 1));
                 }
 
-                if ((this-> get_dati_clock_pstate()) != 0x0)
+                if (((this-> get_pmanager_cinst_ptr())-> get_dati_clock_pstate()) != 0x0)
                 {
                     (this-> is_dati_clock_ppos) = false;
-                    (this-> set_dati_clock_pneg_count((this-> get_dati_clock_pneg_count()) + 1));
+                    ((this-> get_pmanager_cinst_ptr())-> set_dati_clock_pneg_count(((this-> get_pmanager_cinst_ptr())-> get_dati_clock_pneg_count()) + 1));
                 }
 
                 if ((this-> is_dati_clock_ppos) == true)
                 {
-                    std::cout << ": " << (this-> get_dati_clock_ppos_count())  << std::endl;
+                    std::cout << ": " << ((this-> get_pmanager_cinst_ptr())-> get_dati_clock_ppos_count())  << std::endl;
 
-                (this-> digit_i_buffer [(this-> digit_i_buffer_pos)] ) = (this-> get_digit_pstate ( (this-> get_dati_pid((this-> digit_i_buffer_pos))) ) );
+                (this-> digit_i_buffer [(this-> digit_i_buffer_pos)] ) = (this-> get_digit_pstate ( ((this-> get_pmanager_cinst_ptr())-> get_dati_pid((this-> digit_i_buffer_pos))) ) );
 
-                if ( (this-> get_iltick_count( ) ) == ( ( ((this-> get_dati_pcount()) - 1) + ((this-> ibit_read_holdup) - 1) ) + (this-> ibp_pcount_multiplier) ) )
+                if ( (this-> get_iltick_count( ) ) == ( ( (((this-> get_pmanager_cinst_ptr())-> get_dati_pcount()) - 1) + ((this-> ibit_read_holdup) - 1) ) + (this-> ibp_pcount_multiplier) ) )
                 {
-                    (this-> ibp_pcount_multiplier ) += (this-> get_dati_pcount());
+                    (this-> ibp_pcount_multiplier ) += ((this-> get_pmanager_cinst_ptr())-> get_dati_pcount());
                     (this-> digit_i_buffer_pos ) = 0;
                     if ( (this-> get_iltick_count( ) ) == 0)
                         (this-> ibp_pcount_multiplier ) = 0;
@@ -339,21 +342,21 @@ void
                 else
                 {
                     (this-> digit_i_buffer_pos) ++;
-                    if ( (this-> ibp_pcount_multiplier) == (this-> get_dati_pcount()) )
+                    if ( (this-> ibp_pcount_multiplier) == ((this-> get_pmanager_cinst_ptr())-> get_dati_pcount()) )
                         (this-> ibp_pcount_multiplier ) = 0;
                 }
 
-                if ( (this-> get_iltick_count( ) ) == ( ((this-> ibit_read_holdup ) - 1) + ((this-> get_dati_pcount()) - 1) ) )
+                if ( (this-> get_iltick_count( ) ) == ( ((this-> ibit_read_holdup ) - 1) + (((this-> get_pmanager_cinst_ptr())-> get_dati_pcount()) - 1) ) )
                 {
-                    for (int unsigned(i_bitset_pos ) = 0; i_bitset_pos != (this-> get_dati_pcount()); i_bitset_pos ++)
-                        (this-> digit_dati_bitset [( (this-> i_bitset_fcount ) * (this-> get_dati_pcount()) + i_bitset_pos)] ) = (this-> digit_i_buffer [i_bitset_pos] );
+                    for (int unsigned(i_bitset_pos ) = 0; i_bitset_pos != ((this-> get_pmanager_cinst_ptr())-> get_dati_pcount()); i_bitset_pos ++)
+                        (this-> digit_dati_bitset [( (this-> i_bitset_fcount ) * ((this-> get_pmanager_cinst_ptr())-> get_dati_pcount()) + i_bitset_pos)] ) = (this-> digit_i_buffer [i_bitset_pos] );
 
                     if ( (this-> i_bitset_finished [(this-> i_bitset_fcount )] ) == false)
                     {
                         (this-> i_bitset_finished [(this-> i_bitset_fcount )] ) = true;
                     }
 
-                    if ( (this-> i_bitset_fcount ) == ((this-> dati_bitset_length ) / (this-> get_dati_pcount()) ) - 1)
+                    if ( (this-> i_bitset_fcount ) == ((this-> dati_bitset_length ) / ((this-> get_pmanager_cinst_ptr())-> get_dati_pcount()) ) - 1)
                         (this-> i_bitset_fcount ) = 0;
                     else
                         (this-> i_bitset_fcount ) ++;
@@ -367,12 +370,12 @@ void
 
             (this-> set_iltick_count ( (this-> o_iltick_count ) ) );
 
-            if ( (this-> get_iltick_count( ) ) <= ( ( (this-> get_dato_pcount()) - 1) + (this-> obit_write_holdup - 1) ) && (this-> get_iltick_count( ) ) >= (this-> obit_write_holdup - 1) )
+            if ( (this-> get_iltick_count( ) ) <= ( ( ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount()) - 1) + (this-> obit_write_holdup - 1) ) && (this-> get_iltick_count( ) ) >= (this-> obit_write_holdup - 1) )
             {
-                if ( (this-> get_iltick_count( ) ) == ( ( (this-> obit_write_holdup ) - 1) + ( (this-> get_dato_pcount()) ) ) || (this-> get_iltick_count( ) ) == (this-> obit_write_holdup - 1) )
+                if ( (this-> get_iltick_count( ) ) == ( ( (this-> obit_write_holdup ) - 1) + ( ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount()) ) ) || (this-> get_iltick_count( ) ) == (this-> obit_write_holdup - 1) )
                 {
-                    for (int unsigned(o_bitset_pos ) = 0; o_bitset_pos != (this-> get_dato_pcount()); o_bitset_pos ++)
-                        (this-> digit_o_buffer [o_bitset_pos] ) = (this-> digit_dato_bitset [( (this-> o_bitset_fcount ) * (this-> get_dato_pcount()) + o_bitset_pos )] );
+                    for (int unsigned(o_bitset_pos ) = 0; o_bitset_pos != ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount()); o_bitset_pos ++)
+                        (this-> digit_o_buffer [o_bitset_pos] ) = (this-> digit_dato_bitset [( (this-> o_bitset_fcount ) * ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount()) + o_bitset_pos )] );
 
                     if ( (this-> o_bitset_finished [(this-> o_bitset_fcount )] ) == false)
                     {
@@ -380,20 +383,20 @@ void
                         (this-> o_bitset_finished [(this-> o_bitset_fcount )] ) = true;
                     }
 
-                    if ( (this-> o_bitset_fcount ) == ( (this-> dato_bitset_length ) / (this-> get_dato_pcount()) ) - 1)
+                    if ( (this-> o_bitset_fcount ) == ( (this-> dato_bitset_length ) / ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount()) ) - 1)
                         (this-> o_bitset_fcount ) = 0;
                     else
                         (this-> o_bitset_fcount ) ++;
                 }
 
                 (this-> set_digit_pstate (
-                    (this-> get_dato_pid((this-> digit_o_buffer_pos))),
+                    ((this-> get_pmanager_cinst_ptr())-> get_dato_pid((this-> digit_o_buffer_pos))),
                     (this-> digit_o_buffer [(this-> digit_o_buffer_pos )] )
                 ) );
 
-                if ( (this-> get_iltick_count( ) ) == ( ( ( (this-> get_dato_pcount()) - 1) + (this-> obit_write_holdup - 1) ) + (this-> obp_pcount_multiplier ) ) )
+                if ( (this-> get_iltick_count( ) ) == ( ( ( ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount()) - 1) + (this-> obit_write_holdup - 1) ) + (this-> obp_pcount_multiplier ) ) )
                 {
-                    (this-> obp_pcount_multiplier ) += (this-> get_dato_pcount());
+                    (this-> obp_pcount_multiplier ) += ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount());
                     (this-> digit_o_buffer_pos ) = 0;
                     if ( (this-> get_iltick_count( ) ) == 0)
                         (this-> obp_pcount_multiplier ) = 0;
@@ -401,16 +404,16 @@ void
                 else
                 {
                     (this-> digit_o_buffer_pos ) ++;
-                    if ( (this-> obp_pcount_multiplier ) == (this-> get_dato_pcount()) )
+                    if ( (this-> obp_pcount_multiplier ) == ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount()) )
                         (this-> obp_pcount_multiplier ) = 0;
                 }
             }
 
             (this-> set_iltick_count ( (this-> temp_iltick_count ) ) );
 
-            if ( ( ((this-> get_dati_pcount()) - 1) + (this-> ibit_read_holdup - 1) ) == ( ((this-> get_dato_pcount()) - 1) + (this-> obit_write_holdup - 1) ) )
+            if ( ( (((this-> get_pmanager_cinst_ptr())-> get_dati_pcount()) - 1) + (this-> ibit_read_holdup - 1) ) == ( (((this-> get_pmanager_cinst_ptr())-> get_dato_pcount()) - 1) + (this-> obit_write_holdup - 1) ) )
             {
-                if ( (this-> get_iltick_count( ) ) == ( ( ((this-> get_dati_pcount()) - 1) + (this-> ibit_read_holdup - 1) ) + ( ((this-> get_dato_pcount()) - 1) + (this-> obit_write_holdup - 1) ) ) )
+                if ( (this-> get_iltick_count( ) ) == ( ( (((this-> get_pmanager_cinst_ptr())-> get_dati_pcount()) - 1) + (this-> ibit_read_holdup - 1) ) + ( (((this-> get_pmanager_cinst_ptr())-> get_dato_pcount()) - 1) + (this-> obit_write_holdup - 1) ) ) )
                 {
                     (this-> i_iltick_count ) = 0;
                     (this-> o_iltick_count ) = 0;
@@ -419,13 +422,13 @@ void
             }
             else
             {
-                if ( (this-> i_iltick_count ) == ( ((this-> get_dati_pcount()) - 1) + (this-> ibit_read_holdup - 1) ) )
+                if ( (this-> i_iltick_count ) == ( (((this-> get_pmanager_cinst_ptr())-> get_dati_pcount()) - 1) + (this-> ibit_read_holdup - 1) ) )
                 {
                     (this-> i_iltick_count ) = 0;
                     break;
                 }
 
-                if ( (this-> o_iltick_count ) == ( ((this-> get_dato_pcount()) - 1) + (this-> obit_write_holdup - 1) ) )
+                if ( (this-> o_iltick_count ) == ( (((this-> get_pmanager_cinst_ptr())-> get_dato_pcount()) - 1) + (this-> obit_write_holdup - 1) ) )
                 {
                     (this-> o_iltick_count ) = 0;
                     break;
@@ -527,17 +530,17 @@ void
 {
     (this-> set_digit_pstate_fptr (__digit_pid, __digit_pstate ) );
 
-    if (__digit_pid == (this-> get_dato_clock_pid( ) ))
-        (this-> update_dato_clock_pstate(__digit_pstate));
+    if (__digit_pid == ((this-> get_pmanager_cinst_ptr())-> get_dato_clock_pid( ) ))
+        ((this-> get_pmanager_cinst_ptr())-> update_dato_clock_pstate(__digit_pstate));
 
-    else if (__digit_pid == (this-> get_dato_latch_pid( ) ))
-        (this-> update_dato_latch_pstate(__digit_pstate));
+    else if (__digit_pid == ((this-> get_pmanager_cinst_ptr())-> get_dato_latch_pid( ) ))
+        ((this-> get_pmanager_cinst_ptr())-> update_dato_latch_pstate(__digit_pstate));
 
     else
     {
-        for (int unsigned(x ) = 0; x != (this-> get_dato_pcount()); x ++)
+        for (int unsigned(x ) = 0; x != ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount()); x ++)
         {
-            if (__digit_pid == (this-> get_dati_pid (x) ) )
+            if (__digit_pid == ((this-> get_pmanager_cinst_ptr())-> get_dati_pid (x) ) )
             {
                 return;
             }
@@ -592,7 +595,7 @@ bool
 bool
 (io_service::is_external_clock (bool(__is_type ) ) )
 {
-    return ( (this-> get_digit_pstate_fptr ( (this-> get_mio_clock_pid() ) ) ) == __is_type? true : false);
+    return ( (this-> get_digit_pstate_fptr ( ((this-> get_pmanager_cinst_ptr())-> get_mio_clock_pid() ) ) ) == __is_type? true : false);
 }
 
 void
@@ -609,7 +612,7 @@ void
 void
 (io_service::update_clock_reading( ) )
 {
-    (this-> external_clock_reading ) = (this-> get_digit_pstate_fptr ( (this-> get_mio_clock_pid() ) ) ) == 1? true : false;
+    (this-> external_clock_reading ) = (this-> get_digit_pstate_fptr ( ((this-> get_pmanager_cinst_ptr())-> get_mio_clock_pid() ) ) ) == 1? true : false;
 }
 
 void
