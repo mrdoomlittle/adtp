@@ -199,10 +199,11 @@ void
 }
 
 # include "shift_reg.hpp"
-
+# include "port_manager.hpp"
 int
 (main( ) )
 {
+/*
     tmp::io_service io;
     tmp::pin_manager pman;
 
@@ -229,7 +230,9 @@ int
     for (int unsigned x = 0; x != 8; x ++)
         std::cout << lol[x] << std::endl;
 
-        
+*/
+
+    tmp::port_manager portm; 
 /*
     io.service_init
     (
