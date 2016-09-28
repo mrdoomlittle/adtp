@@ -14,6 +14,7 @@
     # include <stdlib.h>
 # else
     # include <boost/cstdlib.hpp>
+    # include <iostream>
 # endif
 
 namespace tmp { template <typename __darr_type> class dynamic_array
@@ -135,6 +136,33 @@ namespace tmp { template <typename __darr_type> class dynamic_array
 
                 std::free((this-> darr_ilayers [(data_id::__swap)]));
             }
+        }
+
+        void(del_darr_layer(int unsigned(__layer_arr_pos)))
+        {
+            (this-> darr_ilayers [(data_id::__swap)]) = new __darr_type [(this-> darr_length) * (this-> darr_depth) -1];
+
+            int unsigned (r) = 0;
+
+            for (int unsigned(x ) = 0; x != ((this-> darr_length) * (this-> darr_depth)); x ++)
+            {
+                if (x >= (__layer_arr_pos * (this-> darr_length)) && x < (__layer_arr_pos * (this-> darr_length)) + (this-> darr_length)) {r ++; continue;}
+            
+                (this-> darr_ilayers [(data_id::__swap)] [(x-r)]) = (this-> darr_ilayers [(data_id::__main)] [(x)]);
+            }
+
+            (this-> darr_depth) --;
+
+            std::free((this-> darr_ilayers [(data_id::__main)]));
+
+            (this-> darr_ilayers [(data_id::__main)]) = new __darr_type [(this-> darr_length) * (this-> darr_depth)];
+
+            for (int unsigned(x ) = 0; x != ((this-> darr_length) * (this-> darr_depth)); x ++)
+            {
+                (this-> darr_ilayers [(data_id::__main)] [x]) = (this-> darr_ilayers [(data_id::__swap)] [x]);
+            }
+
+            std::free((this-> darr_ilayers [(data_id::__swap)]));
         }
 
         int unsigned(get_darr_length())

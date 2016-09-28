@@ -200,6 +200,7 @@ void
 
 # include "shift_reg.hpp"
 # include "port_manager.hpp"
+# include "dynamic_array.hpp"
 int
 (main( ) )
 {
@@ -214,16 +215,18 @@ int
     std::cout << "" << std::endl;
     reg.set_pmanager_cinst_ptr(&pman);
     reg.add_shift_register(0, 2, 3, 4, 5, 8);
+
+*/
     int unsigned * test = new int unsigned [8];
-    test[0] = 0;
-    test[1] = 0;
+    test[0] = 1;
+    test[1] = 1;
     test[2] = 0;
     test[3] = 0;
     test[4] = 0;
-    test[5] = 0;
-    test[6] = 0;
-    test[7] = 0;
-
+    test[5] = 1;
+    test[6] = 1;
+    test[7] = 1;
+/*
     reg.set_shift_reg_obitset(test, 0);
 
     int unsigned * lol = reg.get_shift_reg_obitset(0); 
@@ -233,6 +236,24 @@ int
 */
 
     tmp::port_manager portm; 
+
+
+    // all of this is for debugging new things
+    portm.add_port_num(9500);
+    tmp::dynamic_array <int unsigned> a;
+    a.darr_init(8, 5);
+    a.set_darr_layer(test, 2);
+
+    for (int unsigned x = 0; x != 8; x ++)    
+        std::cout << *a.get_darr_ilayer(1, x);
+    std::cout << ", ArrayPOS: " << 1 << std::endl;
+    
+    a.del_darr_layer(1);
+    std::cout << "Remove/Delete Array Layer" << std::endl;
+
+    for (int unsigned x = 0; x != 8; x ++)
+        std::cout << *a.get_darr_ilayer(1, x);
+    std::cout << ", ArrayPOS: " << 1 << std::endl;
 /*
     io.service_init
     (
