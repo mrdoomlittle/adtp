@@ -11,6 +11,41 @@
 
 namespace tmp
 {
+io_service::pmanager_ct
+(* io_service::get_pmanager_cinst_ptr())
+{
+    return ((this-> pmanager_cinst_ptr));
+}
+
+io_service::sregister_ct
+(* io_service::get_sregister_cinst_ptr())
+{
+    return ((this-> sregister_cinst_ptr));
+}
+
+void
+(io_service::init_pmanager_cinst())
+{
+    if ((this-> has_pmanager_cinst_init) == true) return;
+
+    static pmanager_ct pmanager_cinstance;
+
+    (this-> pmanager_cinst_ptr) = & pmanager_cinstance;
+
+    (this-> has_pmanager_cinst_init ) = true;
+}
+
+void
+(io_service::init_sregister_cinst())
+{
+    if ((this-> has_sregister_cinst_init) == true) return;
+
+    static sregister_ct sregister_cinstance;
+
+    (this-> sregister_cinst_ptr) = & sregister_cinstance;
+
+    (this-> has_sregister_cinst_init ) = true;
+}
 
 io_service::io_service( ) { }
 io_service::~io_service( ) { }

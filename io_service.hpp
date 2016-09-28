@@ -19,6 +19,8 @@
 # include "bitset.hpp"
 # include "data_packet.hpp"
 # include "shift_reg.hpp"
+# include "port_manager.hpp"
+
 /* example: if the start state is 0x0 then the clock will start ticking when changes to 0x1
 */
 namespace tmp { class io_service
@@ -32,39 +34,21 @@ namespace tmp { class io_service
         sregister_ct
             (* sregister_cinst_ptr ) = nullptr;
 
-        pmanager_ct(* get_pmanager_cinst_ptr())
-        {
-            return ((this-> pmanager_cinst_ptr));
-        }
+        typedef port_manager port_manager_ct;
+        port_manager_ct
+            (* port_manager_cint_ptr ) = nullptr;
 
-        sregister_ct(* get_sregister_cinst_ptr())
-        {
-            return ((this-> sregister_cinst_ptr));
-        }
-
-        void (init_pmanager_cinst())
-        {
-            if ((this-> has_pmanager_cinst_init) == true) return;
-
-            static pmanager_ct pmanager_cinstance;
-
-            (this-> pmanager_cinst_ptr) = & pmanager_cinstance;
-
-            (this-> has_pmanager_cinst_init ) = true;
-        }
+        pmanager_ct
+        (* get_pmanager_cinst_ptr());
+        sregister_ct
+        (* get_sregister_cinst_ptr());
+        void
+        (init_pmanager_cinst());
 
         bool(has_pmanager_cinst_init ) = false;
 
-        void (init_sregister_cinst())
-        {
-            if ((this-> has_sregister_cinst_init) == true) return;
-
-            static sregister_ct sregister_cinstance;
-
-            (this-> sregister_cinst_ptr) = & sregister_cinstance;
-
-            (this-> has_sregister_cinst_init ) = true;
-        }
+        void
+        (init_sregister_cinst());
 
         bool(has_sregister_cinst_init ) = false;
 
