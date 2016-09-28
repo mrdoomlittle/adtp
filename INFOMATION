@@ -1,1 +1,3 @@
-data_packet and shift_reg not finished. This projects is not finished not even close
+data_packet and shift_reg not finished. This projects is not finished not even close.
+move source from shft ref hpp file to cpp file.
+

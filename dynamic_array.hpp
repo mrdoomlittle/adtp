@@ -39,6 +39,7 @@ namespace tmp { template <typename __darr_type> class dynamic_array
         {
             /* we might need to apply somthing to dected if this is not a independent var
             */
+
             (this-> darr_ilayers [(data_id::__main)] [(__layer_arr_pos * (this-> darr_length)) + __ilayer_arr_pos]) = *__ilayer_data;
         }
 
@@ -79,10 +80,10 @@ namespace tmp { template <typename __darr_type> class dynamic_array
             switch(__resize_type)
             {
                 case (resize_t::__single_layer) :
-                    
+
                     break;
                 case (resize_t::__all_layers) :
-                    
+
                     if (__resize_to <= (this-> darr_length)) return;
 
                     (this-> darr_ilayers [(data_id::__swap)]) = new __darr_type [__resize_to * (this-> darr_depth)];
@@ -117,7 +118,7 @@ namespace tmp { template <typename __darr_type> class dynamic_array
 
                 std::free((this-> darr_ilayers [(data_id::__main)]));
             }
-            
+
             if ((this-> darr_depth) == 0)
             {
                 (this-> darr_depth) ++;
@@ -127,7 +128,7 @@ namespace tmp { template <typename __darr_type> class dynamic_array
                 return;
             }
 
-            if ((this-> darr_depth) != 0) 
+            if ((this-> darr_depth) != 0)
             {
                 for (int unsigned(x ) = 0; x != ((this-> darr_length) * (this-> darr_depth)); x ++)
                     (this-> darr_ilayers [(data_id::__main)] [x]) = (this-> darr_ilayers [(data_id::__swap)] [x]);

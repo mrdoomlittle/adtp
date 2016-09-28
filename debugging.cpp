@@ -204,12 +204,32 @@ int
 (main( ) )
 {
     tmp::io_service io;
+    tmp::pin_manager pman;
 
 
+ 
     tmp::shift_reg reg;
 
     std::cout << "" << std::endl;
-    reg.add_shift_register(0, 0, 0, 0, 0, 0);
+    reg.set_pmanager_cinst_ptr(&pman);
+    reg.add_shift_register(0, 2, 3, 4, 5, 8);
+    int unsigned * test = new int unsigned [8];
+    test[0] = 0;
+    test[1] = 0;
+    test[2] = 0;
+    test[3] = 0;
+    test[4] = 0;
+    test[5] = 0;
+    test[6] = 0;
+    test[7] = 0;
+
+    reg.set_shift_reg_obitset(test, 0);
+
+    int unsigned * lol = reg.get_shift_reg_obitset(0); 
+    for (int unsigned x = 0; x != 8; x ++)
+        std::cout << lol[x] << std::endl;
+
+        
 /*
     io.service_init
     (
