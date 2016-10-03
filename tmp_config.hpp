@@ -6,6 +6,21 @@
 * Email: doctordoomlittle@gmail.com
 */
 
+# ifdef ARDUINO
+    # include <stdint.h>
+# else
+    # include <iostream>
+    # include <boost/cstdint.hpp>
+# endif
+
+namespace tmp
+{
+    enum __time_t : int unsigned 
+    {
+        __nano_seconds = 0
+    };
+}
+
 # define digit_pin_input_mode 0x1
 # define digit_pin_output_mode 0x0
 

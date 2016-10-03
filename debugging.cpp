@@ -65,6 +65,18 @@ void
     }
 }
 
+#include <chrono>
+#include <ctime>
+
+int unsigned long(get_high_res_clock())
+{
+    auto hrc_now = std::chrono::high_resolution_clock::now( );
+
+    auto nano_seconds = std::chrono::duration_cast <std::chrono::nanoseconds> (hrc_now.time_since_epoch( ) ).count( );
+
+    return(nano_seconds);
+}
+
 int unsigned(simulated_pin_state_i [3] [8]) = {
     {0x1, 0x0, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}, {0x1, 0x1, 0x0, 0x1, 0x1, 0x1, 0x1, 0x1}, {0x1, 0x1, 0x1, 0x0, 0x1, 0x1, 0x1, 0x1} } ;
 
@@ -138,13 +150,13 @@ uint8_t test[8][8] =
     {1, 1, 1, 1, 1, 1, 1, 0},
 };
 
-void
+int unsigned
 (external_mlinit (tmp::io_service(* __io_service ) ) )
 {
-
+    return 1;
 }
 
-void
+int unsigned
 (external_mltick (tmp::io_service(* __io_service ) ) )
 {
 
@@ -196,73 +208,28 @@ void
         std::cout << std::endl;
     }
     tcount++;
+
+    return 1;
 }
 
 # include "shift_reg.hpp"
 # include "port_manager.hpp"
 # include "dynamic_array.hpp"
+//# include "cint_convert.hpp"
 int
 (main( ) )
-{
-/*
+{ 
     tmp::io_service io;
-    tmp::pin_manager pman;
 
-
- 
-    tmp::shift_reg reg;
-
-    std::cout << "" << std::endl;
-    reg.set_pmanager_cinst_ptr(&pman);
-    reg.add_shift_register(0, 2, 3, 4, 5, 8);
-
-*/
-    int unsigned * test = new int unsigned [8];
-    test[0] = 1;
-    test[1] = 1;
-    test[2] = 0;
-    test[3] = 0;
-    test[4] = 0;
-    test[5] = 1;
-    test[6] = 1;
-    test[7] = 1;
-/*
-    reg.set_shift_reg_obitset(test, 0);
-
-    int unsigned * lol = reg.get_shift_reg_obitset(0); 
-    for (int unsigned x = 0; x != 8; x ++)
-        std::cout << lol[x] << std::endl;
-
-*/
-
-    tmp::port_manager portm; 
-
-
-    // all of this is for debugging new things
-    portm.add_port_num(9500);
-    tmp::dynamic_array <int unsigned> a;
-    a.darr_init(8, 5);
-    a.set_darr_layer(test, 2);
-
-    for (int unsigned x = 0; x != 8; x ++)    
-        std::cout << *a.get_darr_ilayer(1, x);
-    std::cout << ", ArrayPOS: " << 1 << std::endl;
-    
-    a.del_darr_layer(1);
-    std::cout << "Remove/Delete Array Layer" << std::endl;
-
-    for (int unsigned x = 0; x != 8; x ++)
-        std::cout << *a.get_darr_ilayer(1, x);
-    std::cout << ", ArrayPOS: " << 1 << std::endl;
-/*
     io.service_init
     (
         & set_digit_pin_mode,
         & set_digit_pin_state,
         & get_digit_pin_state,
+        & get_high_res_clock,
         & external_mlinit,
         & external_mltick
-    );*/
+    );
 }
 
 # endif /*ARDUINO*/

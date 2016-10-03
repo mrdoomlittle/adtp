@@ -11,44 +11,57 @@
 
 namespace tmp
 {
-io_service::pmanager_ct
-(* io_service::get_pmanager_cinst_ptr())
-{
-    return ((this-> pmanager_cinst_ptr));
-}
 
-io_service::sregister_ct
-(* io_service::get_sregister_cinst_ptr())
+io_service::pmanager_ct
+(* io_service::get_pmanager_cinst_ptr( ) )
 {
-    return ((this-> sregister_cinst_ptr));
+    return ( (this-> pmanager_cinst_ptr) );
+}
+io_service::sregister_ct
+(* io_service::get_sregister_cinst_ptr( ) )
+{
+    return ( (this-> sregister_cinst_ptr) );
 }
 
 void
-(io_service::init_pmanager_cinst())
+(io_service::init_pmanager_cinst( ) )
 {
-    if ((this-> has_pmanager_cinst_init) == true) return;
+    if ( (this-> has_pmanager_cinst_init) == true) return;
 
     static pmanager_ct pmanager_cinstance;
 
-    (this-> pmanager_cinst_ptr) = & pmanager_cinstance;
+    (this-> pmanager_cinst_ptr ) = & pmanager_cinstance;
 
     (this-> has_pmanager_cinst_init ) = true;
 }
-
 void
-(io_service::init_sregister_cinst())
+(io_service::init_sregister_cinst( ) )
 {
-    if ((this-> has_sregister_cinst_init) == true) return;
+    if ( (this-> has_sregister_cinst_init) == true) return;
 
     static sregister_ct sregister_cinstance;
 
-    (this-> sregister_cinst_ptr) = & sregister_cinstance;
+    (this-> sregister_cinst_ptr ) = & sregister_cinstance;
 
     (this-> has_sregister_cinst_init ) = true;
 }
 
-io_service::io_service( ) { }
-io_service::~io_service( ) { }
+io_service::io_service( )
+{
+
+}
+io_service::~io_service( )
+{
+    if ( (this-> has_pmanager_cinst_init) == true)
+    {   
+        std::free ( (this-> get_pmanager_cinst_ptr( ) ) );
+    }
+
+    if ( (this-> has_sregister_cinst_init) == true)
+    {
+        std::free ( (this-> get_sregister_cinst_ptr( ) ) );
+    }
+}
 
 void
 (io_service::service_init (
@@ -58,6 +71,8 @@ void
         (* __set_digit_pstate_fptr),
     get_digit_pstate_ft
         (*__get_digit_pstate_fptr),
+    get_high_rclock_ft
+        (* __get_high_rclock_fptr),
     extern_mlinit_ft
         (* __extern_mlinit_fptr),
     extern_mltick_ft
@@ -67,12 +82,14 @@ void
     (this-> set_ptr_to_sdigit_pmode_f (__set_digit_pmode_fptr) );
     (this-> set_ptr_to_sdigit_pstate_f (__set_digit_pstate_fptr) );
     (this-> set_ptr_to_gdigit_pstate_f (__get_digit_pstate_fptr) );
+    (this-> set_ptr_to_ghigh_rclock_f (__get_high_rclock_fptr) );
     (this-> set_ptr_to_extern_mlinit_f (__extern_mlinit_fptr) );
     (this-> set_ptr_to_extern_mltick_f (__extern_mltick_fptr) );
 
     if ( (this-> is_ptr_to_sdigit_pmode_f (nullptr) ) ) return;
     if ( (this-> is_ptr_to_sdigit_pstate_f (nullptr) ) ) return;
     if ( (this-> is_ptr_to_gdigit_pstate_f (nullptr) ) ) return;
+    if ( (this-> is_ptr_to_ghigh_rclock_f (nullptr) ) ) return;
     if ( (this-> is_ptr_to_extern_mlinit_f (nullptr) ) ) return;
     if ( (this-> is_ptr_to_extern_mltick_f (nullptr) ) ) return;
 
@@ -80,21 +97,28 @@ void
 
     (this-> toggle_iloop_state( ) );
 
-    (this-> init_pmanager_cinst());
-    (this-> init_sregister_cinst());
 
-    for (int unsigned x = 0; x != (this-> get_pmanager_cinst_ptr())-> get_dati_pcount(); x++)
-        (this-> get_pmanager_cinst_ptr())-> set_dati_pid((def_digit_dati_pids [x]), x);
+    // create a instance of classes
+    (this-> init_pmanager_cinst( ) );
+    (this-> init_sregister_cinst( ) );
 
-    for (int unsigned x = 0; x != (this-> get_pmanager_cinst_ptr())-> get_dato_pcount(); x++)
-        (this-> get_pmanager_cinst_ptr())-> set_dato_pid((def_digit_dato_pids [x]), x);
+    for (int unsigned x = 0; x != (this-> get_pmanager_cinst_ptr( ) )-> get_dati_pcount( ); x++)
+        (this-> get_pmanager_cinst_ptr( ) )-> set_dati_pid ( (def_digit_dati_pids [x]), x);
 
-    (this-> get_pmanager_cinst_ptr())-> set_mio_clock_pid (def_digit_mio_clock_pid);
-    (this-> get_pmanager_cinst_ptr())-> set_dati_clock_pid (def_digit_dati_clock_pid);
-    (this-> get_pmanager_cinst_ptr())-> set_dato_clock_pid (def_digit_dato_clock_pid);
+    for (int unsigned x = 0; x != (this-> get_pmanager_cinst_ptr( ) )-> get_dato_pcount( ); x++)
+        (this-> get_pmanager_cinst_ptr( ) )-> set_dato_pid ( (def_digit_dato_pids [x]), x);
 
-    (this-> get_pmanager_cinst_ptr())-> set_dati_latch_pid (def_digit_dati_latch_pid);
-    (this-> get_pmanager_cinst_ptr())-> set_dato_latch_pid (def_digit_dato_latch_pid);
+    (this-> get_pmanager_cinst_ptr( ) )-> 
+        set_mio_clock_pid (def_digit_mio_clock_pid);
+    (this-> get_pmanager_cinst_ptr( ) )-> 
+        set_dati_clock_pid (def_digit_dati_clock_pid);
+    (this-> get_pmanager_cinst_ptr( ) )-> 
+        set_dato_clock_pid (def_digit_dato_clock_pid);
+
+    (this-> get_pmanager_cinst_ptr( ) )-> 
+        set_dati_latch_pid (def_digit_dati_latch_pid);
+    (this-> get_pmanager_cinst_ptr( ) )-> 
+        set_dato_latch_pid (def_digit_dato_latch_pid);
 
     /* this is a simulated output so i can test if its working right
     */
@@ -107,6 +131,8 @@ void
     (this-> digit_dato_bitset [6] ) = 1;
     (this-> digit_dato_bitset [7] ) = 1;
 
+
+    // i will be moving this or removing it later
     # ifdef def_dati_bitset_length
         dati_bitset_length = def_dati_bitset_length;
     # endif
@@ -135,31 +161,34 @@ void
         obitset_buff_size = def_obitset_buff_size;
     # endif
 
-    (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr())-> get_mio_clock_pid( ), digit_pin_input_mode) );
+    (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )-> 
+        get_mio_clock_pid( ), digit_pin_input_mode) );
 
-    (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr())-> get_dati_clock_pid( ), digit_pin_input_mode) );
+    (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )-> 
+        get_dati_clock_pid( ), digit_pin_input_mode) );
 
-    (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr())-> get_dato_clock_pid( ), digit_pin_output_mode) );
+    (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )-> 
+        get_dato_clock_pid( ), digit_pin_output_mode) );
 
     for (int unsigned(x ) = 0; x != (this-> digit_i_pin_count); x ++)
-        (this-> set_digit_pmode ((this-> get_pmanager_cinst_ptr())-> get_dati_pid(x), digit_pin_input_mode));
+        (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )-> get_dati_pid (x), digit_pin_input_mode) );
 
     for (int unsigned(x ) = 0; x != (this-> digit_o_pin_count); x ++)
-        (this-> set_digit_pmode ((this-> get_pmanager_cinst_ptr())-> get_dato_pid(x), digit_pin_output_mode));
+        (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )-> get_dato_pid (x), digit_pin_output_mode) );
 
-    (this-> digit_io_bitset [(bitset_id::__i_bitset)]).bitset_init((this-> dati_bitset_length));
-    (this-> digit_io_bitset [(bitset_id::__o_bitset)]).bitset_init((this-> dato_bitset_length));
-                                        // sectors
-    (this-> i_bitset_buffer).dbuff_init(1, (this-> ibitset_buff_size), (this-> dati_bitset_length));
-    (this-> o_bitset_buffer).dbuff_init(1, (this-> obitset_buff_size), (this-> dato_bitset_length));
+    (this-> digit_io_bitset [(bitset_id::__i_bitset)]).bitset_init ( (this-> dati_bitset_length) );
+    (this-> digit_io_bitset [(bitset_id::__o_bitset)]).bitset_init ( (this-> dato_bitset_length) );
+                                        
+    (this-> i_bitset_buffer).dbuff_init (1/*sectors*/, (this-> ibitset_buff_size), (this-> dati_bitset_length) );
+    (this-> o_bitset_buffer).dbuff_init (1/*sectors*/, (this-> obitset_buff_size), (this-> dato_bitset_length) );
 
-    if ( (this-> clock_sstate_ignore ) == digit_pin_high_state )
+    if ( (this-> clock_sstate_ignore) == digit_pin_high_state)
     {
         (this-> ilclockp_toggled ) = true;
         (this-> ilclockp_tcount ) = 1;
     }
 
-    if ( (this-> clock_sstate_ignore ) == digit_pin_low_state )
+    if ( (this-> clock_sstate_ignore) == digit_pin_low_state)
     {
         (this-> ilclockn_toggled ) = true;
         (this-> ilclockn_tcount ) = 1;
@@ -188,9 +217,9 @@ void
         (this-> obit_write_holdup ) = ( (this-> obit_write_holdup ) + ( ( (this-> obyte_write_holdup ) - 1) * ( (this-> dato_bitset_length ) / ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount()) ) ) );
 
         if ( (this-> get_mltick_count( ) ) == 0 )
-            (this-> call_extern_mlinit (this ) );
+            if ( (this-> call_extern_mlinit (this ) ) == 0) return;
 
-        (this-> call_extern_mltick (this ) );
+        if ( (this-> call_extern_mltick (this ) ) == 0) return;
 
         for (int unsigned(x ) = 0; x != (this-> obitset_buff_size ); x ++)
             (this-> o_bitset_buffer).add_to_dbuff((this-> get_io_bitset (1, 0, x)), 2, 0, 0, x, true, true, false);
@@ -508,6 +537,11 @@ void
     (this-> get_digit_pstate_fptr ) = __get_digit_pstate_fptr;
 }
 void
+(io_service::set_ptr_to_ghigh_rclock_f (get_high_rclock_ft(* __get_high_rclock_fptr) ) )
+{
+    (this-> get_high_rclock_fptr ) = __get_high_rclock_fptr;
+}
+void
 (io_service::set_ptr_to_extern_mlinit_f (extern_mlinit_ft(* __extern_mlinit_fptr) ) )
 {
     (this-> extern_mlinit_fptr ) = __extern_mlinit_fptr;
@@ -532,6 +566,11 @@ bool
 (io_service::is_ptr_to_gdigit_pstate_f (get_digit_pstate_ft(* __is_type) ) )
 {
     return ( (this-> get_digit_pstate_fptr) == __is_type? true : false);
+}
+bool
+(io_service::is_ptr_to_ghigh_rclock_f (get_high_rclock_ft(* __is_type) ) )
+{
+    return ( (this-> get_high_rclock_fptr ) == __is_type? true : false);
 }
 bool
 (io_service::is_ptr_to_extern_mlinit_f (extern_mlinit_ft(* __is_type) ) )
@@ -588,15 +627,15 @@ bool
     return ( (this-> get_digit_pstate_fptr (__digit_pid ) ) == 1? true: false);
 }
 
-void
+int unsigned
 (io_service::call_extern_mlinit (io_service(* __class_ptr ) ) )
 {
-    (this-> extern_mlinit_fptr (__class_ptr ) );
+    return ( (this-> extern_mlinit_fptr (__class_ptr ) ) );
 }
-void
+int unsigned
 (io_service::call_extern_mltick (io_service(* __class_ptr ) ) )
 {
-    (this-> extern_mltick_fptr (__class_ptr ) );
+    return ( (this-> extern_mltick_fptr (__class_ptr ) ) );
 }
 
 void

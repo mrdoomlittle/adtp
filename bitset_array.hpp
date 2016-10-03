@@ -6,7 +6,8 @@
 namespace tmp { template <typename __bitset_type> class bitset_array
 {
     public :
-        void(bitset_init(int unsigned(__bitset_length ), int unsigned(__bitset_depth)))
+        void
+        (bitset_init(int unsigned(__bitset_length ), int unsigned(__bitset_depth)))
         {
             if (__bitset_depth != 0)
             {
@@ -22,7 +23,8 @@ namespace tmp { template <typename __bitset_type> class bitset_array
             (this-> bitset_depth) = __bitset_depth;
         }
     
-        void(set_bitset(__bitset_type(* __bitset), int unsigned(__set_type), int unsigned(__ibitset_arr_pos), int unsigned(__bitset_arr_pos)))
+        void
+        (set_bitset(__bitset_type(* __bitset), int unsigned(__set_type), int unsigned(__ibitset_arr_pos), int unsigned(__bitset_arr_pos)))
         {
             (this-> bitset_array [__bitset_arr_pos]).set_bitset(__bitset, __set_type , __ibitset_arr_pos); 
         }
@@ -45,7 +47,8 @@ namespace tmp { template <typename __bitset_type> class bitset_array
             (this-> bitset_array [__bitset_arr_pos]).flip_bitset();
         } 
 
-        void(add_bitset())
+        void
+        (add_bitset())
         {
             if (bitset_depth != 0) {
             // this take memory up by *2 so might need to fix that
@@ -76,7 +79,8 @@ namespace tmp { template <typename __bitset_type> class bitset_array
             (this-> bitset_depth)++;
         }
 
-        int unsigned(get_bitset_depth())
+        int unsigned
+        (get_bitset_depth())
         {
             return((this-> bitset_depth));
         }

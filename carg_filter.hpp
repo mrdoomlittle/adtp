@@ -35,23 +35,33 @@ namespace tmp { class carg_filter
         char (* * temp_out_list ) = nullptr;
 
     public :
-        char const (* * filter_list_in (char const (* _char_list_in ) = nullptr,
-        char const (* _separator_char ) = nullptr, size_t (_char_list_length ) = 0) ) ;
+        char const 
+        (* * filter_list_in (char const(* _char_list_in ) = nullptr,
+            char const(* _separator_char ) = nullptr, size_t(_char_list_length ) = 0) ) ;
 
-        void (set_list_length (size_t (_char_list_length ) = 0 ) );
-        size_t (get_list_length( ) );
+        void 
+        (set_list_length (size_t (_char_list_length ) = 0 ) );
+        size_t 
+        (get_list_length( ) );
 
-        void (set_list_in (char const (* _char_list_in ) = nullptr) );
-        char const (* get_list_in( ) );
+        void 
+        (set_list_in (char const (* _char_list_in ) = nullptr) );
+        char const 
+        (* get_list_in( ) );
 
-        void (set_list_out (char const (* * _char_list_out ) = nullptr) );
-        char const (* * get_list_out( ) );
+        void 
+        (set_list_out (char const (* * _char_list_out ) = nullptr) );
+        char const 
+        (* * get_list_out( ) );
 
-        void (set_separator (char const (* separator_char ) = nullptr) );
+        void 
+        (set_separator (char const (* separator_char ) = nullptr) );
         char const (* get_separator( ) );
 
-        size_t (get_sub_counter( ) );
-        size_t (* get_sub_list_size( ) );
+        size_t 
+        (get_sub_counter( ) );
+        size_t 
+        (* get_sub_list_size( ) );
 } ; }
 
 # endif /*__carg__filter__hpp__*/

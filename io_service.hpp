@@ -6,12 +6,6 @@
 * Email: doctordoomlittle@gmail.com
 */
 
-# ifdef ARDUINO
-    # include <stdint.h>
-# else
-    # include <boost/cstdint.hpp>
-# endif
-
 # include "tmp_config.hpp"
 # include "dynamic_array.hpp"
 # include "dynamic_buffer.hpp"
@@ -20,12 +14,17 @@
 # include "data_packet.hpp"
 # include "shift_reg.hpp"
 # include "port_manager.hpp"
+# include "time.hpp"
 
 /* example: if the start state is 0x0 then the clock will start ticking when changes to 0x1
 */
 namespace tmp { class io_service
 {
     protected :
+        typedef time time_ct;
+        time_ct
+            (* time_cinst_ptr ) = nullptr;
+
         typedef pin_manager pmanager_ct;
         pmanager_ct
             (* pmanager_cinst_ptr) = nullptr;
@@ -37,11 +36,12 @@ namespace tmp { class io_service
         typedef port_manager port_manager_ct;
         port_manager_ct
             (* port_manager_cint_ptr ) = nullptr;
-
+ 
         pmanager_ct
         (* get_pmanager_cinst_ptr());
         sregister_ct
         (* get_sregister_cinst_ptr());
+
         void
         (init_pmanager_cinst());
 
@@ -82,11 +82,16 @@ namespace tmp { class io_service
         get_digit_pstate_ft
             (* get_digit_pstate_fptr ) = nullptr;
 
-        typedef void( (extern_mlinit_ft ) (io_service *) );
+        typedef int unsigned long( (get_high_rclock_ft) ( ) );
+        get_high_rclock_ft
+            (* get_high_rclock_fptr ) = nullptr;
+
+        // change to bool  or int unsigned
+        typedef int unsigned( (extern_mlinit_ft ) (io_service *) );
         extern_mlinit_ft
             (* extern_mlinit_fptr ) = nullptr;
 
-        typedef void( (extern_mltick_ft ) (io_service *) );
+        typedef int unsigned( (extern_mltick_ft ) (io_service *) );
         extern_mltick_ft
             (* extern_mltick_fptr ) = nullptr;
     public :
@@ -101,6 +106,8 @@ namespace tmp { class io_service
                 (* __set_digit_pstate_fptr) = nullptr,
             get_digit_pstate_ft
                 (* __get_digit_pstate_fptr) = nullptr,
+            get_high_rclock_ft
+                (* __get_high_rclock_fptr ) = nullptr,
             extern_mlinit_ft
                 (* __extern_mlinit_fptr) = nullptr,
             extern_mltick_ft
@@ -114,6 +121,8 @@ namespace tmp { class io_service
         void
         (set_ptr_to_gdigit_pstate_f (get_digit_pstate_ft(* __get_digit_pstate_fptr) ) );
         void
+        (set_ptr_to_ghigh_rclock_f (get_high_rclock_ft(* __get_high_rclock_fptr) ) );
+        void
         (set_ptr_to_extern_mlinit_f (extern_mlinit_ft(* __extern_mlinit_fptr) ) );
         void
         (set_ptr_to_extern_mltick_f (extern_mltick_ft(* __extern_mltick_fptr) ) );
@@ -124,6 +133,8 @@ namespace tmp { class io_service
         (is_ptr_to_sdigit_pstate_f (set_digit_pstate_ft(* __is_type) ) );
         bool
         (is_ptr_to_gdigit_pstate_f (get_digit_pstate_ft(* __is_type) ) );
+        bool
+        (is_ptr_to_ghigh_rclock_f (get_high_rclock_ft(* __is_type) ) );
         bool
         (is_ptr_to_extern_mlinit_f (extern_mlinit_ft(* __is_type) ) );
         bool
@@ -154,7 +165,7 @@ namespace tmp { class io_service
 
 
     public :
-    // NOTE: change this
+    // NOTE: might change to struct or keep as enum/ and it move to tmp_config
         enum sg_type : int unsigned { __individual = 0, __total_array = 1 } ;
         enum shift_direction : int unsigned { __right = 0, __left = 1 } ;
         enum bitset_id : int unsigned { __i_bitset = 0, __o_bitset = 1 } ;
@@ -226,6 +237,15 @@ namespace tmp { class io_service
         bool(i_buffer_finished ) = false;
         bool(o_buffer_finished ) = false;
 
+        //enum clock_ttmethod: int unsigned
+        //{
+        //    __only_when_true = 0,
+        //    __only_when_false = 1,
+        //    __change_in_clock = 2
+        //}
+
+        int unsigned(clock_ttmethod) = def_clock_trigger_method;
+
         void
         (set_digit_pmode (uint8_t(__digit_pid ), uint8_t(__digit_pmode ) ) );
         void
@@ -233,9 +253,9 @@ namespace tmp { class io_service
         bool
         (get_digit_pstate (uint8_t(__digit_pid ) ));
 
-        void
+        int unsigned
         (call_extern_mlinit (io_service(* __class_ptr ) ) );
-        void
+        int unsigned
         (call_extern_mltick (io_service(* __class_ptr ) ) );
 
         int unsigned(external_clock_ptcount ) = 0;
