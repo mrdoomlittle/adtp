@@ -67,14 +67,18 @@ void
 
 #include <chrono>
 #include <ctime>
-
-int unsigned long(get_high_res_clock())
+// NOTE: add somthing so i can check if a int is null
+int unsigned long (get_high_res_clock (int unsigned(__time_format) ) )
 {
-    auto hrc_now = std::chrono::high_resolution_clock::now( );
+    if (__time_format == (tmp_config::time_format::__nano_seconds) )
+    {
+        auto hrc_now = std::chrono::high_resolution_clock::now( );
 
-    auto nano_seconds = std::chrono::duration_cast <std::chrono::nanoseconds> (hrc_now.time_since_epoch( ) ).count( );
+        auto nano_seconds = std::chrono::duration_cast <std::chrono::nanoseconds> (hrc_now.time_since_epoch( ) ).count( );
 
-    return(nano_seconds);
+        return(nano_seconds);
+    }
+    return 0;
 }
 
 int unsigned(simulated_pin_state_i [3] [8]) = {
@@ -218,7 +222,8 @@ int unsigned
 //# include "cint_convert.hpp"
 int
 (main( ) )
-{ 
+{
+
     tmp::io_service io;
 
     io.service_init
@@ -230,6 +235,7 @@ int
         & external_mlinit,
         & external_mltick
     );
+
 }
 
 # endif /*ARDUINO*/

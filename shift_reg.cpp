@@ -19,7 +19,7 @@ void(shift_reg::update_shift_reg_ipstates(int unsigned(__shift_reg_arr_pos)))
 {
     for (int unsigned(x) = 0; x != *shift_reg_ipcount_l.get_darr_ilayer(__shift_reg_arr_pos, 0); x ++)
     {
-        (this-> set_shift_reg_cpstate(__shift_reg_arr_pos, digit_pin_high_state));
+        (this-> set_shift_reg_cpstate(__shift_reg_arr_pos, tmp_config::digit_pin_high_state));
 
         for (int unsigned(y ) = 0; y != shift_reg_ctohigh_holdup; y ++){}
 
@@ -27,15 +27,15 @@ void(shift_reg::update_shift_reg_ipstates(int unsigned(__shift_reg_arr_pos)))
 
         for (int unsigned(y ) = 0; y != shift_reg_ctolow_holdup; y ++){}
 
-        (this-> set_shift_reg_cpstate(__shift_reg_arr_pos, digit_pin_low_state));
-        (this-> set_shift_reg_opstate(__shift_reg_arr_pos, digit_pin_low_state));
+        (this-> set_shift_reg_cpstate(__shift_reg_arr_pos, tmp_config::digit_pin_low_state));
+        (this-> set_shift_reg_opstate(__shift_reg_arr_pos, tmp_config::digit_pin_low_state));
     }
 
-    (this-> set_shift_reg_lpstate(__shift_reg_arr_pos, digit_pin_high_state));
+    (this-> set_shift_reg_lpstate(__shift_reg_arr_pos, tmp_config::digit_pin_high_state));
 
     for (int unsigned(y ) = 0; y != shift_reg_ctolow_holdup; y ++){}
 
-    (this-> set_shift_reg_lpstate(__shift_reg_arr_pos, digit_pin_low_state));
+    (this-> set_shift_reg_lpstate(__shift_reg_arr_pos, tmp_config::digit_pin_low_state));
 }
 
 void (shift_reg::set_shift_reg_obitset(int unsigned(* __obitset), int unsigned(__shift_reg_arr_pos)))

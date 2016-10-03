@@ -18,11 +18,11 @@
 namespace tmp { class pin_manager
 {
     private :
-        uint8_t(digit_mio_clock_pid ) = def_digit_mio_clock_pid;
-        uint8_t(digit_dati_clock_pid ) = def_digit_dati_clock_pid;
-        uint8_t(digit_dato_clock_pid ) = def_digit_dato_clock_pid;
-        uint8_t(digit_dati_latch_pid ) = def_digit_dati_latch_pid;
-        uint8_t(digit_dato_latch_pid ) = def_digit_dato_latch_pid;
+        uint8_t(digit_mio_clock_pid ) = tmp_config::def_digit_mio_clock_pid;
+        uint8_t(digit_dati_clock_pid ) = tmp_config::def_digit_dati_clock_pid;
+        uint8_t(digit_dato_clock_pid ) = tmp_config::def_digit_dato_clock_pid;
+        uint8_t(digit_dati_latch_pid ) = tmp_config::def_digit_dati_latch_pid;
+        uint8_t(digit_dato_latch_pid ) = tmp_config::def_digit_dato_latch_pid;
 
         bool(mio_clock_pid_sstate ) = false;
         bool(dati_clock_pid_sstate ) = false;
@@ -38,20 +38,20 @@ namespace tmp { class pin_manager
         int unsigned(dati_clock_pneg_count ) = 0;
         int unsigned(dato_clock_pneg_count ) = 0;
 
-        int(mio_clock_pstate ) = digit_pin_low_state;
-        int(dati_clock_pstate ) = digit_pin_low_state;
-        int(dato_clock_pstate ) = digit_pin_low_state;
-        int(dati_latch_pstate ) = digit_pin_low_state;
-        int(dato_latch_pstate ) = digit_pin_low_state;
+        int(mio_clock_pstate ) = tmp_config::digit_pin_low_state;
+        int(dati_clock_pstate ) = tmp_config::digit_pin_low_state;
+        int(dato_clock_pstate ) = tmp_config::digit_pin_low_state;
+        int(dati_latch_pstate ) = tmp_config::digit_pin_low_state;
+        int(dato_latch_pstate ) = tmp_config::digit_pin_low_state;
 
-        int(mio_clock_pmode ) = digit_pin_input_mode;
-        int(dati_clock_pmode ) = digit_pin_input_mode;
-        int(dato_clock_pmode ) = digit_pin_output_mode;
-        int(dati_latch_pmode ) = digit_pin_input_mode;
-        int(dato_latch_pmode ) = digit_pin_output_mode;
+        int(mio_clock_pmode ) = tmp_config::digit_pin_input_mode;
+        int(dati_clock_pmode ) = tmp_config::digit_pin_input_mode;
+        int(dato_clock_pmode ) = tmp_config::digit_pin_output_mode;
+        int(dati_latch_pmode ) = tmp_config::digit_pin_input_mode;
+        int(dato_latch_pmode ) = tmp_config::digit_pin_output_mode;
 
-        int unsigned(digit_dati_pcount ) = def_digit_i_pin_count;
-        int unsigned(digit_dato_pcount ) = def_digit_o_pin_count;
+        int unsigned(digit_dati_pcount ) = tmp_config::def_digit_i_pin_count;
+        int unsigned(digit_dato_pcount ) = tmp_config::def_digit_o_pin_count;
 
         dynamic_array <bool> dati_pid_sstate_list;
         dynamic_array <bool> dato_pid_sstate_list;

@@ -53,8 +53,8 @@ namespace tmp { class io_service
         bool(has_sregister_cinst_init ) = false;
 
     private :
-        int unsigned(digit_i_pin_count ) = def_digit_i_pin_count;
-        int unsigned(digit_o_pin_count ) = def_digit_o_pin_count;
+        int unsigned(digit_i_pin_count ) = tmp_config::def_digit_i_pin_count;
+        int unsigned(digit_o_pin_count ) = tmp_config::def_digit_o_pin_count;
 
         int unsigned(clock_sstate_ignore ) = 0x0;
 
@@ -82,7 +82,7 @@ namespace tmp { class io_service
         get_digit_pstate_ft
             (* get_digit_pstate_fptr ) = nullptr;
 
-        typedef int unsigned long( (get_high_rclock_ft) ( ) );
+        typedef int unsigned long( (get_high_rclock_ft) (int unsigned) );
         get_high_rclock_ft
             (* get_high_rclock_fptr ) = nullptr;
 
@@ -140,8 +140,8 @@ namespace tmp { class io_service
         bool
         (is_ptr_to_extern_mltick_f (extern_mltick_ft(* __is_type) ) );
     private :
-        int unsigned(mltick_holdup) = def_mltick_holdup;
-        int unsigned(iltick_holdup) = def_iltick_holdup;
+        int unsigned(mltick_holdup) = tmp_config::def_mltick_holdup;
+        int unsigned(iltick_holdup) = tmp_config::def_iltick_holdup;
 
         int unsigned(real_mltick_count) = 0;
         int unsigned(real_iltick_count) = 0;
@@ -244,7 +244,12 @@ namespace tmp { class io_service
         //    __change_in_clock = 2
         //}
 
-        int unsigned(clock_ttmethod) = def_clock_trigger_method;
+        enum clock_tick_method : int unsigned
+        {
+
+        } ;
+
+        int unsigned(clock_ttmethod) = tmp_config::def_clock_trigger_method;
 
         void
         (set_digit_pmode (uint8_t(__digit_pid ), uint8_t(__digit_pmode ) ) );

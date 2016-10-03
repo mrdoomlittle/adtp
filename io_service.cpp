@@ -53,7 +53,7 @@ io_service::io_service( )
 io_service::~io_service( )
 {
     if ( (this-> has_pmanager_cinst_init) == true)
-    {   
+    {
         std::free ( (this-> get_pmanager_cinst_ptr( ) ) );
     }
 
@@ -103,22 +103,22 @@ void
     (this-> init_sregister_cinst( ) );
 
     for (int unsigned x = 0; x != (this-> get_pmanager_cinst_ptr( ) )-> get_dati_pcount( ); x++)
-        (this-> get_pmanager_cinst_ptr( ) )-> set_dati_pid ( (def_digit_dati_pids [x]), x);
+        (this-> get_pmanager_cinst_ptr( ) )-> set_dati_pid ( (tmp_config::def_digit_dati_pids [x]), x);
 
     for (int unsigned x = 0; x != (this-> get_pmanager_cinst_ptr( ) )-> get_dato_pcount( ); x++)
-        (this-> get_pmanager_cinst_ptr( ) )-> set_dato_pid ( (def_digit_dato_pids [x]), x);
+        (this-> get_pmanager_cinst_ptr( ) )-> set_dato_pid ( (tmp_config::def_digit_dato_pids [x]), x);
 
-    (this-> get_pmanager_cinst_ptr( ) )-> 
-        set_mio_clock_pid (def_digit_mio_clock_pid);
-    (this-> get_pmanager_cinst_ptr( ) )-> 
-        set_dati_clock_pid (def_digit_dati_clock_pid);
-    (this-> get_pmanager_cinst_ptr( ) )-> 
-        set_dato_clock_pid (def_digit_dato_clock_pid);
+    (this-> get_pmanager_cinst_ptr( ) )->
+        set_mio_clock_pid (tmp_config::def_digit_mio_clock_pid);
+    (this-> get_pmanager_cinst_ptr( ) )->
+        set_dati_clock_pid (tmp_config::def_digit_dati_clock_pid);
+    (this-> get_pmanager_cinst_ptr( ) )->
+        set_dato_clock_pid (tmp_config::def_digit_dato_clock_pid);
 
-    (this-> get_pmanager_cinst_ptr( ) )-> 
-        set_dati_latch_pid (def_digit_dati_latch_pid);
-    (this-> get_pmanager_cinst_ptr( ) )-> 
-        set_dato_latch_pid (def_digit_dato_latch_pid);
+    (this-> get_pmanager_cinst_ptr( ) )->
+        set_dati_latch_pid (tmp_config::def_digit_dati_latch_pid);
+    (this-> get_pmanager_cinst_ptr( ) )->
+        set_dato_latch_pid (tmp_config::def_digit_dato_latch_pid);
 
     /* this is a simulated output so i can test if its working right
     */
@@ -131,64 +131,50 @@ void
     (this-> digit_dato_bitset [6] ) = 1;
     (this-> digit_dato_bitset [7] ) = 1;
 
+    this-> dati_bitset_length = tmp_config::def_dati_bitset_length;
 
-    // i will be moving this or removing it later
-    # ifdef def_dati_bitset_length
-        dati_bitset_length = def_dati_bitset_length;
-    # endif
-    # ifdef def_dato_bitset_length
-        dato_bitset_length = def_dato_bitset_length;
-    # endif
+    this-> dato_bitset_length = tmp_config::def_dato_bitset_length;
 
-    # ifdef def_ibit_read_holdup
-        ibit_read_holdup = def_ibit_read_holdup;
-    # endif
-    # ifdef def_obit_write_holdup
-        obit_write_holdup = def_obit_write_holdup;
-    # endif
+    this-> ibit_read_holdup = tmp_config::def_ibit_read_holdup;
 
-    # ifdef def_ibyte_read_holdup
-        ibyte_read_holdup = def_ibyte_read_holdup;
-    # endif
-    # ifdef def_obyte_write_holdup
-        obyte_write_holdup = def_obyte_write_holdup;
-    # endif
+    this-> obit_write_holdup = tmp_config::def_obit_write_holdup;
 
-    # ifdef def_ibitset_buff_size
-        ibitset_buff_size = def_ibitset_buff_size;
-    # endif
-    # ifdef def_obitset_buff_size
-        obitset_buff_size = def_obitset_buff_size;
-    # endif
+    this-> ibyte_read_holdup = tmp_config::def_ibyte_read_holdup;
 
-    (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )-> 
-        get_mio_clock_pid( ), digit_pin_input_mode) );
+    this-> obyte_write_holdup = tmp_config::def_obyte_write_holdup;
 
-    (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )-> 
-        get_dati_clock_pid( ), digit_pin_input_mode) );
+    this-> ibitset_buff_size = tmp_config::def_ibitset_buff_size;
 
-    (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )-> 
-        get_dato_clock_pid( ), digit_pin_output_mode) );
+    this-> obitset_buff_size = tmp_config::def_obitset_buff_size;
+
+    (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )->
+        get_mio_clock_pid( ), tmp_config::digit_pin_input_mode) );
+
+    (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )->
+        get_dati_clock_pid( ), tmp_config::digit_pin_input_mode) );
+
+    (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )->
+        get_dato_clock_pid( ), tmp_config::digit_pin_output_mode) );
 
     for (int unsigned(x ) = 0; x != (this-> digit_i_pin_count); x ++)
-        (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )-> get_dati_pid (x), digit_pin_input_mode) );
+        (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )-> get_dati_pid (x), tmp_config::digit_pin_input_mode) );
 
     for (int unsigned(x ) = 0; x != (this-> digit_o_pin_count); x ++)
-        (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )-> get_dato_pid (x), digit_pin_output_mode) );
+        (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )-> get_dato_pid (x), tmp_config::digit_pin_output_mode) );
 
     (this-> digit_io_bitset [(bitset_id::__i_bitset)]).bitset_init ( (this-> dati_bitset_length) );
     (this-> digit_io_bitset [(bitset_id::__o_bitset)]).bitset_init ( (this-> dato_bitset_length) );
-                                        
+
     (this-> i_bitset_buffer).dbuff_init (1/*sectors*/, (this-> ibitset_buff_size), (this-> dati_bitset_length) );
     (this-> o_bitset_buffer).dbuff_init (1/*sectors*/, (this-> obitset_buff_size), (this-> dato_bitset_length) );
 
-    if ( (this-> clock_sstate_ignore) == digit_pin_high_state)
+    if ( (this-> clock_sstate_ignore) == tmp_config::digit_pin_high_state)
     {
         (this-> ilclockp_toggled ) = true;
         (this-> ilclockp_tcount ) = 1;
     }
 
-    if ( (this-> clock_sstate_ignore) == digit_pin_low_state)
+    if ( (this-> clock_sstate_ignore) == tmp_config::digit_pin_low_state)
     {
         (this-> ilclockn_toggled ) = true;
         (this-> ilclockn_tcount ) = 1;
@@ -210,8 +196,8 @@ void
 
         (this-> set_digit_pstate((this-> get_pmanager_cinst_ptr())-> get_dato_clock_pid(), (this-> get_pmanager_cinst_ptr())-> get_dato_clock_pstate()));
 
-        (this-> ibit_read_holdup ) = def_ibit_read_holdup;
-        (this-> obit_write_holdup ) = def_obit_write_holdup;
+        (this-> ibit_read_holdup ) = tmp_config::def_ibit_read_holdup;
+        (this-> obit_write_holdup ) = tmp_config::def_obit_write_holdup;
 
         (this-> ibit_read_holdup ) = ( (this-> ibit_read_holdup ) + ( ( (this-> ibyte_read_holdup ) - 1) * ( (this-> dati_bitset_length ) / ((this-> get_pmanager_cinst_ptr())-> get_dati_pcount()) ) ) );
         (this-> obit_write_holdup ) = ( (this-> obit_write_holdup ) + ( ( (this-> obyte_write_holdup ) - 1) * ( (this-> dato_bitset_length ) / ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount()) ) ) );
@@ -280,11 +266,11 @@ void
             if ( (this-> o_bitset_finished [o_bitsetf_pos] ) == true) (this-> o_bitsetf_truec ) ++;
             if ( (this-> o_bitsetf_truec ) == ( (this-> dato_bitset_length ) / (this-> get_pmanager_cinst_ptr())-> get_dato_pcount() ) )
             {
-                (this-> set_digit_pstate((this-> get_pmanager_cinst_ptr())-> get_dato_latch_pid(), digit_pin_high_state));
+                (this-> set_digit_pstate((this-> get_pmanager_cinst_ptr())-> get_dato_latch_pid(), tmp_config::digit_pin_high_state));
 
                 for (int x = 0; x != 1000; x++){} // this is only temporary
 
-                (this-> set_digit_pstate((this-> get_pmanager_cinst_ptr())-> get_dato_latch_pid(), digit_pin_low_state));
+                (this-> set_digit_pstate((this-> get_pmanager_cinst_ptr())-> get_dato_latch_pid(), tmp_config::digit_pin_low_state));
 
                 (this-> o_bitsetf_truec ) = 0;
 # ifndef ARDUINO
@@ -443,7 +429,7 @@ void
 
                     if ( (this-> o_bitset_finished [(this-> o_bitset_fcount )] ) == false)
                     {
-                        //(this-> set_digit_pstate((this-> get_dato_latch_pid()), digit_pin_high_state));
+                        //(this-> set_digit_pstate((this-> get_dato_latch_pid()), tmp_config::digit_pin_high_state));
                         (this-> o_bitset_finished [(this-> o_bitset_fcount )] ) = true;
                     }
 
