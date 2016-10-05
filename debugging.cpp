@@ -220,10 +220,12 @@ int unsigned
 # include "port_manager.hpp"
 # include "dynamic_array.hpp"
 # include "dpacket_array.hpp"
-//# include "cint_convert.hpp"
+
+# include "socket_manager.hpp"
+# include "cint_convert.hpp"
 int
 (main( ) )
-{
+{/*
     tmp::port_manager pm;
 
     pm.add_port_num(21299, true);
@@ -245,7 +247,36 @@ int
 
     std::cout << "DPS: " << a.get_dpacket_ptr(0)-> get_dati_dpacket_size() << std::endl;
     //std::cout << tmp::data_packet::__dato_bitset << std::endl;
-    
+   */
+
+   //tmp::socket_manager sock;
+
+   std::cout << tmp::convert_to_int<int unsigned>("20299", 5) << std::endl;
+
+    //sock.create_socket("101.128.277.117", 8080);
+/* 
+    int unsigned tcount = 0;
+    int unsigned nlength = 0;
+    int unsigned curr = 10;
+    for (;;)
+    {
+        for (int x = 0; x != 1000000; x++) {}
+
+        if (tcount == 0) nlength ++;
+
+        if (tcount != 0)
+        {
+            if (tcount == (curr))
+            {
+                nlength ++;
+                curr = (curr * 10);
+            }
+        }
+
+        std::cout << "CNum:" << tcount << ", NLength: " << nlength << ", C:" << curr << std::endl;
+        tcount ++;        
+    }
+*/
 /*    tmp::io_service io;
 
     io.service_init
