@@ -2,8 +2,9 @@
 # define __port__manager__hpp__
 # include "dynamic_array.hpp"
 # include "bitset_array.hpp"
-
-
+# include "tmp_config.hpp"
+# include "data_packet.hpp"
+# include "dpacket_array.hpp"
 // all of the code hear will be change when i have time
 # define port_active 0
 # define port_inactive 1
@@ -23,8 +24,10 @@ namespace tmp { class port_manager
         port_manager()
         {
             (this-> port_num_list).darr_init(1, 0);
-            (this-> port_ibitset).bitset_init(8, 0);
-            (this-> port_obitset).bitset_init(8, 0);
+            (this-> port_ibitset).bitset_init((tmp_config::def_dati_bitset_length), 0);
+            (this-> port_obitset).bitset_init((tmp_config::def_dato_bitset_length), 0);
+
+            (this-> dpackets).init_dpacket_array(0);
         }
 
         void
@@ -35,6 +38,7 @@ namespace tmp { class port_manager
             (this-> port_num_list).add_darr_layer();
             (this-> port_ibitset).add_bitset();
             (this-> port_obitset).add_bitset();
+            (this-> dpackets).add_dpacket();
 
             if (__set_port_num == true)
             {
@@ -93,7 +97,66 @@ namespace tmp { class port_manager
         }
 
         bool(cant_get_port_num_arr_pos ) = false;
-        
+       
+
+        void(set_port_dati_bitset())
+        {
+
+        }
+
+        void(set_port_dato_bitset())
+        {
+
+        } 
+
+        /* example of how we are going to get the packet as a program
+
+            if ((pin_manager-> get_port_dpacket_ptr())-> is_dpacket_complete() == false) return; 
+
+            this can be done other ways! 
+
+        */
+    
+        // hear we are going to send the bitset and add it to the packet
+        void(update_port_dpacket(int unsigned(__bitset_t), int unsigned(__port_number)))
+        {
+
+            // the header has a fixed size because we cant determine the size of the data packet so we will 
+            // store the size of the data packet inside the header with the port and anyother data that we need
+
+            // this need cleaning up. need to add a enum to the config for bitset_t io or ...
+            /*
+            int unsigned arr_pos = (this-> get_port_num_arr_pos(__port_number));
+            if ((this-> dpackets).get_dpacket_ptr(arr_pos)-> is_dpheader_complete() == false)
+            {
+                switch(__bitset_t)
+                {
+                    case 0:
+                        (this-> dpackets).get_dpacket_ptr(arr_pos)-> add_to_dpheader(__bitset_t, (this-> port_ibitset));
+                        break;
+                    case 1:
+                        (this-> dpackets).get_dpacket_ptr(arr_pos)-> add_to_dpheader(__bitset_t, (this-> port_obitset));
+                        break;
+                }
+            }
+            else
+            {
+                if ((this-> dpackets).get_dpacket_ptr(arr_pos)-> is_dpacket_complete() == false)
+                {
+                    switch(__bitset_t)
+                    {
+                        case 0:
+                            (this-> dpackets).get_dpacket_ptr(arr_pos)-> add_to_dpacket(__bitset_t, (this-> port_ibitset));
+                            break;
+
+                        case 1:
+                            (this-> dpackets).get_dpacket_ptr(arr_pos)-> add_to_dpacket(__bitset_t, (this-> port_obitset));
+                            break;
+                    }
+                }
+            }*/
+        }
+
         void 
         (del_port_num())
         {
@@ -134,7 +197,9 @@ namespace tmp { class port_manager
         dynamic_array <int unsigned> port_num_list;
         bitset_array <int unsigned> port_ibitset;
         bitset_array <int unsigned> port_obitset; 
-
+        
+        dpacket_array dpackets; 
+        
      
         dynamic_array <int unsigned> port_state_list;
 } ; }

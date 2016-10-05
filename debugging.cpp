@@ -219,12 +219,34 @@ int unsigned
 # include "shift_reg.hpp"
 # include "port_manager.hpp"
 # include "dynamic_array.hpp"
+# include "dpacket_array.hpp"
 //# include "cint_convert.hpp"
 int
 (main( ) )
 {
+    tmp::port_manager pm;
 
-    tmp::io_service io;
+    pm.add_port_num(21299, true);
+
+    for (int unsigned x = 0; x != pm.get_port_num_count(); x ++)
+        std::cout << "Port Num: " << pm.get_port_num(x) << std::endl;
+
+
+    tmp::dpacket_array a;
+
+    a.init_dpacket_array(2);
+
+    a.get_dpacket_ptr(0)-> set_dati_dpacket_size(2);
+
+    std::cout << "DPAS: " << a.get_dparray_size() << std::endl;
+    a.add_dpacket();
+
+    std::cout << "DPAS: " << a.get_dparray_size() << std::endl;
+
+    std::cout << "DPS: " << a.get_dpacket_ptr(0)-> get_dati_dpacket_size() << std::endl;
+    //std::cout << tmp::data_packet::__dato_bitset << std::endl;
+    
+/*    tmp::io_service io;
 
     io.service_init
     (
@@ -235,7 +257,7 @@ int
         & external_mlinit,
         & external_mltick
     );
-
+*/
 }
 
 # endif /*ARDUINO*/

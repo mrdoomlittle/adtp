@@ -11,12 +11,12 @@ namespace tmp { template <typename __bitset_type> class bitset_array
         {
             if (__bitset_depth != 0)
             {
-            (this-> bitset_array) = new bitset <__bitset_type> [__bitset_depth];
-            //(this-> bitset_array).darr_init(__bitset_depth, 0);
-            for (int unsigned(x ) = 0; x != __bitset_depth; x ++)
-            {
-               (this-> bitset_array [x]).bitset_init(__bitset_length); 
-            }
+                (this-> bitset_array) = new bitset <__bitset_type> [__bitset_depth];
+                //(this-> bitset_array).darr_init(__bitset_depth, 0);
+                for (int unsigned(x ) = 0; x != __bitset_depth; x ++)
+                {
+                    (this-> bitset_array [x]).bitset_init(__bitset_length); 
+                }
             }
 
             (this-> bitset_length) = __bitset_length;
@@ -50,16 +50,17 @@ namespace tmp { template <typename __bitset_type> class bitset_array
         void
         (add_bitset())
         {
-            if (bitset_depth != 0) {
-            // this take memory up by *2 so might need to fix that
-            (this-> bitset_array_swp) = new bitset <__bitset_type> [(this-> bitset_depth)];
-            for (int unsigned(x ) = 0; x != (this-> bitset_depth); x ++)
+            if (bitset_depth != 0)
             {
-               (this-> bitset_array_swp [x]).bitset_init((this-> bitset_length));
-               (this-> bitset_array_swp [x]).set_bitset((this-> bitset_array [x]).get_bitset(1, x), 1, x);
-            } 
+                // this take memory up by *2 so might need to fix that
+                (this-> bitset_array_swp) = new bitset <__bitset_type> [(this-> bitset_depth)];
+                for (int unsigned(x ) = 0; x != (this-> bitset_depth); x ++)
+                {
+                    (this-> bitset_array_swp [x]).bitset_init((this-> bitset_length));
+                    (this-> bitset_array_swp [x]).set_bitset((this-> bitset_array [x]).get_bitset(1, x), 1, x);
+                } 
 
-            delete[] (this-> bitset_array); 
+                delete[] (this-> bitset_array); 
             }
 
             if (bitset_depth == 0)
@@ -67,15 +68,18 @@ namespace tmp { template <typename __bitset_type> class bitset_array
                 (this-> bitset_array) = new bitset <__bitset_type> [(this-> bitset_depth) + 1];
                 (this-> bitset_array [0]).bitset_init((this-> bitset_length));
             }
-            if (bitset_depth != 0) {
-            for (int unsigned(x ) = 0; x != (this-> bitset_depth); x ++)
+
+            if (bitset_depth != 0)
             {
-                (this-> bitset_array [x]).bitset_init((this-> bitset_length));
-                (this-> bitset_array [x]).set_bitset((this-> bitset_array_swp [x]).get_bitset(1, x), 1, x);
+                for (int unsigned(x ) = 0; x != (this-> bitset_depth); x ++)
+                {
+                    (this-> bitset_array [x]).bitset_init((this-> bitset_length));
+                    (this-> bitset_array [x]).set_bitset((this-> bitset_array_swp [x]).get_bitset(1, x), 1, x);
+                }
+
+                delete[] (this-> bitset_array_swp);
             }
 
-            delete[] (this-> bitset_array_swp);
-            }
             (this-> bitset_depth)++;
         }
 
@@ -89,6 +93,7 @@ namespace tmp { template <typename __bitset_type> class bitset_array
         int unsigned(bitset_depth) = 0;
 
     private :
+        // REMINDER: change this into a array of 2 like others e.g. main = [0] and swap = [1]
         bitset <__bitset_type> * bitset_array;
         bitset <__bitset_type> * bitset_array_swp;
 } ; }

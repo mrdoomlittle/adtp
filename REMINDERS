@@ -1,5 +1,4 @@
-move pin funcs / etc to the pin_manager source/header files.
-change some things around to allow vals to be changed well running.
-change bitset_size to bitset_length as it makes more sense.
-warning there might be alot of bugs as i im moving things around
+need to finish time.hpp/cpp and implement a fetcher to allow you to pick what the deley is measured in
+and also need to clean and remain things + ... lots of other things.
 
+move the enums like bitset io type or etc to config

@@ -20,9 +20,28 @@ namespace tmp_config
 {
     enum time_format : int unsigned
     {
-        __nano_seconds = 0,
-        __mloop_tick_count = 1
-    };
+        __nano_seconds,
+        __mloop_tick_count
+    } ;
+
+    enum port_state : int unsigned
+    {
+        __active,
+        __inactive,
+        __enabled,
+        __disabled,
+        __reserved,
+        __taken,
+        __nottaken
+    } ;
+
+    extern int unsigned(dpacket_header_size);
+
+    extern int unsigned(max_dpacket_size);
+    extern int unsigned(min_dpacket_size);
+
+    extern int unsigned(max_digit_pin_id);
+    extern int unsigned(min_digit_pin_id);
 
     extern int const(digit_pin_input_mode);
     extern int const(digit_pin_output_mode);
@@ -54,14 +73,15 @@ namespace tmp_config
     extern int const unsigned(def_digit_i_pin_count);
     extern int const unsigned(def_digit_o_pin_count);
 
-    extern int unsigned const def_digit_dati_pids[];
-    extern int unsigned const def_digit_dato_pids[];
+    extern int unsigned const(def_digit_dati_pids[]);
+    extern int unsigned const(def_digit_dato_pids[]);
 
-    extern int unsigned def_digit_dati_latch_pid;
-    extern int unsigned def_digit_dato_latch_pid;
+    extern int unsigned(def_digit_dati_latch_pid);
+    extern int unsigned(def_digit_dato_latch_pid);
 
-    extern int unsigned def_digit_mio_clock_pid;
-    extern int unsigned def_clock_sstate_ignore;
-    extern int unsigned def_clock_trigger_method;
+    extern int unsigned(def_digit_mio_clock_pid);
+
+    extern int unsigned(def_clock_sstate_ignore);
+    extern int unsigned(def_clock_ttrigger_method);
 }
 # endif /*__tmp__config__hpp__*/

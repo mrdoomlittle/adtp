@@ -1,5 +1,10 @@
 # include "tmp_config.hpp"
 // reminder keep as it is for now but might change it by removing tmp_config:: and adding a namespace tmp_config {}
+int unsigned(tmp_config::dpacket_header_size) = 8;
+
+int unsigned(tmp_config::max_dpacket_size) = 64; // this is in bytes
+int unsigned(tmp_config::min_dpacket_size) = 64;
+
 int const tmp_config::digit_pin_input_mode = 0x1;
 int const tmp_config::digit_pin_output_mode = 0x0;
 
@@ -41,7 +46,7 @@ int unsigned tmp_config::def_digit_dato_latch_pid = 10;
 
 int unsigned tmp_config::def_digit_mio_clock_pid = 6;
 int unsigned tmp_config::def_clock_sstate_ignore = 0x1;
-int unsigned tmp_config::def_clock_trigger_method = 0;
+int unsigned tmp_config::def_clock_ttrigger_method = 0;
 
 // NOTE: dont know if this work or not but will be testing this when done
 # ifdef ARDUINO

@@ -53,8 +53,10 @@ namespace tmp { class io_service
         bool(has_sregister_cinst_init ) = false;
 
     private :
-        int unsigned(digit_i_pin_count ) = tmp_config::def_digit_i_pin_count;
-        int unsigned(digit_o_pin_count ) = tmp_config::def_digit_o_pin_count;
+        int unsigned(digit_i_pin_count ) = 
+            (tmp_config::def_digit_i_pin_count);
+        int unsigned(digit_o_pin_count ) = 
+            (tmp_config::def_digit_o_pin_count);
 
         int unsigned(clock_sstate_ignore ) = 0x0;
 
@@ -161,9 +163,6 @@ namespace tmp { class io_service
         bool(ilclockn_toggled) = false;
         int unsigned(ilclockn_tcount) = 0;
 
-
-
-
     public :
     // NOTE: might change to struct or keep as enum/ and it move to tmp_config
         enum sg_type : int unsigned { __individual = 0, __total_array = 1 } ;
@@ -249,7 +248,7 @@ namespace tmp { class io_service
 
         } ;
 
-        int unsigned(clock_ttmethod) = tmp_config::def_clock_trigger_method;
+        int unsigned(clock_ttrigger_method) = (tmp_config::def_clock_ttrigger_method);
 
         void
         (set_digit_pmode (uint8_t(__digit_pid ), uint8_t(__digit_pmode ) ) );
