@@ -2,6 +2,13 @@
 # define __carg__filter__hpp__
 /*this code is from another one of my projects i will get this working the next day*/
 
+/* Created and Designed by MrDoomLittle
+* Github URL: https://github.com/mrdoomlittle
+* Email Addr: doctordoomlittle@gmail.com
+* For Current Infomation about This Project
+* See the File Called: ( INFOMATION )
+*/
+
 # ifndef ARDUINO
     # include <boost/cstdint.hpp>
 # else
@@ -35,32 +42,32 @@ namespace tmp { class carg_filter
         char (* * temp_out_list ) = nullptr;
 
     public :
-        char const 
+        char const
         (* * filter_list_in (char const(* _char_list_in ) = nullptr,
             char const(* _separator_char ) = nullptr, size_t(_char_list_length ) = 0) ) ;
 
-        void 
+        void
         (set_list_length (size_t (_char_list_length ) = 0 ) );
-        size_t 
+        size_t
         (get_list_length( ) );
 
-        void 
+        void
         (set_list_in (char const (* _char_list_in ) = nullptr) );
-        char const 
+        char const
         (* get_list_in( ) );
 
-        void 
+        void
         (set_list_out (char const (* * _char_list_out ) = nullptr) );
-        char const 
+        char const
         (* * get_list_out( ) );
 
-        void 
+        void
         (set_separator (char const (* separator_char ) = nullptr) );
         char const (* get_separator( ) );
 
-        size_t 
+        size_t
         (get_sub_counter( ) );
-        size_t 
+        size_t
         (* get_sub_list_size( ) );
 } ; }
 

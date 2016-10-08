@@ -1,9 +1,14 @@
 # include "io_service.hpp"
 
-/* Created and Designed by mrdoomlittle
-* Github: https://github.com/mrdoomlittle
-* Email: doctordoomlittle@gmail.com
+/* Created and Designed by MrDoomLittle
+* Github URL: https://github.com/mrdoomlittle
+* Email Addr: doctordoomlittle@gmail.com
+* For Current Infomation about This Project
+* See the File Called: ( INFOMATION )
 */
+
+// this is for debugging
+# define INTERFACE_COUNT 1
 
 # ifndef ARDUINO
     # include <iostream>
@@ -28,7 +33,7 @@ void
 {
     if ( (this-> has_pmanager_cinst_init) == true) return;
 
-    static pmanager_ct pmanager_cinstance;
+    static pmanager_ct pmanager_cinstance(2);
 
     (this-> pmanager_cinst_ptr ) = & pmanager_cinstance;
 
@@ -54,12 +59,12 @@ io_service::~io_service( )
 {
     if ( (this-> has_pmanager_cinst_init) == true)
     {
-        std::free ( (this-> get_pmanager_cinst_ptr( ) ) );
+        //std::free ( (this-> get_pmanager_cinst_ptr( ) ) );
     }
 
     if ( (this-> has_sregister_cinst_init) == true)
     {
-        std::free ( (this-> get_sregister_cinst_ptr( ) ) );
+        //std::free ( (this-> get_sregister_cinst_ptr( ) ) );
     }
 }
 
@@ -97,28 +102,27 @@ void
 
     (this-> toggle_iloop_state( ) );
 
-
     // create a instance of classes
     (this-> init_pmanager_cinst( ) );
     (this-> init_sregister_cinst( ) );
 
-    for (int unsigned x = 0; x != (this-> get_pmanager_cinst_ptr( ) )-> get_dati_pcount( ); x++)
+    for (int unsigned x = 0; x != (this-> get_pmanager_cinst_ptr( ) )-> get_dati_pcount( 0); x++)
         (this-> get_pmanager_cinst_ptr( ) )-> set_dati_pid ( (tmp_config::def_digit_dati_pids [x]), x);
 
-    for (int unsigned x = 0; x != (this-> get_pmanager_cinst_ptr( ) )-> get_dato_pcount( ); x++)
+    for (int unsigned x = 0; x != (this-> get_pmanager_cinst_ptr( ) )-> get_dato_pcount( 0); x++)
         (this-> get_pmanager_cinst_ptr( ) )-> set_dato_pid ( (tmp_config::def_digit_dato_pids [x]), x);
 
     (this-> get_pmanager_cinst_ptr( ) )->
-        set_mio_clock_pid (tmp_config::def_digit_mio_clock_pid);
+        set_mio_clock_pid (tmp_config::def_digit_mio_clock_pid, 0);
     (this-> get_pmanager_cinst_ptr( ) )->
-        set_dati_clock_pid (tmp_config::def_digit_dati_clock_pid);
+        set_dati_clock_pid (tmp_config::def_digit_dati_clock_pid, 0);
     (this-> get_pmanager_cinst_ptr( ) )->
-        set_dato_clock_pid (tmp_config::def_digit_dato_clock_pid);
+        set_dato_clock_pid (tmp_config::def_digit_dato_clock_pid, 0);
 
     (this-> get_pmanager_cinst_ptr( ) )->
-        set_dati_latch_pid (tmp_config::def_digit_dati_latch_pid);
+        set_dati_latch_pid (tmp_config::def_digit_dati_latch_pid, 0);
     (this-> get_pmanager_cinst_ptr( ) )->
-        set_dato_latch_pid (tmp_config::def_digit_dato_latch_pid);
+        set_dato_latch_pid (tmp_config::def_digit_dato_latch_pid, 0);
 
     /* this is a simulated output so i can test if its working right
     */
@@ -131,9 +135,14 @@ void
     (this-> digit_dato_bitset [6] ) = 1;
     (this-> digit_dato_bitset [7] ) = 1;
 
-    this-> dati_bitset_length = tmp_config::def_dati_bitset_length;
+    (this-> dati_bitset_length).darr_init(1, INTERFACE_COUNT);
+    (this-> dato_bitset_length).darr_init(1, INTERFACE_COUNT);
 
-    this-> dato_bitset_length = tmp_config::def_dato_bitset_length;
+    for (int unsigned iface = 0; iface != INTERFACE_COUNT; iface ++)
+    {
+        (this-> dati_bitset_length).set_darr_ilayer(const_cast<int unsigned *>(&(tmp_config::def_dati_bitset_length)), iface, 0);
+        (this-> dato_bitset_length).set_darr_ilayer(const_cast<int unsigned *>(&(tmp_config::def_dati_bitset_length)), iface, 0);
+    }
 
     this-> ibit_read_holdup = tmp_config::def_ibit_read_holdup;
 
@@ -147,34 +156,47 @@ void
 
     this-> obitset_buff_size = tmp_config::def_obitset_buff_size;
 
-    (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )->
-        get_mio_clock_pid( ), tmp_config::digit_pin_input_mode) );
+    for (int unsigned(iface ) = 0; iface != INTERFACE_COUNT; iface ++)
+        (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )->
+            get_mio_clock_pid(iface), tmp_config::digit_pin_input_mode) );
 
-    (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )->
-        get_dati_clock_pid( ), tmp_config::digit_pin_input_mode) );
+    for (int unsigned(iface ) = 0; iface != INTERFACE_COUNT; iface ++)
+        (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )->
+            get_dati_clock_pid(iface), tmp_config::digit_pin_input_mode) );
 
-    (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )->
-        get_dato_clock_pid( ), tmp_config::digit_pin_output_mode) );
+    for (int unsigned(iface ) = 0; iface != INTERFACE_COUNT; iface ++)
+        (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )->
+            get_dato_clock_pid(iface), tmp_config::digit_pin_output_mode) );
 
-    for (int unsigned(x ) = 0; x != (this-> digit_i_pin_count); x ++)
-        (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )-> get_dati_pid (x), tmp_config::digit_pin_input_mode) );
+    for (int unsigned(iface ) = 0; iface != INTERFACE_COUNT; iface ++)
+        for (int unsigned(x ) = 0; x != (this-> get_pmanager_cinst_ptr( ) )-> get_dati_pcount(iface); x ++)
+            (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )-> get_dati_pid (x), tmp_config::digit_pin_input_mode) );
 
-    for (int unsigned(x ) = 0; x != (this-> digit_o_pin_count); x ++)
-        (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )-> get_dato_pid (x), tmp_config::digit_pin_output_mode) );
+    for (int unsigned(iface ) = 0; iface != INTERFACE_COUNT; iface ++)
+        for (int unsigned(x ) = 0; x != (this-> get_pmanager_cinst_ptr( ) )-> get_dato_pcount(iface); x ++)
+            (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )-> get_dato_pid (x), tmp_config::digit_pin_output_mode) );
 
-    (this-> digit_io_bitset [(bitset_id::__i_bitset)]).bitset_init ( (this-> dati_bitset_length) );
-    (this-> digit_io_bitset [(bitset_id::__o_bitset)]).bitset_init ( (this-> dato_bitset_length) );
+    //for (int unsigned iface = 0; iface != INTERFACE_COUNT; iface ++)
+    //{
+        (this-> digit_datio_bitset[(bitset_id::__i_bitset)]).bitset_init ( *(this-> dati_bitset_length).get_darr_ilayer(0, 0), INTERFACE_COUNT, false);
+        (this-> digit_datio_bitset[(bitset_id::__o_bitset)]).bitset_init ( *(this-> dato_bitset_length).get_darr_ilayer(0, 0), INTERFACE_COUNT, false);
+        for (int unsigned iface = 0; iface != INTERFACE_COUNT; iface ++)
+        {
+            (this-> digit_datio_bitset[(bitset_id::__i_bitset)]).get_bitset_cinst_ptr(iface)-> bitset_init(INTERFACE_COUNT);
+            (this-> digit_datio_bitset[(bitset_id::__o_bitset)]).get_bitset_cinst_ptr(iface)-> bitset_init(INTERFACE_COUNT);
+        }
 
-    (this-> i_bitset_buffer).dbuff_init (1/*sectors*/, (this-> ibitset_buff_size), (this-> dati_bitset_length) );
-    (this-> o_bitset_buffer).dbuff_init (1/*sectors*/, (this-> obitset_buff_size), (this-> dato_bitset_length) );
+        (this-> dati_bitset_buff).dbuff_init (INTERFACE_COUNT, (this-> ibitset_buff_size), *(this-> dati_bitset_length).get_darr_ilayer(0, 0) );
+        (this-> dati_bitset_buff).dbuff_init (INTERFACE_COUNT, (this-> obitset_buff_size), *(this-> dato_bitset_length).get_darr_ilayer(0, 0) );
+    //}
 
-    if ( (this-> clock_sstate_ignore) == tmp_config::digit_pin_high_state)
+    if ( (this-> clock_sstate_ignore) == (tmp_config::digit_pin_high_state))
     {
         (this-> ilclockp_toggled ) = true;
         (this-> ilclockp_tcount ) = 1;
     }
 
-    if ( (this-> clock_sstate_ignore) == tmp_config::digit_pin_low_state)
+    if ( (this-> clock_sstate_ignore) == (tmp_config::digit_pin_low_state))
     {
         (this-> ilclockn_toggled ) = true;
         (this-> ilclockn_tcount ) = 1;
@@ -192,41 +214,47 @@ void
 
         (this-> update_clock_reading( ) );
 
-        ((this-> get_pmanager_cinst_ptr())-> update_dati_clock_pstate((this-> get_digit_pstate((this-> get_pmanager_cinst_ptr())-> get_dati_clock_pid()))));
+        ((this-> get_pmanager_cinst_ptr())-> update_dati_clock_pstate((this-> get_digit_pstate((this-> get_pmanager_cinst_ptr())-> get_dati_clock_pid(0)))));
 
-        (this-> set_digit_pstate((this-> get_pmanager_cinst_ptr())-> get_dato_clock_pid(), (this-> get_pmanager_cinst_ptr())-> get_dato_clock_pstate()));
+        (this-> set_digit_pstate((this-> get_pmanager_cinst_ptr())-> get_dato_clock_pid(0), (this-> get_pmanager_cinst_ptr())-> get_dato_clock_pstate()));
 
         (this-> ibit_read_holdup ) = tmp_config::def_ibit_read_holdup;
         (this-> obit_write_holdup ) = tmp_config::def_obit_write_holdup;
 
-        (this-> ibit_read_holdup ) = ( (this-> ibit_read_holdup ) + ( ( (this-> ibyte_read_holdup ) - 1) * ( (this-> dati_bitset_length ) / ((this-> get_pmanager_cinst_ptr())-> get_dati_pcount()) ) ) );
-        (this-> obit_write_holdup ) = ( (this-> obit_write_holdup ) + ( ( (this-> obyte_write_holdup ) - 1) * ( (this-> dato_bitset_length ) / ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount()) ) ) );
+        // when ibit_read_holdup / etc are arrays like dati_bitset_length then i will update it
+        (this-> ibit_read_holdup ) = ( (this-> ibit_read_holdup ) + ( ( (this-> ibyte_read_holdup ) - 1) * (8/*bitset_length*/ / ((this-> get_pmanager_cinst_ptr())-> get_dati_pcount(0)) ) ) );
+        (this-> obit_write_holdup ) = ( (this-> obit_write_holdup ) + ( ( (this-> obyte_write_holdup ) - 1) * (8/*bitset_length*/ / ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount(0)) ) ) );
 
         if ( (this-> get_mltick_count( ) ) == 0 )
             if ( (this-> call_extern_mlinit (this ) ) == 0) return;
 
         if ( (this-> call_extern_mltick (this ) ) == 0) return;
-
+return;
         for (int unsigned(x ) = 0; x != (this-> obitset_buff_size ); x ++)
-            (this-> o_bitset_buffer).add_to_dbuff((this-> get_io_bitset (1, 0, x)), 2, 0, 0, x, true, true, false);
+            (this-> dati_bitset_buff).add_to_dbuff((this-> get_io_bitset (0, 1, 0, x)), 2, 0, 0, x, true, true, false);
 
 # ifndef ARDUINO
-        for (int unsigned(x ) = 0; x != ( (this-> dati_bitset_length ) / ((this-> get_pmanager_cinst_ptr())-> get_dati_pcount()) ); x ++ )
+        for (int unsigned iface = 0; iface != INTERFACE_COUNT; iface ++)
+            for (int unsigned(x ) = 0; x != ( *(this-> dati_bitset_length).get_darr_ilayer(iface, 0) / ((this-> get_pmanager_cinst_ptr())-> get_dati_pcount(iface)) ); x ++ )
                 std::cout << (this-> i_bitset_finished [x] );
 
         std::cout << " :IFBIT, ";
 
-        for (int unsigned(x ) = 0; x != ( (this-> dato_bitset_length ) / ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount()) ); x ++ )
-            std::cout << (this-> o_bitset_finished [x] );
+        for (int unsigned iface = 0; iface != INTERFACE_COUNT; iface ++)
+            for (int unsigned(x ) = 0; x != ( *(this-> dato_bitset_length).get_darr_ilayer(iface, 0) / ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount(iface)) ); x ++ )
+                std::cout << (this-> o_bitset_finished [x] );
         std::cout << " :OFBIT";
 
         std::cout << std::endl;
 # endif
 
-        for (int unsigned(i_bitsetf_pos ) = 0; i_bitsetf_pos != ( (this-> dati_bitset_length ) / ((this-> get_pmanager_cinst_ptr())-> get_dati_pcount()) ); i_bitsetf_pos ++ )
+
+
+for (int unsigned iface = 0; iface != INTERFACE_COUNT; iface ++) {
+        for (int unsigned(i_bitsetf_pos ) = 0; i_bitsetf_pos != ( *(this-> dati_bitset_length ).get_darr_ilayer(iface, 0) / ((this-> get_pmanager_cinst_ptr())-> get_dati_pcount(0)) ); i_bitsetf_pos ++ )
         {
             if ( (this-> i_bitset_finished [i_bitsetf_pos] ) == true) (this-> i_bitsetf_truec ) ++;
-            if ((this-> i_bitsetf_truec ) == ( (this-> dati_bitset_length ) / ((this-> get_pmanager_cinst_ptr())-> get_dati_pcount()) ) )
+            if ((this-> i_bitsetf_truec ) == ( *(this-> dati_bitset_length ).get_darr_ilayer(iface, 0) / ((this-> get_pmanager_cinst_ptr())-> get_dati_pcount(0)) ) )
             {
                 (this-> i_bitsetf_truec ) = 0;
 
@@ -235,42 +263,43 @@ void
 
                 std::cout << "IBITSET_DUMP: ";
 
-                for (int unsigned(x ) = 0; x != (this-> dati_bitset_length ); x ++ )
+                for (int unsigned(x ) = 0; x != *(this-> dati_bitset_length ).get_darr_ilayer(iface, 0); x ++ )
                     std::cout << unsigned( (this-> digit_dati_bitset [x] ) );
 
                 std::cout << std::endl << std::endl;
 
-                for (int unsigned(x ) = 0; x != (this-> dati_bitset_length ); x ++ )
-                    std::cout << "STATE: " << i_bitset_buffer.is_block_smarker(true, 0, x) << ", DBUFF_ID: " << x << std::endl;
+                for (int unsigned(x ) = 0; x != *(this-> dati_bitset_length ).get_darr_ilayer(iface, 0); x ++ )
+                    std::cout << "STATE: " << dati_bitset_buff.is_block_smarker(true, iface, x) << ", DBUFF_ID: " << x << std::endl;
 
                 std::cout << "DBUFF_POS: " << i_bitset_buff_pos << std::endl;
 # endif
 
-                for (int unsigned(x ) = 0; x != (this-> dati_bitset_length ); x ++ )
-                    (this-> i_bitset_buffer).add_to_dbuff(&(this-> digit_dati_bitset [x]), 2, 0, 0, 0, true, true, true);
+                for (int unsigned(x ) = 0; x != *(this-> dati_bitset_length ).get_darr_ilayer(iface, 0); x ++ )
+                    (this-> dati_bitset_buff).add_to_dbuff(&(this-> digit_dati_bitset [x]), 2, iface, 0, 0, false, true, true);
 
                 if ( (this-> i_bitset_buff_pos[0] ) == (this-> ibitset_buff_size ) - 1)
                     (this-> i_bitset_buff_pos[0] ) = 0;
 
                 else (this-> i_bitset_buff_pos[0] ) ++;
 
-                for (int unsigned(x ) = 0; x != ( (this-> dati_bitset_length ) / ((this-> get_pmanager_cinst_ptr())-> get_dati_pcount()) ); x ++ )
+                for (int unsigned(x ) = 0; x != ( *(this-> dati_bitset_length ).get_darr_ilayer(iface, 0) / ((this-> get_pmanager_cinst_ptr())-> get_dati_pcount(0)) ); x ++ )
                     (this-> i_bitset_finished [x] ) = false;
             }
-        }
+        }}
 
         (this-> i_bitsetf_truec ) = 0;
 
-        for (int unsigned(o_bitsetf_pos ) = 0; o_bitsetf_pos != ( (this-> dato_bitset_length ) / (this-> get_pmanager_cinst_ptr())-> get_dato_pcount() ); o_bitsetf_pos ++ )
+for (int unsigned iface = 0; iface != INTERFACE_COUNT; iface ++) {
+        for (int unsigned(o_bitsetf_pos ) = 0; o_bitsetf_pos != ( *(this-> dato_bitset_length ).get_darr_ilayer(iface, 0) / (this-> get_pmanager_cinst_ptr())-> get_dato_pcount(0) ); o_bitsetf_pos ++ )
         {
             if ( (this-> o_bitset_finished [o_bitsetf_pos] ) == true) (this-> o_bitsetf_truec ) ++;
-            if ( (this-> o_bitsetf_truec ) == ( (this-> dato_bitset_length ) / (this-> get_pmanager_cinst_ptr())-> get_dato_pcount() ) )
+            if ( (this-> o_bitsetf_truec ) == ( *(this-> dato_bitset_length ).get_darr_ilayer(iface, 0) / (this-> get_pmanager_cinst_ptr())-> get_dato_pcount(0) ) )
             {
-                (this-> set_digit_pstate((this-> get_pmanager_cinst_ptr())-> get_dato_latch_pid(), tmp_config::digit_pin_high_state));
+                (this-> set_digit_pstate((this-> get_pmanager_cinst_ptr())-> get_dato_latch_pid(0), tmp_config::digit_pin_high_state));
 
                 for (int x = 0; x != 1000; x++){} // this is only temporary
 
-                (this-> set_digit_pstate((this-> get_pmanager_cinst_ptr())-> get_dato_latch_pid(), tmp_config::digit_pin_low_state));
+                (this-> set_digit_pstate((this-> get_pmanager_cinst_ptr())-> get_dato_latch_pid(0), tmp_config::digit_pin_low_state));
 
                 (this-> o_bitsetf_truec ) = 0;
 # ifndef ARDUINO
@@ -278,19 +307,19 @@ void
 
                 std::cout << "OBITSET_DUMP: ";
 
-                for (int unsigned(x ) = 0; x != (this-> dato_bitset_length ); x++ )
+                for (int unsigned(x ) = 0; x != *(this-> dato_bitset_length ).get_darr_ilayer(iface, 0); x++ )
                     std::cout << unsigned( (this-> digit_dato_bitset [x] ) );
 
                 std::cout << std::endl << std::endl;
 # endif
-                for (int unsigned(x ) = 0; x != ( (this-> dato_bitset_length ) / (this-> get_pmanager_cinst_ptr())->get_dato_pcount() ); x ++ )
+                for (int unsigned(x ) = 0; x != ( *(this-> dato_bitset_length ).get_darr_ilayer(iface, 0) / (this-> get_pmanager_cinst_ptr())->get_dato_pcount(0) ); x ++ )
                     (this-> o_bitset_finished [x] ) = false;
 
-                if ((this-> o_bitset_buffer).is_block_smarker(true, 0, (this-> o_bitset_buff_pos[0] )) == true)
+                if ((this-> dati_bitset_buff).is_block_smarker(true, iface, (this-> o_bitset_buff_pos[0] )) == true)
                 {
                     for (int unsigned x = 0; x != 8; x ++)
-                        (this-> digit_dato_bitset [x]) = * (this-> o_bitset_buffer).get_from_dbuff(2, 0, (this-> o_bitset_buff_pos[0] ), x, false, false, false, true);
-                        // (this-> o_bitset_buffer).del_from_dbuffer(1, 0, (this-> o_bitset_buff_pos[0] ), 0);
+                        (this-> digit_dato_bitset [x]) = *(this-> dati_bitset_buff).get_from_dbuff(2, iface, (this-> o_bitset_buff_pos[0] ), x, false, false, false, true);
+                        // (this-> dati_bitset_buff).del_from_dbuffer(1, 0, (this-> o_bitset_buff_pos[0] ), 0);
 # ifndef ARDUINO
                     std::cout << "PROSSING: B" << (this-> o_bitset_buff_pos[0] ) << std::endl;
 # endif
@@ -304,20 +333,20 @@ void
                 else
                     (this-> o_bitset_buff_pos[0] ) ++;
             }
-        }
+        }}
 
         // if you look up that bit of code only calls when the bitset has been pushed to the output so it wont be called at startup) this is a quick fix for that
-
+for (int unsigned iface = 0; iface != INTERFACE_COUNT; iface ++) {
         if ((this-> get_mltick_count( ) ) == 0)
         {
-            if ((this-> o_bitset_buffer).is_block_smarker(true, 0, (this-> o_bitset_buff_pos[0] )) == true)
+            if ((this-> dati_bitset_buff).is_block_smarker(true, iface, (this-> o_bitset_buff_pos[0] )) == true)
             {
                 for (int unsigned x = 0; x != 8; x ++)
-                    (this-> digit_dato_bitset [x]) = * (this-> o_bitset_buffer).get_from_dbuff(2, 0, (this-> o_bitset_buff_pos[0] ), x, false, false, false, true);
+                    (this-> digit_dato_bitset [x]) = * (this-> dati_bitset_buff).get_from_dbuff(2, iface, (this-> o_bitset_buff_pos[0] ), x, false, false, false, true);
 
                 (this-> o_bitset_buff_pos[0] ) ++;
             }
-        }
+        }}
 
         (this-> o_bitsetf_truec ) = 0;
 
@@ -362,8 +391,10 @@ void
 
             (this-> set_iltick_count ( (this-> i_iltick_count ) ) );
 
-            if ( (this-> get_iltick_count( ) ) <= ( (((this-> get_pmanager_cinst_ptr())-> get_dati_pcount()) - 1) + ((this-> ibit_read_holdup) - 1) ) && ( (this-> get_iltick_count( ) ) ) >= ((this-> ibit_read_holdup) - 1) )
+            for (int unsigned iface = 0; iface != INTERFACE_COUNT; iface ++) {
+            if ( (this-> get_iltick_count( ) ) <= ( (((this-> get_pmanager_cinst_ptr())-> get_dati_pcount(0)) - 1) + ((this-> ibit_read_holdup) - 1) ) && ( (this-> get_iltick_count( ) ) ) >= ((this-> ibit_read_holdup) - 1) )
             {
+                // input
                 if (((this-> get_pmanager_cinst_ptr())-> get_dati_clock_pstate()) != 0x1)
                 {
                     (this-> is_dati_clock_ppos) = true;
@@ -378,13 +409,12 @@ void
 
                 if ((this-> is_dati_clock_ppos) == true)
                 {
-                    std::cout << ": " << ((this-> get_pmanager_cinst_ptr())-> get_dati_clock_ppos_count())  << std::endl;
 
                 (this-> digit_i_buffer [(this-> digit_i_buffer_pos)] ) = (this-> get_digit_pstate ( ((this-> get_pmanager_cinst_ptr())-> get_dati_pid((this-> digit_i_buffer_pos))) ) );
 
-                if ( (this-> get_iltick_count( ) ) == ( ( (((this-> get_pmanager_cinst_ptr())-> get_dati_pcount()) - 1) + ((this-> ibit_read_holdup) - 1) ) + (this-> ibp_pcount_multiplier) ) )
+                if ( (this-> get_iltick_count( ) ) == ( ( (((this-> get_pmanager_cinst_ptr())-> get_dati_pcount(0)) - 1) + ((this-> ibit_read_holdup) - 1) ) + (this-> ibp_pcount_multiplier) ) )
                 {
-                    (this-> ibp_pcount_multiplier ) += ((this-> get_pmanager_cinst_ptr())-> get_dati_pcount());
+                    (this-> ibp_pcount_multiplier ) += ((this-> get_pmanager_cinst_ptr())-> get_dati_pcount(0));
                     (this-> digit_i_buffer_pos ) = 0;
                     if ( (this-> get_iltick_count( ) ) == 0)
                         (this-> ibp_pcount_multiplier ) = 0;
@@ -392,48 +422,50 @@ void
                 else
                 {
                     (this-> digit_i_buffer_pos) ++;
-                    if ( (this-> ibp_pcount_multiplier) == ((this-> get_pmanager_cinst_ptr())-> get_dati_pcount()) )
+                    if ( (this-> ibp_pcount_multiplier) == ((this-> get_pmanager_cinst_ptr())-> get_dati_pcount(0)) )
                         (this-> ibp_pcount_multiplier ) = 0;
                 }
 
-                if ( (this-> get_iltick_count( ) ) == ( ((this-> ibit_read_holdup ) - 1) + (((this-> get_pmanager_cinst_ptr())-> get_dati_pcount()) - 1) ) )
+                if ( (this-> get_iltick_count( ) ) == ( ((this-> ibit_read_holdup ) - 1) + (((this-> get_pmanager_cinst_ptr())-> get_dati_pcount(0)) - 1) ) )
                 {
-                    for (int unsigned(i_bitset_pos ) = 0; i_bitset_pos != ((this-> get_pmanager_cinst_ptr())-> get_dati_pcount()); i_bitset_pos ++)
-                        (this-> digit_dati_bitset [( (this-> i_bitset_fcount ) * ((this-> get_pmanager_cinst_ptr())-> get_dati_pcount()) + i_bitset_pos)] ) = (this-> digit_i_buffer [i_bitset_pos] );
+                    for (int unsigned(i_bitset_pos ) = 0; i_bitset_pos != ((this-> get_pmanager_cinst_ptr())-> get_dati_pcount(0)); i_bitset_pos ++)
+                        (this-> digit_dati_bitset [( (this-> i_bitset_fcount ) * ((this-> get_pmanager_cinst_ptr())-> get_dati_pcount(0)) + i_bitset_pos)] ) = (this-> digit_i_buffer [i_bitset_pos] );
 
                     if ( (this-> i_bitset_finished [(this-> i_bitset_fcount )] ) == false)
                     {
                         (this-> i_bitset_finished [(this-> i_bitset_fcount )] ) = true;
                     }
 
-                    if ( (this-> i_bitset_fcount ) == ((this-> dati_bitset_length ) / ((this-> get_pmanager_cinst_ptr())-> get_dati_pcount()) ) - 1)
+                    // REMINDER: fix this
+                    if ( (this-> i_bitset_fcount ) == (/*bitset_length*/8 / ((this-> get_pmanager_cinst_ptr())-> get_dati_pcount(0)) ) - 1)
                         (this-> i_bitset_fcount ) = 0;
                     else
                         (this-> i_bitset_fcount ) ++;
                 }
+                    (this-> dati_clock_ltcount) ++ ;
 
-                (this-> dati_clock_ltcount) ++ ;
-
-                (this-> is_dati_clock_ppos) = false;
+                    (this-> is_dati_clock_ppos) = false;
                 }
-            }
+            } }
 
             (this-> set_iltick_count ( (this-> o_iltick_count ) ) );
 
-            if ( (this-> get_iltick_count( ) ) <= ( ( ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount()) - 1) + (this-> obit_write_holdup - 1) ) && (this-> get_iltick_count( ) ) >= (this-> obit_write_holdup - 1) )
+            for (int unsigned iface = 0; iface != INTERFACE_COUNT; iface ++) {
+            if ( (this-> get_iltick_count( ) ) <= ( ( ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount(0)) - 1) + (this-> obit_write_holdup - 1) ) && (this-> get_iltick_count( ) ) >= (this-> obit_write_holdup - 1) )
             {
-                if ( (this-> get_iltick_count( ) ) == ( ( (this-> obit_write_holdup ) - 1) + ( ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount()) ) ) || (this-> get_iltick_count( ) ) == (this-> obit_write_holdup - 1) )
+                if ( (this-> get_iltick_count( ) ) == ( ( (this-> obit_write_holdup ) - 1) + ( ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount(0)) ) ) || (this-> get_iltick_count( ) ) == (this-> obit_write_holdup - 1) )
                 {
-                    for (int unsigned(o_bitset_pos ) = 0; o_bitset_pos != ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount()); o_bitset_pos ++)
-                        (this-> digit_o_buffer [o_bitset_pos] ) = (this-> digit_dato_bitset [( (this-> o_bitset_fcount ) * ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount()) + o_bitset_pos )] );
+                    for (int unsigned(o_bitset_pos ) = 0; o_bitset_pos != ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount(0)); o_bitset_pos ++)
+                        (this-> digit_o_buffer [o_bitset_pos] ) = (this-> digit_dato_bitset [( (this-> o_bitset_fcount ) * ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount(0)) + o_bitset_pos )] );
 
                     if ( (this-> o_bitset_finished [(this-> o_bitset_fcount )] ) == false)
                     {
-                        //(this-> set_digit_pstate((this-> get_dato_latch_pid()), tmp_config::digit_pin_high_state));
+                        //(this-> set_digit_pstate((this-> get_dato_latch_pid(0)), tmp_config::digit_pin_high_state));
                         (this-> o_bitset_finished [(this-> o_bitset_fcount )] ) = true;
                     }
 
-                    if ( (this-> o_bitset_fcount ) == ( (this-> dato_bitset_length ) / ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount()) ) - 1)
+                    // REMINDER: fix this
+                    if ( (this-> o_bitset_fcount ) == ( /*bitset_length*/8 / ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount(0)) ) - 1)
                         (this-> o_bitset_fcount ) = 0;
                     else
                         (this-> o_bitset_fcount ) ++;
@@ -444,9 +476,9 @@ void
                     (this-> digit_o_buffer [(this-> digit_o_buffer_pos )] )
                 ) );
 
-                if ( (this-> get_iltick_count( ) ) == ( ( ( ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount()) - 1) + (this-> obit_write_holdup - 1) ) + (this-> obp_pcount_multiplier ) ) )
+                if ( (this-> get_iltick_count( ) ) == ( ( ( ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount(0)) - 1) + (this-> obit_write_holdup - 1) ) + (this-> obp_pcount_multiplier ) ) )
                 {
-                    (this-> obp_pcount_multiplier ) += ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount());
+                    (this-> obp_pcount_multiplier ) += ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount(0));
                     (this-> digit_o_buffer_pos ) = 0;
                     if ( (this-> get_iltick_count( ) ) == 0)
                         (this-> obp_pcount_multiplier ) = 0;
@@ -454,16 +486,16 @@ void
                 else
                 {
                     (this-> digit_o_buffer_pos ) ++;
-                    if ( (this-> obp_pcount_multiplier ) == ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount()) )
+                    if ( (this-> obp_pcount_multiplier ) == ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount(0)) )
                         (this-> obp_pcount_multiplier ) = 0;
                 }
-            }
+            } }
 
             (this-> set_iltick_count ( (this-> temp_iltick_count ) ) );
 
-            if ( ( (((this-> get_pmanager_cinst_ptr())-> get_dati_pcount()) - 1) + (this-> ibit_read_holdup - 1) ) == ( (((this-> get_pmanager_cinst_ptr())-> get_dato_pcount()) - 1) + (this-> obit_write_holdup - 1) ) )
+            if ( ( (((this-> get_pmanager_cinst_ptr())-> get_dati_pcount(0)) - 1) + (this-> ibit_read_holdup - 1) ) == ( (((this-> get_pmanager_cinst_ptr())-> get_dato_pcount(0)) - 1) + (this-> obit_write_holdup - 1) ) )
             {
-                if ( (this-> get_iltick_count( ) ) == ( ( (((this-> get_pmanager_cinst_ptr())-> get_dati_pcount()) - 1) + (this-> ibit_read_holdup - 1) ) + ( (((this-> get_pmanager_cinst_ptr())-> get_dato_pcount()) - 1) + (this-> obit_write_holdup - 1) ) ) )
+                if ( (this-> get_iltick_count( ) ) == ( ( (((this-> get_pmanager_cinst_ptr())-> get_dati_pcount(0)) - 1) + (this-> ibit_read_holdup - 1) ) + ( (((this-> get_pmanager_cinst_ptr())-> get_dato_pcount(0)) - 1) + (this-> obit_write_holdup - 1) ) ) )
                 {
                     (this-> i_iltick_count ) = 0;
                     (this-> o_iltick_count ) = 0;
@@ -472,13 +504,13 @@ void
             }
             else
             {
-                if ( (this-> i_iltick_count ) == ( (((this-> get_pmanager_cinst_ptr())-> get_dati_pcount()) - 1) + (this-> ibit_read_holdup - 1) ) )
+                if ( (this-> i_iltick_count ) == ( (((this-> get_pmanager_cinst_ptr())-> get_dati_pcount(0)) - 1) + (this-> ibit_read_holdup - 1) ) )
                 {
                     (this-> i_iltick_count ) = 0;
                     break;
                 }
 
-                if ( (this-> o_iltick_count ) == ( (((this-> get_pmanager_cinst_ptr())-> get_dato_pcount()) - 1) + (this-> obit_write_holdup - 1) ) )
+                if ( (this-> o_iltick_count ) == ( (((this-> get_pmanager_cinst_ptr())-> get_dato_pcount(0)) - 1) + (this-> obit_write_holdup - 1) ) )
                 {
                     (this-> o_iltick_count ) = 0;
                     break;
@@ -590,15 +622,15 @@ void
 {
     (this-> set_digit_pstate_fptr (__digit_pid, __digit_pstate ) );
 
-    if (__digit_pid == ((this-> get_pmanager_cinst_ptr())-> get_dato_clock_pid( ) ))
+    if (__digit_pid == ((this-> get_pmanager_cinst_ptr())-> get_dato_clock_pid( 0) ))
         ((this-> get_pmanager_cinst_ptr())-> update_dato_clock_pstate(__digit_pstate));
 
-    else if (__digit_pid == ((this-> get_pmanager_cinst_ptr())-> get_dato_latch_pid( ) ))
+    else if (__digit_pid == ((this-> get_pmanager_cinst_ptr())-> get_dato_latch_pid(0 ) ))
         ((this-> get_pmanager_cinst_ptr())-> update_dato_latch_pstate(__digit_pstate));
 
     else
     {
-        for (int unsigned(x ) = 0; x != ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount()); x ++)
+        for (int unsigned(x ) = 0; x != ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount(0)); x ++)
         {
             if (__digit_pid == ((this-> get_pmanager_cinst_ptr())-> get_dati_pid (x) ) )
             {
@@ -653,9 +685,9 @@ bool
 }
 
 bool
-(io_service::is_external_clock (bool(__is_type ) ) )
+(io_service::is_external_clock (bool(__is_type ), int unsigned(__interface_id)) )
 {
-    return ( (this-> get_digit_pstate_fptr ( ((this-> get_pmanager_cinst_ptr())-> get_mio_clock_pid() ) ) ) == __is_type? true : false);
+    return ( (this-> get_digit_pstate_fptr ( ((this-> get_pmanager_cinst_ptr())-> get_mio_clock_pid(0) ) ) ) == __is_type? true : false);
 }
 
 void
@@ -672,7 +704,7 @@ void
 void
 (io_service::update_clock_reading( ) )
 {
-    (this-> external_clock_reading ) = (this-> get_digit_pstate_fptr ( ((this-> get_pmanager_cinst_ptr())-> get_mio_clock_pid() ) ) ) == 1? true : false;
+    (this-> external_clock_reading ) = (this-> get_digit_pstate_fptr ( ((this-> get_pmanager_cinst_ptr())-> get_mio_clock_pid(0) ) ) ) == 1? true : false;
 }
 
 void
@@ -731,7 +763,7 @@ bool
 }
 
 void
-(io_service::set_io_bitset (int unsigned(__bitset_id), __bitset_type(* __io_bitset), int unsigned(__set_type), int unsigned(__ibitset_arr_pos)))
+(io_service::set_io_bitset (int unsigned(__interface_id), int unsigned(__bitset_id), __bitset_type(* __io_bitset), int unsigned(__set_type), int unsigned(__ibitset_arr_pos)))
 {
     switch(__bitset_id)
     {
@@ -739,10 +771,10 @@ void
             switch(__set_type)
             {
                 case (sg_type::__individual):
-                    (this-> digit_io_bitset [(bitset_id::__i_bitset)]).set_bitset(__io_bitset, (sg_type::__individual), __ibitset_arr_pos);
+                    (this-> digit_datio_bitset [(bitset_id::__i_bitset)]).set_bitset(__io_bitset, (sg_type::__individual), __ibitset_arr_pos, __interface_id);
                 break;
                 case (sg_type::__total_array):
-                    (this-> digit_io_bitset [(bitset_id::__i_bitset)]).set_bitset(__io_bitset, (sg_type::__total_array), __ibitset_arr_pos/*not needed*/);
+                    (this-> digit_datio_bitset [(bitset_id::__i_bitset)]).set_bitset(__io_bitset, (sg_type::__total_array), __ibitset_arr_pos, __interface_id);
                 break;
                 default : return;
             }
@@ -752,11 +784,11 @@ void
             switch(__set_type)
             {
                 case (sg_type::__individual):
-                    (this-> digit_io_bitset [(bitset_id::__o_bitset)]).set_bitset(__io_bitset, (sg_type::__individual), __ibitset_arr_pos);
+                    (this-> digit_datio_bitset [(bitset_id::__o_bitset)]).set_bitset(__io_bitset, (sg_type::__individual), __ibitset_arr_pos, __interface_id);
                 break;
 
                 case (sg_type::__total_array):
-                    (this-> digit_io_bitset [(bitset_id::__o_bitset)]).set_bitset(__io_bitset, (sg_type::__total_array), __ibitset_arr_pos/*not needed*/);
+                    (this-> digit_datio_bitset [(bitset_id::__o_bitset)]).set_bitset(__io_bitset, (sg_type::__total_array), __ibitset_arr_pos, __interface_id);
                 break;
 
                 default : return;
@@ -767,7 +799,7 @@ void
 }
 
 io_service::__bitset_type
-(* io_service::get_io_bitset (int unsigned(__bitset_id), int unsigned(__get_type), int unsigned(__ibitset_arr_pos)))
+(* io_service::get_io_bitset (int unsigned(__interface_id), int unsigned(__bitset_id), int unsigned(__get_type), int unsigned(__ibitset_arr_pos)))
 {
     switch(__bitset_id)
     {
@@ -775,11 +807,11 @@ io_service::__bitset_type
             switch(__get_type)
             {
                 case (sg_type::__individual) :
-                    return ((this-> digit_io_bitset [(bitset_id::__i_bitset)]).get_bitset((sg_type::__individual), __ibitset_arr_pos));
+                    return ((this-> digit_datio_bitset [(bitset_id::__i_bitset)]).get_bitset((sg_type::__individual), __ibitset_arr_pos, __interface_id));
                     break;
 
                 case (sg_type::__total_array) :
-                    return ((this-> digit_io_bitset [(bitset_id::__i_bitset)]).get_bitset((sg_type::__total_array), __ibitset_arr_pos/*not needed*/));
+                    return ((this-> digit_datio_bitset [(bitset_id::__i_bitset)]).get_bitset((sg_type::__total_array), __ibitset_arr_pos, __interface_id));
                     break;
 
                 default : return (nullptr);
@@ -791,11 +823,11 @@ io_service::__bitset_type
             switch(__get_type)
             {
                 case (sg_type::__individual) :
-                    return ((this-> digit_io_bitset [(bitset_id::__o_bitset)]).get_bitset((sg_type::__individual), __ibitset_arr_pos));
+                    return ((this-> digit_datio_bitset [(bitset_id::__o_bitset)]).get_bitset((sg_type::__individual), __ibitset_arr_pos, __interface_id));
                     break;
 
                 case (sg_type::__total_array) :
-                    return ((this-> digit_io_bitset [(bitset_id::__o_bitset)]).get_bitset((sg_type::__total_array), __ibitset_arr_pos/*not needed*/));
+                    return ((this-> digit_datio_bitset [(bitset_id::__o_bitset)]).get_bitset((sg_type::__total_array), __ibitset_arr_pos, __interface_id));
                     break;
 
                 default : return (nullptr);
@@ -808,7 +840,7 @@ io_service::__bitset_type
 }
 
 void
-(io_service::shift_io_bitset (int unsigned(__bitset_id), int unsigned(__shift_direction), int unsigned(__shift_amount)))
+(io_service::shift_io_bitset (int unsigned(__interface_id), int unsigned(__bitset_id), int unsigned(__shift_direction), int unsigned(__shift_amount)))
 {
     switch(__bitset_id)
     {
@@ -816,11 +848,11 @@ void
             switch(__shift_direction)
             {
                 case (shift_direction::__right):
-                    (this-> digit_io_bitset [(bitset_id::__i_bitset)]).shift_bitset((shift_direction::__right), __shift_amount);
+                    (this-> digit_datio_bitset [(bitset_id::__i_bitset)]).shift_bitset((shift_direction::__right), __shift_amount, __interface_id);
                     break;
 
                 case (shift_direction::__left):
-                    (this-> digit_io_bitset [(bitset_id::__i_bitset)]).shift_bitset((shift_direction::__left), __shift_amount);
+                    (this-> digit_datio_bitset [(bitset_id::__i_bitset)]).shift_bitset((shift_direction::__left), __shift_amount, __interface_id);
                     break;
 
                 default : return;
@@ -831,11 +863,11 @@ void
             switch(__shift_direction)
             {
                 case (shift_direction::__right):
-                    (this-> digit_io_bitset [(bitset_id::__o_bitset)]).shift_bitset((shift_direction::__right), __shift_amount);
+                    (this-> digit_datio_bitset [(bitset_id::__o_bitset)]).shift_bitset((shift_direction::__right), __shift_amount, __interface_id);
                     break;
 
                 case (shift_direction::__left):
-                    (this-> digit_io_bitset [(bitset_id::__o_bitset)]).shift_bitset((shift_direction::__left), __shift_amount);
+                    (this-> digit_datio_bitset [(bitset_id::__o_bitset)]).shift_bitset((shift_direction::__left), __shift_amount, __interface_id);
                     break;
 
                 default : return;
@@ -847,15 +879,15 @@ void
 }
 
 void
-(io_service::flip_io_bitset (int unsigned(__bitset_id)))
+(io_service::flip_io_bitset (int unsigned(__interface_id), int unsigned(__bitset_id)))
 {
     switch(__bitset_id)
     {
         case (bitset_id::__i_bitset) :
-            (this-> digit_io_bitset [(bitset_id::__i_bitset)]).flip_bitset();
+            (this-> digit_datio_bitset [(bitset_id::__i_bitset)]).flip_bitset(__interface_id);
         break;
         case (bitset_id::__o_bitset) :
-            (this-> digit_io_bitset [(bitset_id::__o_bitset)]).flip_bitset();
+            (this-> digit_datio_bitset [(bitset_id::__o_bitset)]).flip_bitset(__interface_id);
         break;
         default : return;
     }
@@ -870,8 +902,8 @@ void
             (this-> digit_dati_bitset [__bitset_arr_pos]) = * __i_bitset;
             break;
 
-        case (sg_type::__total_array) :
-            for (int unsigned(bitset_arr_pos ) = 0; bitset_arr_pos != (this-> dati_bitset_length); bitset_arr_pos ++)
+        case (sg_type::__total_array) : // fix this
+            for (int unsigned(bitset_arr_pos ) = 0; bitset_arr_pos != /*bitset length*/8; bitset_arr_pos ++)
                 (this-> set_i_bitset(&__i_bitset[bitset_arr_pos], (sg_type::__individual), bitset_arr_pos));
 
             break;
@@ -905,8 +937,8 @@ void
             (this-> digit_dato_bitset [__bitset_arr_pos]) = * __o_bitset;
             break;
 
-        case (sg_type::__total_array) :
-            for (int unsigned(bitset_arr_pos ) = 0; bitset_arr_pos != (this-> dato_bitset_length); bitset_arr_pos ++)
+        case (sg_type::__total_array) : // fix this
+            for (int unsigned(bitset_arr_pos ) = 0; bitset_arr_pos != /*bitset length*/8; bitset_arr_pos ++)
                 (this-> set_o_bitset(&__o_bitset[bitset_arr_pos], (sg_type::__individual), bitset_arr_pos));
 
             break;

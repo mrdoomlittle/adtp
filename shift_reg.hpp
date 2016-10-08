@@ -18,7 +18,15 @@
 # include "dynamic_array.hpp"
 # include "pin_manager.hpp"
 # include "tmp_config.hpp"
-# include "bitset_array.hpp"
+# include "bitset_list.hpp"
+
+/* Created and Designed by MrDoomLittle
+* Github URL: https://github.com/mrdoomlittle
+* Email Addr: doctordoomlittle@gmail.com
+* For Current Infomation about This Project
+* See the File Called: ( INFOMATION )
+*/
+// still working on this
 namespace tmp { class shift_reg
 {
     protected :
@@ -117,7 +125,7 @@ namespace tmp { class shift_reg
         dynamic_array <uint8_t> shift_reg_pid_list;
 
         // turn into array
-        bitset_array <int unsigned> shift_reg_obitset;
+        bitset_list <int unsigned> shift_reg_obitset;
 
         dynamic_array <int unsigned> shift_reg_ipcount_l;
         dynamic_array <int unsigned> shift_ref_ipstate_l;

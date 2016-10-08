@@ -1,9 +1,11 @@
 # ifndef __dynamic__array__hpp__
 # define __dynamic__array__hpp__
 
-/* Created and Designed by mrdoomlittle
-* Github: https://github.com/mrdoomlittle
-* Email: doctordoomlittle@gmail.com
+/* Created and Designed by MrDoomLittle
+* Github URL: https://github.com/mrdoomlittle
+* Email Addr: doctordoomlittle@gmail.com
+* For Current Infomation about This Project
+* See the File Called: ( INFOMATION )
 */
 
 /* NOTE: this works the same way as the dynamic buffer but its more light wight
@@ -147,7 +149,7 @@ namespace tmp { template <typename __darr_type> class dynamic_array
             for (int unsigned(x ) = 0; x != ((this-> darr_length) * (this-> darr_depth)); x ++)
             {
                 if (x >= (__layer_arr_pos * (this-> darr_length)) && x < (__layer_arr_pos * (this-> darr_length)) + (this-> darr_length)) {r ++; continue;}
-            
+
                 (this-> darr_ilayers [(data_id::__swap)] [(x-r)]) = (this-> darr_ilayers [(data_id::__main)] [(x)]);
             }
 

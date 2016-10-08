@@ -1,8 +1,10 @@
 # ifndef ARDUINO
 
-/* Created and Designed by mrdoomlittle
-* Github: https://github.com/mrdoomlittle
-* Email: doctordoomlittle@gmail.com
+/* Created and Designed by MrDoomLittle
+* Github URL: https://github.com/mrdoomlittle
+* Email Addr: doctordoomlittle@gmail.com
+* For Current Infomation about This Project
+* See the File Called: ( INFOMATION )
 */
 
 # include "io_service.hpp"
@@ -157,6 +159,7 @@ uint8_t test[8][8] =
 int unsigned
 (external_mlinit (tmp::io_service(* __io_service ) ) )
 {
+    std::cout << "This Project is Still Early Development and Many things Need Fixing. Sorry :(" << std::endl;
     return 1;
 }
 
@@ -165,31 +168,33 @@ int unsigned
 {
 
     std::cout << "SET_IO_BITSET" << std::endl;
-    __io_service-> set_io_bitset(1, test[pos], 1, 0);
-    __io_service-> flip_io_bitset(1);
+    __io_service-> set_io_bitset(0, 1, test[pos], 1, 0);
+    return 0;
+    __io_service-> flip_io_bitset(0, 1);
+
     tcount = 0;
     if (pos == 7)
         pos = 0;
     else
         pos ++;
-
+    for (int unsigned (iface ) = 0; iface != 1; iface ++) {
     for (int unsigned (x ) = 0; x != 8; x ++)
-        std::cout << unsigned(* __io_service-> get_io_bitset(0, 0, x));
+        std::cout << unsigned(* __io_service-> get_io_bitset(0, 0, 0, x));
 
 
     std::cout << "/I::BITSET\n" << std::endl;
 
     for (int unsigned (x ) = 0; x != 8; x ++)
-        std::cout << unsigned(* __io_service-> get_io_bitset(1, 0, x));
+        std::cout << unsigned(* __io_service-> get_io_bitset(0, 1, 0, x));
 
     std::cout << "/O::BITSET\n" << std::endl;
 
     for (int unsigned(x ) = 0; x != 8; x ++)
     {
         for (int unsigned(y ) = 0; y != 8; y ++)
-            std::cout << unsigned(*__io_service-> i_bitset_buffer.get_from_dbuff(2, 0, x, y, false, false, false, true));
+            std::cout << unsigned(*__io_service-> dati_bitset_buff.get_from_dbuff(2, iface, x, y, false, false, false, true));
 
-        if (__io_service-> i_bitset_buffer.is_block_smarker(true, 0, x) == true)
+        if ((__io_service-> dati_bitset_buff).is_block_smarker(true, iface, x) == true)
             std::cout << " & SM: " << "USED";
         else
             std::cout << " & SM: " << "FREE";
@@ -197,9 +202,9 @@ int unsigned
         std::cout << " : : ";
 
         for (int unsigned(y ) = 0; y != 8; y ++)
-            std::cout << unsigned(*__io_service-> o_bitset_buffer.get_from_dbuff(2, 0, x, y, false, false, false, true));
+            std::cout << unsigned(*__io_service-> dato_bitset_buff.get_from_dbuff(2, iface, x, y, false, false, false, true));
 
-        if (__io_service-> o_bitset_buffer.is_block_smarker(true, 0, x) == true)
+        if (__io_service-> dato_bitset_buff.is_block_smarker(true, iface, x) == true)
             std::cout << " & SM: " << "USED";
         else
             std::cout << " & SM: " << "FREE";
@@ -210,7 +215,7 @@ int unsigned
         }
 
         std::cout << std::endl;
-    }
+    }}
     tcount++;
 
     return 1;
@@ -220,12 +225,20 @@ int unsigned
 # include "port_manager.hpp"
 # include "dynamic_array.hpp"
 # include "dpacket_array.hpp"
-
+# include "tmp_ip.hpp"
 # include "socket_manager.hpp"
 # include "cint_convert.hpp"
+# include "pin_manager.hpp"
 int
 (main( ) )
-{/*
+{
+    //tmp::pin_manager pm(2);
+
+
+
+
+
+/*
     tmp::port_manager pm;
 
     pm.add_port_num(21299, true);
@@ -248,13 +261,15 @@ int
     std::cout << "DPS: " << a.get_dpacket_ptr(0)-> get_dati_dpacket_size() << std::endl;
     //std::cout << tmp::data_packet::__dato_bitset << std::endl;
    */
+   // tmp::tmp_ip as;
+    //tmp::socket_manager sock;
 
-   //tmp::socket_manager sock;
+  //  as.set_system_ip_addr("192.168.000.100");
 
-   std::cout << tmp::convert_to_int<int unsigned>("20299", 5) << std::endl;
+   //std::cout << tmp::convert_to_int<int unsigned>("20299", 5) << std::endl;
 
-    //sock.create_socket("101.128.277.117", 8080);
-/* 
+//    sock.create_socket("101.128.277.117", 8080);
+/*
     int unsigned tcount = 0;
     int unsigned nlength = 0;
     int unsigned curr = 10;
@@ -274,10 +289,11 @@ int
         }
 
         std::cout << "CNum:" << tcount << ", NLength: " << nlength << ", C:" << curr << std::endl;
-        tcount ++;        
+        tcount ++;
     }
 */
-/*    tmp::io_service io;
+
+tmp::io_service io;
 
     io.service_init
     (
@@ -288,7 +304,7 @@ int
         & external_mlinit,
         & external_mltick
     );
-*/
+
 }
 
 # endif /*ARDUINO*/

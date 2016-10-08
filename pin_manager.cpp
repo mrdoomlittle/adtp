@@ -1,33 +1,66 @@
 # include "pin_manager.hpp"
 
-/* Created and Designed by mrdoomlittle
-* Github: https://github.com/mrdoomlittle
-* Email: doctordoomlittle@gmail.com
+/* Created and Designed by MrDoomLittle
+* Github URL: https://github.com/mrdoomlittle
+* Email Addr: doctordoomlittle@gmail.com
+* For Current Infomation about This Project
+* See the File Called: ( INFOMATION )
 */
 
 namespace tmp
 {
-pin_manager::pin_manager()
+pin_manager::pin_manager(int unsigned(__interface_count))
 {
     bool temp = false; // this will be replaced later its just a quick fix
-    (this-> dati_pid_sstate_list).darr_init((this-> digit_dati_pcount), 1);
-    (this-> dati_pstate_list).darr_init((this-> digit_dati_pcount), 1);
-    (this-> dati_pmode_list).darr_init((this-> digit_dati_pcount), 1);
 
-    (this-> digit_dati_pid_list).darr_init((this-> digit_dati_pcount), 1);
-
-    for (int unsigned(x ) = 0; x != (this-> digit_dati_pcount); x ++)
-        (this-> dati_pid_sstate_list).set_darr_ilayer(&temp, 0, x);
-
-    (this-> dato_pid_sstate_list).darr_init((this-> digit_dato_pcount), 1);
-    (this-> dato_pstate_list).darr_init((this-> digit_dato_pcount), 1);
-    (this-> dato_pmode_list).darr_init((this-> digit_dato_pcount), 1);
-
-    (this-> digit_dato_pid_list).darr_init((this-> digit_dato_pcount), 1);
-
-    for (int unsigned(x ) = 0; x != (this-> digit_dato_pcount); x ++)
-        (this-> dato_pid_sstate_list).set_darr_ilayer(&temp, 0, x);
+    (this-> digit_dati_pcount).darr_init(1, __interface_count);
+    (this-> digit_dato_pcount).darr_init(1, __interface_count);
+    for(int unsigned x = 0; x != __interface_count; x ++)
+    {
+        int unsigned c = 2;
+        (this-> digit_dati_pcount).set_darr_ilayer(&c, x, 0);
+        (this-> digit_dato_pcount).set_darr_ilayer(&c, x, 0);
     }
+
+    (this-> digit_mio_clock_pid).darr_init(1, __interface_count);
+    (this-> digit_dati_clock_pid).darr_init(1, __interface_count);
+    (this-> digit_dato_clock_pid).darr_init(1, __interface_count);
+    (this-> digit_dati_latch_pid).darr_init(1, __interface_count);
+    (this-> digit_dato_latch_pid).darr_init(1, __interface_count);
+
+    (this-> mio_clock_pid_sstate).darr_init(1, __interface_count);
+    (this-> dati_clock_pid_sstate).darr_init(1, __interface_count);
+    (this-> dato_clock_pid_sstate).darr_init(1, __interface_count);
+    (this-> dati_latch_pid_sstate).darr_init(1, __interface_count);
+    (this-> dato_latch_pid_sstate).darr_init(1, __interface_count);
+
+    for (int unsigned(y ) = 0; y != __interface_count; y ++)
+    {
+        (this-> dati_pid_sstate_list).darr_init(*(this-> digit_dati_pcount).get_darr_ilayer(y, 0), __interface_count);
+        (this-> dati_pstate_list).darr_init(*(this-> digit_dati_pcount).get_darr_ilayer(y, 0), __interface_count);
+        (this-> dati_pmode_list).darr_init(*(this-> digit_dati_pcount).get_darr_ilayer(y, 0), __interface_count);
+
+        (this-> digit_dati_pid_list).darr_init(*(this-> digit_dati_pcount).get_darr_ilayer(y, 0), __interface_count);
+    }
+
+    for (int unsigned(y ) = 0; y != __interface_count; y ++)
+        for (int unsigned(x ) = 0; x != *(this-> digit_dati_pcount).get_darr_ilayer(y, 0); x ++)
+            (this-> dati_pid_sstate_list).set_darr_ilayer(&temp, y, x);
+
+    for (int unsigned(y ) = 0; y != __interface_count; y ++)
+    {
+        (this-> dato_pid_sstate_list).darr_init(*(this-> digit_dato_pcount).get_darr_ilayer(y, 0), __interface_count);
+        (this-> dato_pstate_list).darr_init(*(this-> digit_dato_pcount).get_darr_ilayer(y, 0), __interface_count);
+        (this-> dato_pmode_list).darr_init(*(this-> digit_dato_pcount).get_darr_ilayer(y, 0), __interface_count);
+
+        (this-> digit_dato_pid_list).darr_init(*(this-> digit_dato_pcount).get_darr_ilayer(y, 0), __interface_count);
+    }
+
+    for (int unsigned(y ) = 0; y != __interface_count; y ++)
+        for (int unsigned(x ) = 0; x != *(this-> digit_dato_pcount).get_darr_ilayer(y, 0); x ++)
+            (this-> dato_pid_sstate_list).set_darr_ilayer(&temp, y, x);
+
+}
 
 bool
 (pin_manager::is_pid_irange (uint8_t(__digit_pid ) ) )
@@ -111,179 +144,179 @@ int unsigned
 }
 
 void
-(pin_manager::set_mio_clock_pid (uint8_t(__digit_pid ) ) )
+(pin_manager::set_mio_clock_pid (uint8_t(__digit_pid ), int unsigned(__interface_id) ) )
 {
     if (!(this-> is_pid_irange (__digit_pid) ) ) return;
 
-    (this-> set_mio_clock_pid_sstate (true) );
+    (this-> set_mio_clock_pid_sstate (true, __interface_id) );
 
-    (this-> digit_mio_clock_pid ) = __digit_pid;
+    (this-> digit_mio_clock_pid ).set_darr_ilayer(&__digit_pid, __interface_id, 0);
 }
 void
-(pin_manager::set_dati_clock_pid (uint8_t(__digit_pid ) ) )
+(pin_manager::set_dati_clock_pid (uint8_t(__digit_pid ), int unsigned(__interface_id) ) )
 {
     if (!(this-> is_pid_irange (__digit_pid) ) ) return;
 
-    (this-> set_dati_clock_pid_sstate (true) );
+    (this-> set_dati_clock_pid_sstate (true, __interface_id) );
 
-    (this-> digit_dati_clock_pid ) = __digit_pid;
+    (this-> digit_dati_clock_pid ).set_darr_ilayer(&__digit_pid, __interface_id, 0);
 }
 void
-(pin_manager::set_dato_clock_pid (uint8_t(__digit_pid ) ) )
+(pin_manager::set_dato_clock_pid (uint8_t(__digit_pid ), int unsigned(__interface_id) ) )
 {
     if (!(this-> is_pid_irange (__digit_pid) ) ) return;
 
-    (this-> set_dato_clock_pid_sstate (true) );
+    (this-> set_dato_clock_pid_sstate (true, __interface_id) );
 
-    (this-> digit_dato_clock_pid ) = __digit_pid;
+    (this-> digit_dato_clock_pid ).set_darr_ilayer(&__digit_pid, __interface_id, 0);
 }
 void
-(pin_manager::set_dati_latch_pid (uint8_t(__digit_pid ) ) )
+(pin_manager::set_dati_latch_pid (uint8_t(__digit_pid ), int unsigned(__interface_id) ) )
 {
     if (!(this-> is_pid_irange (__digit_pid) ) ) return;
 
-    (this-> set_dati_latch_pid_sstate (true) );
+    (this-> set_dati_latch_pid_sstate (true, __interface_id) );
 
-    (this-> digit_dati_latch_pid ) = __digit_pid;
+    (this-> digit_dati_latch_pid ).set_darr_ilayer(&__digit_pid, __interface_id, 0);
 }
 void
-(pin_manager::set_dato_latch_pid (uint8_t(__digit_pid ) ) )
+(pin_manager::set_dato_latch_pid (uint8_t(__digit_pid ), int unsigned(__interface_id) ) )
 {
     if (!(this-> is_pid_irange (__digit_pid) ) ) return;
 
-    (this-> set_dato_latch_pid_sstate (true) );
+    (this-> set_dato_latch_pid_sstate (true, __interface_id) );
 
-    (this-> digit_dato_latch_pid ) = __digit_pid;
+    (this-> digit_dato_latch_pid ).set_darr_ilayer(&__digit_pid, __interface_id, 0);
 }
 
 uint8_t
-(pin_manager::get_mio_clock_pid( ) )
+(pin_manager::get_mio_clock_pid(int unsigned(__interface_id) ) )
 {
-    return ( (this-> digit_mio_clock_pid) );
+    return (* (this-> digit_mio_clock_pid).get_darr_ilayer(__interface_id, 0) );
 }
 uint8_t
-(pin_manager::get_dati_clock_pid( ) )
+(pin_manager::get_dati_clock_pid(int unsigned(__interface_id) ) )
 {
-    return ( (this-> digit_dati_clock_pid) );
+    return (* (this-> digit_dati_clock_pid).get_darr_ilayer(__interface_id, 0) );
 }
 uint8_t
-(pin_manager::get_dato_clock_pid( ) )
+(pin_manager::get_dato_clock_pid(int unsigned(__interface_id) ) )
 {
-    return ( (this-> digit_dato_clock_pid) );
+    return (* (this-> digit_dato_clock_pid).get_darr_ilayer(__interface_id, 0) );
 }
 uint8_t
-(pin_manager::get_dati_latch_pid( ) )
+(pin_manager::get_dati_latch_pid(int unsigned(__interface_id) ) )
 {
-    return ( (this-> digit_dati_latch_pid) );
+    return (* (this-> digit_dati_latch_pid).get_darr_ilayer(__interface_id, 0) );
 }
 uint8_t
-(pin_manager::get_dato_latch_pid( ) )
+(pin_manager::get_dato_latch_pid(int unsigned(__interface_id) ) )
 {
-    return ( (this-> digit_dato_latch_pid) );
+    return (* (this-> digit_dato_latch_pid).get_darr_ilayer(__interface_id, 0) );
 }
 
 void
-(pin_manager::uset_mio_clock_pid( ) )
+(pin_manager::uset_mio_clock_pid(int unsigned(__interface_id ) ) )
 {
-    (this-> set_mio_clock_pid_sstate (false) );
+    (this-> set_mio_clock_pid_sstate (false, __interface_id) );
 }
 void
-(pin_manager::uset_dati_clock_pid( ) )
+(pin_manager::uset_dati_clock_pid(int unsigned(__interface_id ) ) )
 {
-    (this-> set_dati_clock_pid_sstate (false) );
+    (this-> set_dati_clock_pid_sstate (false, __interface_id) );
 }
 void
-(pin_manager::uset_dato_clock_pid( ) )
+(pin_manager::uset_dato_clock_pid(int unsigned(__interface_id ) ) )
 {
-    (this-> set_dato_clock_pid_sstate (false) );
+    (this-> set_dato_clock_pid_sstate (false, __interface_id) );
 }
 void
-(pin_manager::uset_dati_latch_pid( ) )
+(pin_manager::uset_dati_latch_pid(int unsigned(__interface_id ) ) )
 {
-    (this-> set_dati_latch_pid_sstate (false) );
+    (this-> set_dati_latch_pid_sstate (false, __interface_id) );
 }
 void
-(pin_manager::uset_dato_latch_pid( ) )
+(pin_manager::uset_dato_latch_pid(int unsigned(__interface_id ) ) )
 {
-    (this-> set_dato_latch_pid_sstate (false) );
+    (this-> set_dato_latch_pid_sstate (false, __interface_id) );
 }
 
 void
-(pin_manager::set_mio_clock_pid_sstate (bool(__pid_sstate ) ) )
+(pin_manager::set_mio_clock_pid_sstate (bool(__pid_sstate ), int unsigned(__interface_id ) ) )
 {
-    (this-> mio_clock_pid_sstate ) = __pid_sstate;
+    (this-> mio_clock_pid_sstate ).set_darr_ilayer(&__pid_sstate, __interface_id, 0);
 }
 void
-(pin_manager::set_dati_clock_pid_sstate (bool(__pid_sstate ) ) )
+(pin_manager::set_dati_clock_pid_sstate (bool(__pid_sstate ), int unsigned(__interface_id ) ) )
 {
-    (this-> dati_clock_pid_sstate ) = __pid_sstate;
+    (this-> dati_clock_pid_sstate ).set_darr_ilayer(&__pid_sstate, __interface_id, 0);
 }
 void
-(pin_manager::set_dato_clock_pid_sstate (bool(__pid_sstate ) ) )
+(pin_manager::set_dato_clock_pid_sstate (bool(__pid_sstate ), int unsigned(__interface_id ) ) )
 {
-    (this-> dato_clock_pid_sstate ) = __pid_sstate;
+    (this-> dato_clock_pid_sstate ).set_darr_ilayer(&__pid_sstate, __interface_id, 0);
 }
 void
-(pin_manager::set_dati_latch_pid_sstate (bool(__pid_sstate ) ) )
+(pin_manager::set_dati_latch_pid_sstate (bool(__pid_sstate ), int unsigned(__interface_id ) ) )
 {
-    (this-> dati_latch_pid_sstate ) = __pid_sstate;
+    (this-> dati_latch_pid_sstate ).set_darr_ilayer(&__pid_sstate, __interface_id, 0);
 }
 void
-(pin_manager::set_dato_latch_pid_sstate (bool(__pid_sstate ) ) )
+(pin_manager::set_dato_latch_pid_sstate (bool(__pid_sstate ), int unsigned(__interface_id ) ) )
 {
-    (this-> dato_latch_pid_sstate ) = __pid_sstate;
+    (this-> dato_latch_pid_sstate ).set_darr_ilayer(&__pid_sstate, __interface_id, 0);
 }
 
 bool
-(pin_manager::get_mio_clock_pid_sstate( ) )
+(pin_manager::get_mio_clock_pid_sstate(int unsigned(__interface_id ) ) )
 {
-    return ( (this-> mio_clock_pid_sstate) );
+    return (* (this-> mio_clock_pid_sstate).get_darr_ilayer(__interface_id, 0) );
 }
 bool
-(pin_manager::get_dati_clock_pid_sstate( ) )
+(pin_manager::get_dati_clock_pid_sstate(int unsigned(__interface_id ) ) )
 {
-    return ( (this-> dati_clock_pid_sstate) );
+    return (* (this-> dati_clock_pid_sstate).get_darr_ilayer(__interface_id, 0) );
 }
 bool
-(pin_manager::get_dato_clock_pid_sstate( ) )
+(pin_manager::get_dato_clock_pid_sstate(int unsigned(__interface_id ) ) )
 {
-    return ( (this-> dato_clock_pid_sstate) );
+    return (* (this-> dato_clock_pid_sstate).get_darr_ilayer(__interface_id, 0) );
 }
 bool
-(pin_manager::get_dati_latch_pid_sstate( ) )
+(pin_manager::get_dati_latch_pid_sstate(int unsigned(__interface_id ) ) )
 {
-    return ( (this-> dati_latch_pid_sstate) );
+    return (* (this-> dati_latch_pid_sstate).get_darr_ilayer(__interface_id, 0) );
 }
 bool
-(pin_manager::get_dato_latch_pid_sstate( ) )
+(pin_manager::get_dato_latch_pid_sstate(int unsigned(__interface_id ) ) )
 {
-    return ( (this-> dato_latch_pid_sstate) );
+    return (* (this-> dato_latch_pid_sstate).get_darr_ilayer(__interface_id, 0) );
 }
 
 bool
-(pin_manager::is_mio_clock_pid_sstate (bool(__pid_sstate ) ) )
+(pin_manager::is_mio_clock_pid_sstate (bool(__pid_sstate ), int unsigned(__interface_id ) ) )
 {
-    return ( (this-> get_mio_clock_pid_sstate( )) == __pid_sstate? true : false);
+    return ( (this-> get_mio_clock_pid_sstate(__interface_id )) == __pid_sstate? true : false);
 }
 bool
-(pin_manager::is_dati_clock_pid_sstate (bool(__pid_sstate ) ) )
+(pin_manager::is_dati_clock_pid_sstate (bool(__pid_sstate ), int unsigned(__interface_id ) ) )
 {
-    return ( (this-> get_dati_clock_pid_sstate( )) == __pid_sstate? true : false);
+    return ( (this-> get_dati_clock_pid_sstate(__interface_id )) == __pid_sstate? true : false);
 }
 bool
-(pin_manager::is_dato_clock_pid_sstate (bool(__pid_sstate ) ) )
+(pin_manager::is_dato_clock_pid_sstate (bool(__pid_sstate ), int unsigned(__interface_id ) ) )
 {
-    return ( (this-> get_dato_clock_pid_sstate( )) == __pid_sstate? true : false);
+    return ( (this-> get_dato_clock_pid_sstate(__interface_id )) == __pid_sstate? true : false);
 }
 bool
-(pin_manager::is_dati_latch_pid_sstate (bool(__pid_sstate ) ) )
+(pin_manager::is_dati_latch_pid_sstate (bool(__pid_sstate ), int unsigned(__interface_id ) ) )
 {
-    return ( (this-> get_dati_latch_pid_sstate( )) == __pid_sstate? true : false);
+    return ( (this-> get_dati_latch_pid_sstate(__interface_id )) == __pid_sstate? true : false);
 }
 bool
-(pin_manager::is_dato_latch_pid_sstate (bool(__pid_sstate ) ) )
+(pin_manager::is_dato_latch_pid_sstate (bool(__pid_sstate ), int unsigned(__interface_id ) ) )
 {
-    return ( (this-> get_dato_latch_pid_sstate( )) == __pid_sstate? true : false);
+    return ( (this-> get_dato_latch_pid_sstate(__interface_id )) == __pid_sstate? true : false);
 }
 
 void

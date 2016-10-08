@@ -5,11 +5,11 @@
 # include "dynamic_array.hpp"
 
 
-/*
-what am i doing hear / what is going hear?
-
-this will hold function's for time so like a stop watch get the time and etc
-
+/* Created and Designed by MrDoomLittle
+* Github URL: https://github.com/mrdoomlittle
+* Email Addr: doctordoomlittle@gmail.com
+* For Current Infomation about This Project
+* See the File Called: ( INFOMATION )
 */
 
 namespace tmp { class time

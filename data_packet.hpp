@@ -2,8 +2,15 @@
 # define __data__packet__hpp__
 # include "tmp_config.hpp"
 # include "bitset.hpp"
-# include "bitset_array.hpp"
+# include "bitset_list.hpp"
 
+/* Created and Designed by MrDoomLittle
+* Github URL: https://github.com/mrdoomlittle
+* Email Addr: doctordoomlittle@gmail.com
+* For Current Infomation about This Project
+* See the File Called: ( INFOMATION )
+*/
+// still working on this
 namespace tmp { class data_packet
 {
     public :
@@ -18,7 +25,7 @@ namespace tmp { class data_packet
 
         void(set_dati_dpacket_size(int unsigned(__dpacket_size)))
         {
-            
+
 
             (this-> dati_dpacket_size) = __dpacket_size;
         }
@@ -48,12 +55,12 @@ namespace tmp { class data_packet
                 case(this-> __dato_bitset):
                     if ((this-> dati_dpheader_pos) == (this-> dpheader_dato_bitsetc))
                         (this-> dato_dpheader_pos) = 0;
-                    
+
                     (this-> dato_dpheader).set_bitset(__bitset, 1, 0, (this-> dato_dpheader_pos));
 
                     (this-> dato_dpheader_pos) ++;
                     break;
-            } 
+            }
         }
 
         void(add_bitset_to_dpacket(int unsigned(__bitset_t), uint8_t(* __bitset)))
@@ -100,30 +107,30 @@ namespace tmp { class data_packet
                     return(this-> dati_dpacket_pos);
                 case(this-> __dato_dpheader_pos):
                     return(this-> dato_dpheader_pos);
-                case(this-> __dato_dpacket_pos):    
+                case(this-> __dato_dpacket_pos):
                     return(this-> dato_dpacket_pos);
-                defualt : return 0;
+                default : return 0;
             }
         }
 
-        bitset_array <uint8_t>(* get_dpheader_ptr(int unsigned(__dat_type)))
+        bitset_list <uint8_t>(* get_dpheader_ptr(int unsigned(__dat_type)))
         {
             switch(__dat_type)
             {
                 case 0: return(&(this-> dati_dpheader));
                 case 1: return(&(this-> dato_dpheader));
-                
+
                 default : return nullptr;
             }
         }
-        
-        bitset_array <uint8_t>(* get_dpacket_ptr(int unsigned(__dat_type)))
+
+        bitset_list <uint8_t>(* get_dpacket_ptr(int unsigned(__dat_type)))
         {
             switch(__dat_type)
             {
                 case 0: return(&(this-> dati_dpacket));
                 case 1: return(&(this-> dato_dpacket));
-    
+
                 default : return nullptr;
             }
         }
@@ -148,7 +155,7 @@ namespace tmp { class data_packet
             __dato_dpheader_pos,
             __dato_dpacket_pos
         };
-  
+
         int unsigned(dpacket_header_size) = (tmp_config::dpacket_header_size);
         int unsigned(dpheader_dati_bitsetc) = ((tmp_config::dpacket_header_size) / (tmp_config::def_dati_bitset_length));
         int unsigned(dpheader_dato_bitsetc) = ((tmp_config::dpacket_header_size) / (tmp_config::def_dato_bitset_length));
@@ -156,14 +163,14 @@ namespace tmp { class data_packet
         int unsigned(dato_dpacket_size) = 0;
         int unsigned(dati_dpheader_pos) = 0;
         int unsigned(dati_dpacket_pos) = 0;
-        
+
         int unsigned(dato_dpheader_pos) = 0;
         int unsigned(dato_dpacket_pos) = 0;
-        bitset_array <uint8_t> dati_dpheader;
-        bitset_array <uint8_t> dati_dpacket; 
-        
-        bitset_array <uint8_t> dato_dpheader;
-        bitset_array <uint8_t> dato_dpacket; 
+        bitset_list <uint8_t> dati_dpheader;
+        bitset_list <uint8_t> dati_dpacket;
+
+        bitset_list <uint8_t> dato_dpheader;
+        bitset_list <uint8_t> dato_dpacket;
 
 } ; }
 

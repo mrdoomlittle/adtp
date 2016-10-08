@@ -3,3 +3,7 @@ and also need to clean and remain things + ... lots of other things.
 
 move the enums like bitset io type or etc to config.
 
+cleaned up bitset_list.
+need to fix cint_convert
+
+need to update pin_manager to support multiple interfaces

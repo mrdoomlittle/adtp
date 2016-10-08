@@ -1,9 +1,11 @@
 # ifndef __io__service__hpp__
 # define __io__service__hpp__
 
-/* Created and Designed by mrdoomlittle
-* Github: https://github.com/mrdoomlittle
-* Email: doctordoomlittle@gmail.com
+/* Created and Designed by MrDoomLittle
+* Github URL: https://github.com/mrdoomlittle
+* Email Addr: doctordoomlittle@gmail.com
+* For Current Infomation about This Project
+* See the File Called: ( INFOMATION )
 */
 
 # include "tmp_config.hpp"
@@ -13,13 +15,14 @@
 # include "bitset.hpp"
 # include "data_packet.hpp"
 # include "shift_reg.hpp"
-# include "port_manager.hpp"
 # include "time.hpp"
-
+# include "interface.hpp"
 /* example: if the start state is 0x0 then the clock will start ticking when changes to 0x1
 */
 namespace tmp { class io_service
 {
+    private :
+        int unsigned(amount_of_interfaces) = 2;
     protected :
         typedef time time_ct;
         time_ct
@@ -33,10 +36,6 @@ namespace tmp { class io_service
         sregister_ct
             (* sregister_cinst_ptr ) = nullptr;
 
-        typedef port_manager port_manager_ct;
-        port_manager_ct
-            (* port_manager_cint_ptr ) = nullptr;
- 
         pmanager_ct
         (* get_pmanager_cinst_ptr());
         sregister_ct
@@ -53,15 +52,15 @@ namespace tmp { class io_service
         bool(has_sregister_cinst_init ) = false;
 
     private :
-        int unsigned(digit_i_pin_count ) = 
-            (tmp_config::def_digit_i_pin_count);
-        int unsigned(digit_o_pin_count ) = 
-            (tmp_config::def_digit_o_pin_count);
+        int unsigned(digit_i_pin_count ) =
+            (tmp_config::def_digit_dati_pcount);
+        int unsigned(digit_o_pin_count ) =
+            (tmp_config::def_digit_dato_pcount);
 
         int unsigned(clock_sstate_ignore ) = 0x0;
 
-        int unsigned(dati_bitset_length ) = 0;
-        int unsigned(dato_bitset_length ) = 0;
+        dynamic_array <int unsigned> (dati_bitset_length);
+        dynamic_array <int unsigned> (dato_bitset_length);
 
         int unsigned(ibyte_read_holdup ) = 0;
         int unsigned(obyte_write_holdup ) = 0;
@@ -172,16 +171,16 @@ namespace tmp { class io_service
         typedef uint8_t __bitset_type;
 
         void
-        (set_io_bitset (int unsigned(__bitset_id), __bitset_type(* __io_bitset), int unsigned(__set_type), int unsigned(__ibitset_arr_pos)));
+        (set_io_bitset (int unsigned(__interface_id), int unsigned(__bitset_id), __bitset_type(* __io_bitset), int unsigned(__set_type), int unsigned(__ibitset_arr_pos)));
 
         __bitset_type
-        (* get_io_bitset (int unsigned(__bitset_id), int unsigned(__get_type), int unsigned(__ibitset_arr_pos)));
+        (* get_io_bitset (int unsigned(__interface_id), int unsigned(__bitset_id), int unsigned(__get_type), int unsigned(__ibitset_arr_pos)));
 
         void
-        (shift_io_bitset (int unsigned(__bitset_id), int unsigned(__shift_direction), int unsigned(__shift_amount)));
+        (shift_io_bitset (int unsigned(__interface_id), int unsigned(__bitset_id), int unsigned(__shift_direction), int unsigned(__shift_amount)));
 
         void
-        (flip_io_bitset (int unsigned(__bitset_id)));
+        (flip_io_bitset (int unsigned(__interface_id), int unsigned(__bitset_id)));
 
     private :
         void
@@ -195,23 +194,28 @@ namespace tmp { class io_service
         (* get_o_bitset (int unsigned(__get_type), int unsigned(__bitset_arr_pos)));
 
         bitset <__bitset_type> (* digit_io_bitset ) = new bitset <__bitset_type> [2];
+        bitset_list <__bitset_type> (* digit_datio_bitset) = new bitset_list <__bitset_type>[2];
 
         uint8_t
-        (* digit_dati_bitset ) = new uint8_t [dati_bitset_length];
+        (* digit_dati_bitset ) = new uint8_t [/*dati_bitset_length*/8];
         uint8_t
-        (* digit_dato_bitset ) = new uint8_t [dato_bitset_length];
+        (* digit_dato_bitset ) = new uint8_t [/*dati_bitset_length*/8];
 
         bool
-        (* i_bitset_finished ) = new bool [(dati_bitset_length / digit_i_pin_count)];
+        (* i_bitset_finished ) = new bool [(/*dati_bitset_length*/8 / digit_i_pin_count)];
         bool
-        (* o_bitset_finished ) = new bool [(dato_bitset_length / digit_o_pin_count)];
+        (* o_bitset_finished ) = new bool [(/*dati_bitset_length*/8 / digit_o_pin_count)];
 
         int unsigned(i_bitset_fcount ) = 0;
         int unsigned(o_bitset_fcount ) = 0;
 
     public :
         dynamic_buffer <uint8_t> (i_bitset_buffer);
+        dynamic_buffer <uint8_t> (dati_bitset_buff); // this is the newly named one
+
+
         dynamic_buffer <uint8_t> (o_bitset_buffer);
+        dynamic_buffer <uint8_t> (dato_bitset_buff); // this is the newly named one
 
         int unsigned(i_bitset_buff_pos [2]) = {0, 0};
         int unsigned(o_bitset_buff_pos [2]) = {0, 0};
@@ -279,7 +283,7 @@ namespace tmp { class io_service
         bool
         (is_clock_reading (bool(__is_type ) ) );
         bool
-        (is_external_clock (bool(__is_type ) ) );
+        (is_external_clock (bool(__is_type ), int unsigned(__interface_id) = 0 ) );
 
         void
         (toggle_mloop_state( ) );

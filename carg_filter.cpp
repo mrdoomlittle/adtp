@@ -1,6 +1,15 @@
-/*this code is from another one of my projects i will get this working the next day*/
 # include "carg_filter.hpp"
-namespace tmp 
+
+/* Created and Designed by MrDoomLittle
+* Github URL: https://github.com/mrdoomlittle
+* Email Addr: doctordoomlittle@gmail.com
+* For Current Infomation about This Project
+* See the File Called: ( INFOMATION )
+*/
+
+// this need cleaning up, because its from another project
+
+namespace tmp
 {
 char const (* * carg_filter::filter_list_in (char const (* _char_list_in ),
     char const (* _separator_char ), size_t (_char_list_length ) ) )

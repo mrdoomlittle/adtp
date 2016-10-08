@@ -2,12 +2,18 @@
 # define __dpacket__array__hpp__
 # include "data_packet.hpp"
 
+/* Created and Designed by MrDoomLittle
+* Github URL: https://github.com/mrdoomlittle
+* Email Addr: doctordoomlittle@gmail.com
+* For Current Infomation about This Project
+* See the File Called: ( INFOMATION )
+*/
 
 // need to work on this more and test it as i speed coded it
 // so there might be alot of problems + might need to fix
 // the add_packet func as i dont know if it works i was going
 // to delete it and reinit it with the data from the other
-// but i will test it later 
+// but i will test it later
 // this requires cleaning up and renaming vars
 namespace tmp { class dpacket_array
 {
@@ -17,7 +23,7 @@ namespace tmp { class dpacket_array
             (this-> array_size) = __array_size;
 
             if (__array_size != 0)
-                (this-> dpacket[(this-> __main)]) = new data_packet [__array_size]; 
+                (this-> dpacket[(this-> __main)]) = new data_packet [__array_size];
         }
 
         void (add_dpacket())
@@ -28,7 +34,7 @@ namespace tmp { class dpacket_array
 
                 (this-> array_size) ++;
             }
-    
+
             if ((this-> array_size) != 0)
             {
                 (this-> dpacket[(this-> __swap)]) = new data_packet [this-> array_size+1];
@@ -36,7 +42,7 @@ namespace tmp { class dpacket_array
                 for(int unsigned(x) = 0; x != (this-> array_size); x ++)
                 {
                     (this-> dpacket[(this-> __swap)][x]) = (this-> dpacket[(this-> __main)][x]);
-                    //(this-> dpacket[(this-> __main)][x]) = nullptr; // this is only hear as i dont know if delete [] will deinitlize the classes inside            
+                    //(this-> dpacket[(this-> __main)][x]) = nullptr; // this is only hear as i dont know if delete [] will deinitlize the classes inside
                 }
 
                 delete[] (this-> dpacket[(this-> __main)]);
@@ -46,7 +52,7 @@ namespace tmp { class dpacket_array
                 for(int unsigned(x) = 0; x != (this-> array_size); x ++)
                 {
                     (this-> dpacket[(this-> __main)][x]) = (this-> dpacket[(this-> __swap)][x]);
-                
+
                     //(this-> dpacket[(this-> __swap)][x]) = nullptr;
                 }
 
@@ -64,7 +70,7 @@ namespace tmp { class dpacket_array
         data_packet (* get_dpacket_ptr(int unsigned(__arr_pos)))
         {
             return (&(this-> dpacket[(this-> __main)][__arr_pos]));
-        } 
+        }
 
     private :
 

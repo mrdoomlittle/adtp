@@ -14,9 +14,17 @@
     still working on this
 */
 
+/* Created and Designed by MrDoomLittle
+* Github URL: https://github.com/mrdoomlittle
+* Email Addr: doctordoomlittle@gmail.com
+* For Current Infomation about This Project
+* See the File Called: ( INFOMATION )
+*/
 
-// this might me extreamly inefficient but i dont know how else to do it and only other way i could think of was to use bitwise 
-// this will stay like this for now and i might fix it later
+// it is so i can convert a char list to a int
+
+// this might be extreamly inefficient but i dont know how else to do it and only other way i could think of was to use bitwise.
+// this will stay like this for now and i might fix it later + needs cleaning up
 namespace tmp { template <typename __int_type> __int_type(get_num_unit(const char __char, int unsigned(__pos), int unsigned(__char_length)))
 {
     int unsigned ltcount = 0;
@@ -60,7 +68,7 @@ template <typename __int_type> __int_type(convert_to_int(const char * __char_con
                 __output_intdata += (get_num_unit<__int_type>(__char_contains[x], x, __char_length) * 1);
                 break;
             case _2as_char:
-                __output_intdata += (get_num_unit<__int_type>(__char_contains[x], x, __char_length) * 2);   
+                __output_intdata += (get_num_unit<__int_type>(__char_contains[x], x, __char_length) * 2);
                 break;
             case _3as_char:
                 __output_intdata += (get_num_unit<__int_type>(__char_contains[x], x, __char_length) * 3);
@@ -74,7 +82,7 @@ template <typename __int_type> __int_type(convert_to_int(const char * __char_con
             case _6as_char:
                 __output_intdata += (get_num_unit<__int_type>(__char_contains[x], x, __char_length) * 6);
                 break;
-            case _7as_char: 
+            case _7as_char:
                 __output_intdata += (get_num_unit<__int_type>(__char_contains[x], x, __char_length) * 7);
                 break;
             case _8as_char:
