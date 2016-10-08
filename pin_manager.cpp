@@ -421,71 +421,71 @@ int
 }
 
 void
-(pin_manager::set_dati_pid(uint8_t(__digit_pid), int unsigned(__dati_pid_pos)))
+(pin_manager::set_dati_pid(uint8_t(__digit_pid), int unsigned(__dati_pid_pos), int unsigned(__interface_id ) ) )
 {
-    (this-> set_dati_pid_sstate(true, __dati_pid_pos));
+    (this-> set_dati_pid_sstate(true, __dati_pid_pos, __interface_id));
 
-    (this-> digit_dati_pid_list).set_darr_ilayer(&__digit_pid, 0, __dati_pid_pos);
+    (this-> digit_dati_pid_list).set_darr_ilayer(&__digit_pid, __interface_id, __dati_pid_pos);
 }
 void
-(pin_manager::set_dato_pid(uint8_t(__digit_pid), int unsigned(__dato_pid_pos)))
+(pin_manager::set_dato_pid(uint8_t(__digit_pid), int unsigned(__dato_pid_pos), int unsigned(__interface_id ) ) )
 {
-    (this-> set_dato_pid_sstate(true, __dato_pid_pos));
+    (this-> set_dato_pid_sstate(true, __dato_pid_pos, __interface_id));
 
-    (this-> digit_dato_pid_list).set_darr_ilayer(&__digit_pid, 0, __dato_pid_pos);
+    (this-> digit_dato_pid_list).set_darr_ilayer(&__digit_pid, __interface_id, __dato_pid_pos);
 }
 
 uint8_t
-(pin_manager::get_dati_pid(int unsigned(__dati_pid_pos)))
+(pin_manager::get_dati_pid(int unsigned(__dati_pid_pos), int unsigned(__interface_id)))
 {
-    return (*(this-> digit_dati_pid_list).get_darr_ilayer(0, __dati_pid_pos));
+    return (*(this-> digit_dati_pid_list).get_darr_ilayer(__interface_id, __dati_pid_pos));
 }
 uint8_t
-(pin_manager::get_dato_pid(int unsigned(__dato_pid_pos)))
+(pin_manager::get_dato_pid(int unsigned(__dato_pid_pos), int unsigned(__interface_id)))
 {
-    return (*(this-> digit_dato_pid_list).get_darr_ilayer(0, __dato_pid_pos));
+    return (*(this-> digit_dato_pid_list).get_darr_ilayer(__interface_id, __dato_pid_pos));
 }
 
 void
-(pin_manager::uset_dati_pid(int unsigned(__dati_pid_pos)))
+(pin_manager::uset_dati_pid(int unsigned(__dati_pid_pos), int unsigned(__interface_id)))
 {
-    (this-> set_dati_pid_sstate(false, __dati_pid_pos));
+    (this-> set_dati_pid_sstate(false, __dati_pid_pos, __interface_id));
 }
 void
-(pin_manager::uset_dato_pid(int unsigned(__dato_pid_pos)))
+(pin_manager::uset_dato_pid(int unsigned(__dato_pid_pos), int unsigned(__interface_id)))
 {
-    (this-> set_dato_pid_sstate(false, __dato_pid_pos));
+    (this-> set_dato_pid_sstate(false, __dato_pid_pos, __interface_id));
 }
 
 void
-(pin_manager::set_dati_pid_sstate(bool(__pid_sstate ), int unsigned(__dati_pid_pos)))
+(pin_manager::set_dati_pid_sstate(bool(__pid_sstate ), int unsigned(__dati_pid_pos), int unsigned(__interface_id)))
 {
-    (this-> dati_pid_sstate_list).set_darr_ilayer(&__pid_sstate, 0, __dati_pid_pos);
+    (this-> dati_pid_sstate_list).set_darr_ilayer(&__pid_sstate, __interface_id, __dati_pid_pos);
 }
 void
-(pin_manager::set_dato_pid_sstate(bool(__pid_sstate ), int unsigned(__dato_pid_pos)))
+(pin_manager::set_dato_pid_sstate(bool(__pid_sstate ), int unsigned(__dato_pid_pos), int unsigned(__interface_id)))
 {
-    (this-> dato_pid_sstate_list).set_darr_ilayer(&__pid_sstate, 0, __dato_pid_pos);
+    (this-> dato_pid_sstate_list).set_darr_ilayer(&__pid_sstate, __interface_id, __dato_pid_pos);
 }
 
 bool
-(pin_manager::get_dati_pid_sstate(int unsigned(__dati_pid_pos)))
+(pin_manager::get_dati_pid_sstate(int unsigned(__dati_pid_pos), int unsigned(__interface_id)))
 {
-    return (*(this-> dati_pid_sstate_list).get_darr_ilayer(0, __dati_pid_pos));
+    return (*(this-> dati_pid_sstate_list).get_darr_ilayer(__interface_id, __dati_pid_pos));
 }
 bool
-(pin_manager::get_dato_pid_sstate(int unsigned(__dato_pid_pos)))
+(pin_manager::get_dato_pid_sstate(int unsigned(__dato_pid_pos), int unsigned(__interface_id)))
 {
-    return (*(this-> dato_pid_sstate_list).get_darr_ilayer(0, __dato_pid_pos));
+    return (*(this-> dato_pid_sstate_list).get_darr_ilayer(__interface_id, __dato_pid_pos));
 }
 
 bool
-(pin_manager::is_dati_pid_sstate(bool(__pid_sstate ) ,int unsigned(__dati_pid_pos)))
+(pin_manager::is_dati_pid_sstate(bool(__pid_sstate ) ,int unsigned(__dati_pid_pos), int unsigned(__interface_id)))
 {
-    return ( (this-> get_dati_pid_sstate(__dati_pid_pos)) == __pid_sstate? true : false);
+    return ( (this-> get_dati_pid_sstate(__dati_pid_pos, __interface_id)) == __pid_sstate? true : false);
 }
 bool
-(pin_manager::is_dato_pid_sstate(bool(__pid_sstate ), int unsigned(__dato_pid_pos)))
+(pin_manager::is_dato_pid_sstate(bool(__pid_sstate ), int unsigned(__dato_pid_pos), int unsigned(__interface_id)))
 {
-    return ( (this-> get_dato_pid_sstate(__dato_pid_pos)) == __pid_sstate? true : false);
+    return ( (this-> get_dato_pid_sstate(__dato_pid_pos, __interface_id)) == __pid_sstate? true : false);
 } }

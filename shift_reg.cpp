@@ -13,7 +13,7 @@ namespace tmp
 {
 void (shift_reg::set_pmanager_cinst_ptr(pmanager_ct(* __pmanager_cinst_ptr)))
 {
-    if ((is_pmanager_cinst_ptr_set) == true)return;
+    if ((is_pmanager_cinst_ptr_set) == true) return;
 
     (this-> pmanager_cinst_ptr) = __pmanager_cinst_ptr;
 
@@ -27,6 +27,7 @@ shift_reg::pmanager_ct (* shift_reg::get_pmanager_cinst_ptr())
 
 void(shift_reg::update_shift_reg_ipstates(int unsigned(__shift_reg_arr_pos)))
 {
+    // this need working on and needs to be tested
     for (int unsigned(x) = 0; x != *shift_reg_ipcount_l.get_darr_ilayer(__shift_reg_arr_pos, 0); x ++)
     {
         (this-> set_shift_reg_cpstate(__shift_reg_arr_pos, tmp_config::digit_pin_high_state));
@@ -58,37 +59,56 @@ int unsigned(* shift_reg::get_shift_reg_obitset(int unsigned(__shift_reg_arr_pos
     return((this-> shift_reg_obitset).get_bitset(1, 0, __shift_reg_arr_pos));
 }
 
-void(shift_reg::add_shift_register(int unsigned(__shift_reg_arr_pos), uint8_t(__shift_reg_opid), uint8_t(__shift_reg_lpid),
+void
+(shift_reg::add_shift_register(int unsigned(__register_io_t), uint8_t(__shift_reg_pid), uint8_t(__shift_reg_lpid),
     uint8_t(__shift_reg_cpid), uint8_t(__shift_reg_rpid), int unsigned(__shift_reg_ipcount)))
 {
-    // shift reg pin id list
-    shift_reg_pid_list.add_darr_layer();
+    if ((this-> is_pid_being_used(__shift_reg_pid)) == true) return;
+    if ((this-> is_pid_being_used(__shift_reg_lpid)) == true) return;
+    if ((this-> is_pid_being_used(__shift_reg_cpid)) == true) return;
+    if ((this-> is_pid_being_used(__shift_reg_rpid)) == true) return;
 
-    // shift reg pin count list
-    shift_reg_ipcount_l.add_darr_layer();
+    (this-> shift_reg_pid_list).add_darr_layer();
+    (this-> shift_reg_io_type).add_darr_layer();
+    (this-> shift_reg_ipcount_l).add_darr_layer();
 
-    shift_ref_ipstate_l.add_darr_layer();
+    uint8_t __shift_reg_pid_list[4] = {__shift_reg_pid, __shift_reg_lpid, __shift_reg_cpid, __shift_reg_rpid};
 
-    //shift_reg_obitset.bitset_init(8);
+    (this-> shift_reg_pid_list).set_darr_layer(shift_reg_pid_list, (this-> shift_reg_arr_pos));
+    (this-> shift_reg_io_type).set_darr_ilayer(&__register_io_t, (this-> shift_reg_arr_pos), 0);
+   // (this-> shift_reg_ipcount_l).set_darr_ilayer(&__shift_reg_ipcount, (this-> shift_reg_arr_pos), 0)
 
-    uint8_t(shift_reg_pid_list_tmp [4]) = {__shift_reg_opid, __shift_reg_lpid, __shift_reg_cpid, __shift_reg_rpid};
+    (this-> shift_reg_arr_pos) ++;
+}
 
-    /* eatch array layers = one pin and its data
-    */
+bool
+(shift_reg::is_pid_being_used(uint8_t(__digit_pid)))
+{
+    if ((this-> shift_reg_arr_pos) == 0) return(false);
 
-    shift_reg_pid_list.set_darr_layer(shift_reg_pid_list_tmp, __shift_reg_arr_pos);
+    for (int unsigned(y ) = 0; y != (this-> shift_reg_arr_pos); y ++)
+    {
+        for (int unsigned(x ) = 0; x != 4; x ++)
+        {
+            if (*(this-> shift_reg_pid_list).get_darr_ilayer(y, x) == __digit_pid) return(true);    
+        }
+    }    
 
-    shift_reg_ipcount_l.set_darr_ilayer(&__shift_reg_ipcount, __shift_reg_arr_pos, 0);
-
-    (this-> shift_reg_obitset).add_bitset();
+    return(false);
 }
 
 shift_reg::shift_reg()
 {
-    (this-> shift_reg_pid_list).darr_init ((this-> max_amount_of_sreg), 0);
+
+    (this-> shift_reg_pid_list).darr_init (4, 0);
+
+    (this-> shift_reg_ibitset).bitset_init(8, 0);
+    (this-> shift_reg_obitset).bitset_init(8, 0);
+
+    (this-> shift_reg_io_type).darr_init(1, 0);
+
     (this-> shift_reg_ipcount_l).darr_init(1, 0);
     (this-> shift_ref_ipstate_l).darr_init (8, 0);
-    shift_reg_obitset.bitset_init(8, 0);
 }
 
 shift_reg::~shift_reg()

@@ -292,9 +292,21 @@ int
         tcount ++;
     }
 */
-    tmp::port_manager pm;
-    pm.add_port_num(8080, true, 21);
-    std::cout << "PORT_NUM: " << pm.get_port_num(0) << ", IFACE_ID: " << pm.get_port_iface_id(pm.get_port_num(0)) << std::endl;
+    //tmp::port_manager pm;
+    //pm.add_port_num(8080, true, 21);
+    //std::cout << "PORT_NUM: " << pm.get_port_num(0) << ", IFACE_ID: " << pm.get_port_iface_id(pm.get_port_num(0)) << std::endl;
+
+    tmp::pin_manager pmanager(2);
+
+
+
+    tmp::shift_reg sreg;
+    sreg.set_pmanager_cinst_ptr(&pmanager);
+
+    sreg.add_shift_register(0, 2, 3, 4, 5, 8);
+
+
+
 /*
 tmp::io_service io;
 

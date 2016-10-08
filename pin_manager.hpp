@@ -9,14 +9,8 @@
 */
 
 # include "tmp_config.hpp"
+
 # include "dynamic_array.hpp"
-
-# ifndef ARDUINO
-    # include <boost/cstdint.hpp>
-# else
-    # include <stdint.h>
-# endif
-
 
 namespace tmp { class pin_manager
 {
@@ -210,34 +204,34 @@ namespace tmp { class pin_manager
         (get_dato_latch_pmode(int unsigned(__interface_id ) ) );
 
         void
-        (set_dati_pid(uint8_t(__digit_pid), int unsigned(__dati_pid_pos)));
+        (set_dati_pid(uint8_t(__digit_pid), int unsigned(__dati_pid_pos), int unsigned(__interface_id ) ));
         void
-        (set_dato_pid(uint8_t(__digit_pid), int unsigned(__dato_pid_pos)));
+        (set_dato_pid(uint8_t(__digit_pid), int unsigned(__dato_pid_pos), int unsigned(__interface_id ) ));
 
         uint8_t
-        (get_dati_pid(int unsigned(__dati_pid_pos)));
+        (get_dati_pid(int unsigned(__dati_pid_pos), int unsigned(__interface_id)));
         uint8_t
-        (get_dato_pid(int unsigned(__dato_pid_pos)));
+        (get_dato_pid(int unsigned(__dato_pid_pos), int unsigned(__interface_id)));
 
         void
-        (uset_dati_pid(int unsigned(__dati_pid_pos)));
+        (uset_dati_pid(int unsigned(__dati_pid_pos), int unsigned(__interface_id ) ));
         void
-        (uset_dato_pid(int unsigned(__dato_pid_pos)));
+        (uset_dato_pid(int unsigned(__dato_pid_pos), int unsigned(__interface_id ) ));
 
         void
-        (set_dati_pid_sstate(bool(__pid_sstate ), int unsigned(__dati_pid_pos)));
+        (set_dati_pid_sstate(bool(__pid_sstate ), int unsigned(__dati_pid_pos), int unsigned(__interface_id)));
         void
-        (set_dato_pid_sstate(bool(__pid_sstate ), int unsigned(__dato_pid_pos)));
+        (set_dato_pid_sstate(bool(__pid_sstate ), int unsigned(__dato_pid_pos), int unsigned(__interface_id)));
 
         bool
-        (get_dati_pid_sstate(int unsigned(__dati_pid_pos)));
+        (get_dati_pid_sstate(int unsigned(__dati_pid_pos), int unsigned(__interface_id)));
         bool
-        (get_dato_pid_sstate(int unsigned(__dato_pid_pos)));
+        (get_dato_pid_sstate(int unsigned(__dato_pid_pos), int unsigned(__interface_id)));
 
         bool
-        (is_dati_pid_sstate(bool(__pid_sstate ) ,int unsigned(__dati_pid_pos)));
+        (is_dati_pid_sstate(bool(__pid_sstate ) ,int unsigned(__dati_pid_pos), int unsigned(__interface_id)));
         bool
-        (is_dato_pid_sstate(bool(__pid_sstate ), int unsigned(__dato_pid_pos)));
+        (is_dato_pid_sstate(bool(__pid_sstate ), int unsigned(__dato_pid_pos), int unsigned(__interface_id)));
 
         int unsigned
         (get_dati_pcount (int unsigned(__interface_id) ) )
@@ -248,6 +242,20 @@ namespace tmp { class pin_manager
         (get_dato_pcount (int unsigned(__interface_id) ) )
         {
             return(* (this-> digit_dato_pcount).get_darr_ilayer(__interface_id, 0));
+        }
+
+        bool(does_dati_pid_exist(uint8_t(__digit_pid), int unsigned(__interface_id)))
+        {
+            for (int unsigned(x ) = 0; x != (this-> get_dati_pcount(__interface_id)); x ++)
+                if ((this-> get_dati_pid(x, __interface_id)) == __digit_pid) return (true);
+            return (false);
+        }
+
+        bool(does_dato_pid_exist(uint8_t(__digit_pid), int unsigned(__interface_id)))
+        {
+            for (int unsigned(x ) = 0; x != (this-> get_dato_pcount(__interface_id)); x ++)
+                if ((this-> get_dato_pid(x, __interface_id)) == __digit_pid) return (true);
+            return (false);
         }
 } ; }
 

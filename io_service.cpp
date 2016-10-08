@@ -107,10 +107,10 @@ void
     (this-> init_sregister_cinst( ) );
 
     for (int unsigned x = 0; x != (this-> get_pmanager_cinst_ptr( ) )-> get_dati_pcount( 0); x++)
-        (this-> get_pmanager_cinst_ptr( ) )-> set_dati_pid ( (tmp_config::def_digit_dati_pids [x]), x);
+        (this-> get_pmanager_cinst_ptr( ) )-> set_dati_pid ( (tmp_config::def_digit_dati_pids [x]), x, 0/*interface id*/);
 
     for (int unsigned x = 0; x != (this-> get_pmanager_cinst_ptr( ) )-> get_dato_pcount( 0); x++)
-        (this-> get_pmanager_cinst_ptr( ) )-> set_dato_pid ( (tmp_config::def_digit_dato_pids [x]), x);
+        (this-> get_pmanager_cinst_ptr( ) )-> set_dato_pid ( (tmp_config::def_digit_dato_pids [x]), x, 0/*interface id*/);
 
     (this-> get_pmanager_cinst_ptr( ) )->
         set_mio_clock_pid (tmp_config::def_digit_mio_clock_pid, 0);
@@ -170,11 +170,11 @@ void
 
     for (int unsigned(iface ) = 0; iface != INTERFACE_COUNT; iface ++)
         for (int unsigned(x ) = 0; x != (this-> get_pmanager_cinst_ptr( ) )-> get_dati_pcount(iface); x ++)
-            (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )-> get_dati_pid (x), tmp_config::digit_pin_input_mode) );
+            (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )-> get_dati_pid (x, 0/*interface id*/), tmp_config::digit_pin_input_mode) );
 
     for (int unsigned(iface ) = 0; iface != INTERFACE_COUNT; iface ++)
         for (int unsigned(x ) = 0; x != (this-> get_pmanager_cinst_ptr( ) )-> get_dato_pcount(iface); x ++)
-            (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )-> get_dato_pid (x), tmp_config::digit_pin_output_mode) );
+            (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )-> get_dato_pid (x, 0/*interface id*/), tmp_config::digit_pin_output_mode) );
 
     //for (int unsigned iface = 0; iface != INTERFACE_COUNT; iface ++)
     //{
@@ -410,7 +410,7 @@ for (int unsigned iface = 0; iface != INTERFACE_COUNT; iface ++) {
                 if ((this-> is_dati_clock_ppos) == true)
                 {
 
-                (this-> digit_i_buffer [(this-> digit_i_buffer_pos)] ) = (this-> get_digit_pstate ( ((this-> get_pmanager_cinst_ptr())-> get_dati_pid((this-> digit_i_buffer_pos))) ) );
+                (this-> digit_i_buffer [(this-> digit_i_buffer_pos)] ) = (this-> get_digit_pstate ( ((this-> get_pmanager_cinst_ptr())-> get_dati_pid((this-> digit_i_buffer_pos), 0/*interface id*/)) ) );
 
                 if ( (this-> get_iltick_count( ) ) == ( ( (((this-> get_pmanager_cinst_ptr())-> get_dati_pcount(0)) - 1) + ((this-> ibit_read_holdup) - 1) ) + (this-> ibp_pcount_multiplier) ) )
                 {
@@ -472,7 +472,7 @@ for (int unsigned iface = 0; iface != INTERFACE_COUNT; iface ++) {
                 }
 
                 (this-> set_digit_pstate (
-                    ((this-> get_pmanager_cinst_ptr())-> get_dato_pid((this-> digit_o_buffer_pos))),
+                    ((this-> get_pmanager_cinst_ptr())-> get_dato_pid((this-> digit_o_buffer_pos), 0/*interface id*/)),
                     (this-> digit_o_buffer [(this-> digit_o_buffer_pos )] )
                 ) );
 
@@ -618,22 +618,22 @@ void
     (this-> set_digit_pmode_fptr (__digit_pid, __digit_pmode ) );
 }
 void
-(io_service::set_digit_pstate (uint8_t(__digit_pid ), uint8_t(__digit_pstate ) ) )
+(io_service::set_digit_pstate (uint8_t(__digit_pid ), uint8_t(__digit_pstate ), int unsigned(__interface_id ) ) )
 {
     (this-> set_digit_pstate_fptr (__digit_pid, __digit_pstate ) );
 
-    if (__digit_pid == ((this-> get_pmanager_cinst_ptr())-> get_dato_clock_pid( 0) ))
-        ((this-> get_pmanager_cinst_ptr())-> update_dato_clock_pstate(__digit_pstate, 0/*iface id*/));
+    if (__digit_pid == ((this-> get_pmanager_cinst_ptr())-> get_dato_clock_pid(__interface_id) ))
+        ((this-> get_pmanager_cinst_ptr())-> update_dato_clock_pstate(__digit_pstate, __interface_id));
 
-    else if (__digit_pid == ((this-> get_pmanager_cinst_ptr())-> get_dato_latch_pid(0 ) ))
-        ((this-> get_pmanager_cinst_ptr())-> update_dato_latch_pstate(__digit_pstate, 0/*iface id*/));
-
+    else if (__digit_pid == ((this-> get_pmanager_cinst_ptr())-> get_dato_latch_pid(__interface_id) ))
+        ((this-> get_pmanager_cinst_ptr())-> update_dato_latch_pstate(__digit_pstate, __interface_id));
     else
     {
-        for (int unsigned(x ) = 0; x != ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount(0)); x ++)
+        for (int unsigned(x ) = 0; x != ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount(__interface_id)); x ++)
         {
-            if (__digit_pid == ((this-> get_pmanager_cinst_ptr())-> get_dati_pid (x) ) )
+            if (__digit_pid == ((this-> get_pmanager_cinst_ptr())-> get_dati_pid (x, __interface_id) ) )
             {
+
                 return;
             }
         }

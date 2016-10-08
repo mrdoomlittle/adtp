@@ -257,7 +257,7 @@ namespace tmp { class io_service
         void
         (set_digit_pmode (uint8_t(__digit_pid ), uint8_t(__digit_pmode ) ) );
         void
-        (set_digit_pstate (uint8_t(__digit_pid ), uint8_t(__digit_pstate ) ) );
+        (set_digit_pstate (uint8_t(__digit_pid ), uint8_t(__digit_pstate ), int unsigned(__interface_id ) = 0 ) );
         bool
         (get_digit_pstate (uint8_t(__digit_pid ) ));
 
