@@ -25,6 +25,7 @@
 */
 
 // REMINDER: after this is finished and cleaned up put code into .cpp file
+// need interface update
 
 namespace tmp { class port_manager
 {
@@ -35,23 +36,27 @@ namespace tmp { class port_manager
             (this-> port_num_list).darr_init(1, 0);
             (this-> port_ibitset).bitset_init((tmp_config::def_dati_bitset_length), 0);
             (this-> port_obitset).bitset_init((tmp_config::def_dato_bitset_length), 0);
+            (this-> port_iface_id).darr_init(1, 0);
 
             (this-> dpackets).init_dpacket_array(0);
         }
 
         void
-        (add_port_num(int unsigned(__port_number), bool(__set_port_num)))
+        (add_port_num(int unsigned(__port_number), bool(__setup_port_num), int unsigned(__interface_id)))
         {
             if ((this-> dose_port_num_exist(__port_number)) == true) return;
 
             (this-> port_num_list).add_darr_layer();
             (this-> port_ibitset).add_bitset();
             (this-> port_obitset).add_bitset();
+            (this-> port_iface_id).add_darr_layer();
+
             (this-> dpackets).add_dpacket();
 
-            if (__set_port_num == true)
+            if (__setup_port_num == true)
             {
                 (this-> set_port_num(__port_number, (this-> port_num_arr_set_pos)));
+                (this-> set_port_iface_id(__interface_id, __port_number));
                 (this-> port_num_arr_set_pos) ++;
             }
         }
@@ -116,6 +121,16 @@ namespace tmp { class port_manager
         void(set_port_dato_bitset())
         {
 
+        }
+
+        void(set_port_iface_id(int unsigned(__interface_id), int unsigned(__port_number)))
+        {
+            (this-> port_iface_id).set_darr_ilayer(&__interface_id, (this-> get_port_num_arr_pos(__port_number)), 0);
+        }
+
+        int unsigned(get_port_iface_id(int unsigned(__port_number)))
+        {
+            return (* (this-> port_iface_id).get_darr_ilayer((this-> get_port_num_arr_pos(__port_number)), 0));
         }
 
         /* example of how we are going to get the packet as a program
@@ -206,6 +221,7 @@ namespace tmp { class port_manager
         dynamic_array <int unsigned> port_num_list;
         bitset_list <int unsigned> port_ibitset;
         bitset_list <int unsigned> port_obitset;
+        dynamic_array <int unsigned> port_iface_id;
 
         dpacket_array dpackets;
 

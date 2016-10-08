@@ -292,7 +292,10 @@ int
         tcount ++;
     }
 */
-
+    tmp::port_manager pm;
+    pm.add_port_num(8080, true, 21);
+    std::cout << "PORT_NUM: " << pm.get_port_num(0) << ", IFACE_ID: " << pm.get_port_iface_id(pm.get_port_num(0)) << std::endl;
+/*
 tmp::io_service io;
 
     io.service_init
@@ -304,7 +307,7 @@ tmp::io_service io;
         & external_mlinit,
         & external_mltick
     );
-
+*/
 }
 
 # endif /*ARDUINO*/

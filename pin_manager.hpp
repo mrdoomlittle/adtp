@@ -17,14 +17,15 @@
     # include <stdint.h>
 # endif
 
+
 namespace tmp { class pin_manager
 {
     private :
-        dynamic_array <uint8_t> (digit_mio_clock_pid );// = tmp_config::def_digit_mio_clock_pid;
-        dynamic_array <uint8_t> (digit_dati_clock_pid );// = tmp_config::def_digit_dati_clock_pid;
-        dynamic_array <uint8_t> (digit_dato_clock_pid );// = tmp_config::def_digit_dato_clock_pid;
-        dynamic_array <uint8_t> (digit_dati_latch_pid );// = tmp_config::def_digit_dati_latch_pid;
-        dynamic_array <uint8_t> (digit_dato_latch_pid );// = tmp_config::def_digit_dato_latch_pid;
+        dynamic_array <uint8_t> (digit_mio_clock_pid );
+        dynamic_array <uint8_t> (digit_dati_clock_pid );
+        dynamic_array <uint8_t> (digit_dato_clock_pid );
+        dynamic_array <uint8_t> (digit_dati_latch_pid );
+        dynamic_array <uint8_t> (digit_dato_latch_pid );
 
         dynamic_array <bool> (mio_clock_pid_sstate );
         dynamic_array <bool> (dati_clock_pid_sstate );
@@ -32,25 +33,27 @@ namespace tmp { class pin_manager
         dynamic_array <bool> (dati_latch_pid_sstate );
         dynamic_array <bool> (dato_latch_pid_sstate );
 
-        int unsigned(mio_clock_ppos_count ) = 0;
-        int unsigned(dati_clock_ppos_count ) = 0;
-        int unsigned(dato_clock_ppos_count ) = 0;
 
-        int unsigned(mio_clock_pneg_count ) = 0;
-        int unsigned(dati_clock_pneg_count ) = 0;
-        int unsigned(dato_clock_pneg_count ) = 0;
+        dynamic_array <int unsigned> mio_clock_ppos_count;
+        dynamic_array <int unsigned> dati_clock_ppos_count;
+        dynamic_array <int unsigned> dato_clock_ppos_count;
 
-        int(mio_clock_pstate ) = tmp_config::digit_pin_low_state;
-        int(dati_clock_pstate ) = tmp_config::digit_pin_low_state;
-        int(dato_clock_pstate ) = tmp_config::digit_pin_low_state;
-        int(dati_latch_pstate ) = tmp_config::digit_pin_low_state;
-        int(dato_latch_pstate ) = tmp_config::digit_pin_low_state;
+        dynamic_array <int unsigned> mio_clock_pneg_count;
+        dynamic_array <int unsigned> dati_clock_pneg_count;
+        dynamic_array <int unsigned> dato_clock_pneg_count;
 
-        int(mio_clock_pmode ) = tmp_config::digit_pin_input_mode;
-        int(dati_clock_pmode ) = tmp_config::digit_pin_input_mode;
-        int(dato_clock_pmode ) = tmp_config::digit_pin_output_mode;
-        int(dati_latch_pmode ) = tmp_config::digit_pin_input_mode;
-        int(dato_latch_pmode ) = tmp_config::digit_pin_output_mode;
+
+        dynamic_array <int> (mio_clock_pstate );
+        dynamic_array <int> (dati_clock_pstate );
+        dynamic_array <int> (dato_clock_pstate );
+        dynamic_array <int> (dati_latch_pstate );
+        dynamic_array <int> (dato_latch_pstate );
+
+        dynamic_array <int> (mio_clock_pmode );
+        dynamic_array <int> (dati_clock_pmode );
+        dynamic_array <int> (dato_clock_pmode );
+        dynamic_array <int> (dati_latch_pmode );
+        dynamic_array <int> (dato_latch_pmode );
 
         dynamic_array <int unsigned> (digit_dati_pcount );// = tmp_config::def_digit_dati_pcount;
         dynamic_array <int unsigned> (digit_dato_pcount );// = tmp_config::def_digit_dato_pcount;
@@ -80,32 +83,32 @@ namespace tmp { class pin_manager
 
     public :
         void
-        (set_mio_clock_ppos_count(int unsigned(__clock_ppos_count)));
+        (set_mio_clock_ppos_count(int unsigned(__clock_ppos_count), int unsigned(__interface_id )));
         void
-        (set_dati_clock_ppos_count(int unsigned(__clock_ppos_count)));
+        (set_dati_clock_ppos_count(int unsigned(__clock_ppos_count), int unsigned(__interface_id )));
         void
-        (set_dato_clock_ppos_count(int unsigned(__clock_ppos_count)));
+        (set_dato_clock_ppos_count(int unsigned(__clock_ppos_count), int unsigned(__interface_id )));
 
         int unsigned
-        (get_mio_clock_ppos_count());
+        (get_mio_clock_ppos_count(int unsigned(__interface_id )));
         int unsigned
-        (get_dati_clock_ppos_count());
+        (get_dati_clock_ppos_count(int unsigned(__interface_id )));
         int unsigned
-        (get_dato_clock_ppos_count());
+        (get_dato_clock_ppos_count(int unsigned(__interface_id )));
 
         void
-        (set_mio_clock_pneg_count(int unsigned(__clock_pneg_count)));
+        (set_mio_clock_pneg_count(int unsigned(__clock_pneg_count), int unsigned(__interface_id )));
         void
-        (set_dati_clock_pneg_count(int unsigned(__clock_pneg_count)));
+        (set_dati_clock_pneg_count(int unsigned(__clock_pneg_count), int unsigned(__interface_id )));
         void
-        (set_dato_clock_pneg_count(int unsigned(__clock_pneg_count)));
+        (set_dato_clock_pneg_count(int unsigned(__clock_pneg_count), int unsigned(__interface_id )));
 
         int unsigned
-        (get_mio_clock_pneg_count());
+        (get_mio_clock_pneg_count(int unsigned(__interface_id )));
         int unsigned
-        (get_dati_clock_pneg_count());
+        (get_dati_clock_pneg_count(int unsigned(__interface_id )));
         int unsigned
-        (get_dato_clock_pneg_count());
+        (get_dato_clock_pneg_count(int unsigned(__interface_id )));
 
         void
         (set_mio_clock_pid (uint8_t(__digit_pid ), int unsigned(__interface_id ) ) );
@@ -174,37 +177,37 @@ namespace tmp { class pin_manager
         (is_dato_latch_pid_sstate (bool(__pid_sstate ), int unsigned(__interface_id ) ) );
 
         void
-        (update_mio_clock_pstate (int(__mio_clock_pstate ) ) );
+        (update_mio_clock_pstate (int(__mio_clock_pstate ), int unsigned(__interface_id ) ) );
         void
-        (update_dati_clock_pstate (int(__dati_clock_pstate ) ) );
+        (update_dati_clock_pstate (int(__dati_clock_pstate ), int unsigned(__interface_id ) ) );
         void
-        (update_dato_clock_pstate (int(__dato_clock_pstate ) ) );
+        (update_dato_clock_pstate (int(__dato_clock_pstate ), int unsigned(__interface_id ) ) );
         void
-        (update_dati_latch_pstate (int(__dati_latch_pstate ) ) );
+        (update_dati_latch_pstate (int(__dati_latch_pstate ), int unsigned(__interface_id ) ) );
         void
-        (update_dato_latch_pstate (int(__dato_latch_pstate ) ) );
+        (update_dato_latch_pstate (int(__dato_latch_pstate ), int unsigned(__interface_id ) ) );
 
         int
-        (get_mio_clock_pstate( ) );
+        (get_mio_clock_pstate(int unsigned(__interface_id ) ) );
         int
-        (get_dati_clock_pstate( ) );
+        (get_dati_clock_pstate(int unsigned(__interface_id ) ) );
         int
-        (get_dato_clock_pstate( ) );
+        (get_dato_clock_pstate(int unsigned(__interface_id ) ) );
         int
-        (get_dati_latch_pstate( ) );
+        (get_dati_latch_pstate(int unsigned(__interface_id ) ) );
         int
-        (get_dato_latch_pstate( ) );
+        (get_dato_latch_pstate(int unsigned(__interface_id ) ) );
 
         int
-        (get_mio_clock_pmode( ) );
+        (get_mio_clock_pmode(int unsigned(__interface_id ) ) );
         int
-        (get_dati_clock_pmode( ) );
+        (get_dati_clock_pmode(int unsigned(__interface_id ) ) );
         int
-        (get_dato_clock_pmode( ) );
+        (get_dato_clock_pmode(int unsigned(__interface_id ) ) );
         int
-        (get_dati_latch_pmode( ) );
+        (get_dati_latch_pmode(int unsigned(__interface_id ) ) );
         int
-        (get_dato_latch_pmode( ) );
+        (get_dato_latch_pmode(int unsigned(__interface_id ) ) );
 
         void
         (set_dati_pid(uint8_t(__digit_pid), int unsigned(__dati_pid_pos)));

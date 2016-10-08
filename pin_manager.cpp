@@ -34,6 +34,44 @@ pin_manager::pin_manager(int unsigned(__interface_count))
     (this-> dati_latch_pid_sstate).darr_init(1, __interface_count);
     (this-> dato_latch_pid_sstate).darr_init(1, __interface_count);
 
+    (this-> mio_clock_ppos_count).darr_init(1, __interface_count);
+    (this-> dati_clock_ppos_count).darr_init(1, __interface_count);
+    (this-> dato_clock_ppos_count).darr_init(1, __interface_count);
+
+    (this-> mio_clock_pneg_count).darr_init(1, __interface_count);
+    (this-> dati_clock_pneg_count).darr_init(1, __interface_count);
+    (this-> dato_clock_pneg_count).darr_init(1, __interface_count);
+
+    (this-> mio_clock_pstate).darr_init(1, __interface_count);
+    (this-> dati_clock_pstate).darr_init(1, __interface_count);
+    (this-> dato_clock_pstate).darr_init(1, __interface_count);
+    (this-> dati_latch_pstate).darr_init(1, __interface_count);
+    (this-> dato_latch_pstate).darr_init(1, __interface_count);
+    int low = (tmp_config::digit_pin_low_state);
+
+    for (int unsigned(y ) = 0; y != __interface_count; y ++)
+    {
+        (this-> mio_clock_pstate).set_darr_ilayer(&low, y, 0);
+        (this-> dati_clock_pstate).set_darr_ilayer(&low, y, 0);
+        (this-> dato_clock_pstate).set_darr_ilayer(&low, y, 0);
+        (this-> dati_latch_pstate).set_darr_ilayer(&low, y, 0);
+        (this-> dato_latch_pstate).set_darr_ilayer(&low, y, 0);
+    }
+
+    (this-> mio_clock_pmode).darr_init(1, __interface_count);
+    (this-> dati_clock_pmode).darr_init(1, __interface_count);
+    (this-> dato_clock_pmode).darr_init(1, __interface_count);
+    (this-> dati_latch_pmode).darr_init(1, __interface_count);
+    (this-> dato_latch_pmode).darr_init(1, __interface_count);
+    for (int unsigned(y ) = 0; y != __interface_count; y ++)
+    {
+        (this-> mio_clock_pmode).set_darr_ilayer(&low, y, 0);
+        (this-> dati_clock_pmode).set_darr_ilayer(&low, y, 0);
+        (this-> dato_clock_pmode).set_darr_ilayer(&low, y, 0);
+        (this-> dati_latch_pmode).set_darr_ilayer(&low, y, 0);
+        (this-> dato_latch_pmode).set_darr_ilayer(&low, y, 0);
+    }
+
     for (int unsigned(y ) = 0; y != __interface_count; y ++)
     {
         (this-> dati_pid_sstate_list).darr_init(*(this-> digit_dati_pcount).get_darr_ilayer(y, 0), __interface_count);
@@ -80,67 +118,67 @@ bool
     return(true);
 }
 void
-(pin_manager::set_mio_clock_ppos_count(int unsigned(__clock_ppos_count)))
+(pin_manager::set_mio_clock_ppos_count(int unsigned(__clock_ppos_count), int unsigned(__interface_id)))
 {
-    (this-> mio_clock_ppos_count) = __clock_ppos_count;
+    (this-> mio_clock_ppos_count).set_darr_ilayer(&__clock_ppos_count, __interface_id, 0);
 }
 void
-(pin_manager::set_dati_clock_ppos_count(int unsigned(__clock_ppos_count)))
+(pin_manager::set_dati_clock_ppos_count(int unsigned(__clock_ppos_count), int unsigned(__interface_id)))
 {
-    (this-> dati_clock_ppos_count) = __clock_ppos_count;
+    (this-> dati_clock_ppos_count).set_darr_ilayer(&__clock_ppos_count, __interface_id, 0);
 }
 void
-(pin_manager::set_dato_clock_ppos_count(int unsigned(__clock_ppos_count)))
+(pin_manager::set_dato_clock_ppos_count(int unsigned(__clock_ppos_count), int unsigned(__interface_id)))
 {
-    (this-> dato_clock_ppos_count) = __clock_ppos_count;
+    (this-> dato_clock_ppos_count).set_darr_ilayer(&__clock_ppos_count, __interface_id, 0);
 }
 
 int unsigned
-(pin_manager::get_mio_clock_ppos_count())
+(pin_manager::get_mio_clock_ppos_count(int unsigned(__interface_id)))
 {
-    return((this-> mio_clock_ppos_count));
+    return(*(this-> mio_clock_ppos_count).get_darr_ilayer(__interface_id, 0));
 }
 int unsigned
-(pin_manager::get_dati_clock_ppos_count())
+(pin_manager::get_dati_clock_ppos_count(int unsigned(__interface_id)))
 {
-    return((this-> dati_clock_ppos_count));
+    return(*(this-> dati_clock_ppos_count).get_darr_ilayer(__interface_id, 0));
 }
 int unsigned
-(pin_manager::get_dato_clock_ppos_count())
+(pin_manager::get_dato_clock_ppos_count(int unsigned(__interface_id)))
 {
-    return((this-> dato_clock_ppos_count));
+    return(*(this-> dato_clock_ppos_count).get_darr_ilayer(__interface_id, 0));
 }
 
 void
-(pin_manager::set_mio_clock_pneg_count(int unsigned(__clock_pneg_count)))
+(pin_manager::set_mio_clock_pneg_count(int unsigned(__clock_pneg_count), int unsigned(__interface_id)))
 {
-    (this-> mio_clock_pneg_count) = __clock_pneg_count;
+    (this-> mio_clock_pneg_count).set_darr_ilayer(&__clock_pneg_count, __interface_id, 0);
 }
 void
-(pin_manager::set_dati_clock_pneg_count(int unsigned(__clock_pneg_count)))
+(pin_manager::set_dati_clock_pneg_count(int unsigned(__clock_pneg_count), int unsigned(__interface_id)))
 {
-    (this-> dati_clock_pneg_count) = __clock_pneg_count;
+    (this-> dati_clock_pneg_count).set_darr_ilayer(&__clock_pneg_count, __interface_id, 0);
 }
 void
-(pin_manager::set_dato_clock_pneg_count(int unsigned(__clock_pneg_count)))
+(pin_manager::set_dato_clock_pneg_count(int unsigned(__clock_pneg_count), int unsigned(__interface_id)))
 {
-    (this-> dato_clock_pneg_count) = __clock_pneg_count;
+    (this-> dato_clock_pneg_count).set_darr_ilayer(&__clock_pneg_count, __interface_id, 0);
 }
 
 int unsigned
-(pin_manager::get_mio_clock_pneg_count())
+(pin_manager::get_mio_clock_pneg_count(int unsigned(__interface_id)))
 {
-    return((this-> mio_clock_pneg_count));
+    return(*(this-> mio_clock_pneg_count).get_darr_ilayer(__interface_id, 0));
 }
 int unsigned
-(pin_manager::get_dati_clock_pneg_count())
+(pin_manager::get_dati_clock_pneg_count(int unsigned(__interface_id)))
 {
-    return((this-> dati_clock_pneg_count));
+    return(*(this-> dati_clock_pneg_count).get_darr_ilayer(__interface_id, 0));
 }
 int unsigned
-(pin_manager::get_dato_clock_pneg_count())
+(pin_manager::get_dato_clock_pneg_count(int unsigned(__interface_id)))
 {
-    return((this-> dato_clock_pneg_count));
+    return(*(this-> dato_clock_pneg_count).get_darr_ilayer(__interface_id, 0));
 }
 
 void
@@ -320,66 +358,66 @@ bool
 }
 
 void
-(pin_manager::update_dati_clock_pstate(int(__dati_clock_pstate)))
+(pin_manager::update_dati_clock_pstate(int(__dati_clock_pstate), int unsigned(__interface_id )))
 {
-    (this-> dati_clock_pstate) = __dati_clock_pstate;
+    (this-> dati_clock_pstate).set_darr_ilayer(&__dati_clock_pstate, __interface_id, 0);
 }
 void
-(pin_manager::update_dato_clock_pstate(int(__dato_clock_pstate)))
+(pin_manager::update_dato_clock_pstate(int(__dato_clock_pstate), int unsigned(__interface_id )))
 {
-    (this-> dato_clock_pstate) = __dato_clock_pstate;
+    (this-> dato_clock_pstate).set_darr_ilayer(&__dato_clock_pstate, __interface_id, 0);
 }
 void
-(pin_manager::update_dati_latch_pstate(int(__dati_latch_pstate)))
+(pin_manager::update_dati_latch_pstate(int(__dati_latch_pstate), int unsigned(__interface_id )))
 {
-    (this-> dati_latch_pstate) = __dati_latch_pstate;
+    (this-> dati_latch_pstate).set_darr_ilayer(&__dati_latch_pstate, __interface_id, 0);
 }
 void
-(pin_manager::update_dato_latch_pstate(int(__dato_latch_pstate)))
+(pin_manager::update_dato_latch_pstate(int(__dato_latch_pstate), int unsigned(__interface_id )))
 {
-    (this-> dato_latch_pstate) = __dato_latch_pstate;
+    (this-> dato_latch_pstate).set_darr_ilayer(&__dato_latch_pstate, __interface_id, 0);
 }
 
 int
-(pin_manager::get_dati_clock_pstate( ) )
+(pin_manager::get_dati_clock_pstate(int unsigned(__interface_id ) ) )
 {
-    return ((this-> dati_clock_pstate));
+    return (* (this-> dati_clock_pstate).get_darr_ilayer(__interface_id, 0));
 }
 int
-(pin_manager::get_dato_clock_pstate( ) )
+(pin_manager::get_dato_clock_pstate(int unsigned(__interface_id ) ) )
 {
-    return((this-> dato_clock_pstate));
+    return(* (this-> dato_clock_pstate).get_darr_ilayer(__interface_id, 0));
 }
 int
-(pin_manager::get_dati_latch_pstate( ) )
+(pin_manager::get_dati_latch_pstate(int unsigned(__interface_id ) ) )
 {
-    return((this-> dati_latch_pstate));
+    return(* (this-> dati_latch_pstate).get_darr_ilayer(__interface_id, 0));
 }
 int
-(pin_manager::get_dato_latch_pstate( ) )
+(pin_manager::get_dato_latch_pstate(int unsigned(__interface_id ) ) )
 {
-    return((this-> dato_latch_pstate));
+    return(* (this-> dato_latch_pstate).get_darr_ilayer(__interface_id, 0));
 }
 
 int
-(pin_manager::get_dati_clock_pmode( ) )
+(pin_manager::get_dati_clock_pmode(int unsigned(__interface_id ) ) )
 {
-    return((this-> dati_clock_pmode));
+    return(* (this-> dati_clock_pmode).get_darr_ilayer(__interface_id, 0));
 }
 int
-(pin_manager::get_dato_clock_pmode( ) )
+(pin_manager::get_dato_clock_pmode(int unsigned(__interface_id ) ) )
 {
-    return((this-> dato_clock_pmode));
+    return(* (this-> dato_clock_pmode).get_darr_ilayer(__interface_id, 0));
 }
 int
-(pin_manager::get_dati_latch_pmode( ) )
+(pin_manager::get_dati_latch_pmode(int unsigned(__interface_id ) ) )
 {
-    return((this-> dati_latch_pmode));
+    return(* (this-> dati_latch_pmode).get_darr_ilayer(__interface_id, 0));
 }
 int
-(pin_manager::get_dato_latch_pmode( ) )
+(pin_manager::get_dato_latch_pmode(int unsigned(__interface_id ) ) )
 {
-    return((this-> dato_latch_pmode));
+    return(* (this-> dato_latch_pmode).get_darr_ilayer(__interface_id, 0));
 }
 
 void

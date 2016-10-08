@@ -30,12 +30,12 @@ namespace tmp { template <typename __bitset_t> class bitset_list
                 return;
             }
 
+            (this-> bitset_list) = new bitset <__bitset_t> * [2];
+
             if (__amount_of_bitsets != 0)
             {
-                (this-> bitset_list) = new bitset <__bitset_t> * [2];
-                
                 (this-> bitset_list[0]) = new bitset <__bitset_t> [__amount_of_bitsets];
-              
+
                 if (__init_bitsets_now == true)
                 {
                     for (int unsigned(x ) = 0; x != __amount_of_bitsets; x ++)
@@ -114,7 +114,7 @@ namespace tmp { template <typename __bitset_t> class bitset_list
         {
             if (amount_of_bitsets != 0)
             {
-               
+
                 // this take memory up by *2 so might need to fix that
                 (this-> bitset_list[1]) = new bitset <__bitset_t> [(this-> amount_of_bitsets)];
 

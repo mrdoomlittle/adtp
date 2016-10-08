@@ -214,9 +214,9 @@ void
 
         (this-> update_clock_reading( ) );
 
-        ((this-> get_pmanager_cinst_ptr())-> update_dati_clock_pstate((this-> get_digit_pstate((this-> get_pmanager_cinst_ptr())-> get_dati_clock_pid(0)))));
+        ((this-> get_pmanager_cinst_ptr())-> update_dati_clock_pstate((this-> get_digit_pstate((this-> get_pmanager_cinst_ptr())-> get_dati_clock_pid(0))), 0/*iface id*/));
 
-        (this-> set_digit_pstate((this-> get_pmanager_cinst_ptr())-> get_dato_clock_pid(0), (this-> get_pmanager_cinst_ptr())-> get_dato_clock_pstate()));
+        (this-> set_digit_pstate((this-> get_pmanager_cinst_ptr())-> get_dato_clock_pid(0), (this-> get_pmanager_cinst_ptr())-> get_dato_clock_pstate(0/*iface id*/)));
 
         (this-> ibit_read_holdup ) = tmp_config::def_ibit_read_holdup;
         (this-> obit_write_holdup ) = tmp_config::def_obit_write_holdup;
@@ -395,16 +395,16 @@ for (int unsigned iface = 0; iface != INTERFACE_COUNT; iface ++) {
             if ( (this-> get_iltick_count( ) ) <= ( (((this-> get_pmanager_cinst_ptr())-> get_dati_pcount(0)) - 1) + ((this-> ibit_read_holdup) - 1) ) && ( (this-> get_iltick_count( ) ) ) >= ((this-> ibit_read_holdup) - 1) )
             {
                 // input
-                if (((this-> get_pmanager_cinst_ptr())-> get_dati_clock_pstate()) != 0x1)
+                if (((this-> get_pmanager_cinst_ptr())-> get_dati_clock_pstate(0/*iface id*/)) != 0x1)
                 {
                     (this-> is_dati_clock_ppos) = true;
-                    ((this-> get_pmanager_cinst_ptr())-> set_dati_clock_ppos_count(((this-> get_pmanager_cinst_ptr())-> get_dati_clock_ppos_count()) + 1));
+                    ((this-> get_pmanager_cinst_ptr())-> set_dati_clock_ppos_count( ((this-> get_pmanager_cinst_ptr())-> get_dati_clock_ppos_count(iface)) + 1, iface));
                 }
 
-                if (((this-> get_pmanager_cinst_ptr())-> get_dati_clock_pstate()) != 0x0)
+                if (((this-> get_pmanager_cinst_ptr())-> get_dati_clock_pstate(0/*iface id*/)) != 0x0)
                 {
                     (this-> is_dati_clock_ppos) = false;
-                    ((this-> get_pmanager_cinst_ptr())-> set_dati_clock_pneg_count(((this-> get_pmanager_cinst_ptr())-> get_dati_clock_pneg_count()) + 1));
+                    ((this-> get_pmanager_cinst_ptr())-> set_dati_clock_pneg_count(((this-> get_pmanager_cinst_ptr())-> get_dati_clock_pneg_count(iface)) + 1, iface));
                 }
 
                 if ((this-> is_dati_clock_ppos) == true)
@@ -623,10 +623,10 @@ void
     (this-> set_digit_pstate_fptr (__digit_pid, __digit_pstate ) );
 
     if (__digit_pid == ((this-> get_pmanager_cinst_ptr())-> get_dato_clock_pid( 0) ))
-        ((this-> get_pmanager_cinst_ptr())-> update_dato_clock_pstate(__digit_pstate));
+        ((this-> get_pmanager_cinst_ptr())-> update_dato_clock_pstate(__digit_pstate, 0/*iface id*/));
 
     else if (__digit_pid == ((this-> get_pmanager_cinst_ptr())-> get_dato_latch_pid(0 ) ))
-        ((this-> get_pmanager_cinst_ptr())-> update_dato_latch_pstate(__digit_pstate));
+        ((this-> get_pmanager_cinst_ptr())-> update_dato_latch_pstate(__digit_pstate, 0/*iface id*/));
 
     else
     {
