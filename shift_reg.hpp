@@ -9,12 +9,6 @@
 
 # define def_max_amount_of_sreg 4
 
-# ifdef ARDUINO
-    # include <stdint.h>
-# else
-    # include <boost/cstdint.hpp>
-# endif
-# include <iostream>
 # include "dynamic_array.hpp"
 # include "pin_manager.hpp"
 # include "tmp_config.hpp"
@@ -26,6 +20,7 @@
 * For Current Infomation about This Project
 * See the File Called: ( INFOMATION )
 */
+
 // still working on this
 namespace tmp { class shift_reg
 {
@@ -112,21 +107,72 @@ namespace tmp { class shift_reg
             uint8_t(__shift_reg_cpid), uint8_t(__shift_reg_rpid), int unsigned(__shift_reg_ipcount)));
 
         void
-        (bind_shift_register(int unsigned(__register_io_t), int8_t(__shift_reg_pid)));
+        (bind_shift_register(uint8_t(__digit_pid)));
 
         bool
-        (is_pid_being_used(uint8_t(__digit_pid)));
+        (is_pid_being_used(uint8_t(__digit_pid), bool(__only_io_pin) = false));
+        bool
+        (is_pid_incheck(uint8_t(__digit_pid), int unsigned(__interface_id)));
+        int unsigned
+        (* find_pid_arr_pos(uint8_t(__digit_pid), bool(__only_io_pin) = false));
 
         void(del_shift_register());
 
         void
-        (set_shift_reg_opstate());// input
+        (set_shift_reg_opstate())
+        {
+
+        }// input
         void
-        (set_shift_reg_lpstate());// latch
+        (set_shift_reg_lpstate())
+        {
+
+        }// latch
         void
-        (set_shift_reg_cpstate());// clock
+        (set_shift_reg_cpstate())
+        {
+
+        }// clock
         void
-        (set_shift_reg_rpstate());// reset
+        (set_shift_reg_rpstate())
+        {
+
+        }
+
+        uint8_t
+        (get_shift_reg_opstate(int unsigned(__shift_reg_pid)))
+        {
+            int unsigned * pos = (this-> find_pid_arr_pos(__shift_reg_pid, true));
+
+            return(*(this-> shift_reg_pid_list).get_darr_ilayer(pos[0], 0));
+        }
+        uint8_t
+        (get_shift_reg_lpstate(int unsigned(__shift_reg_pid)))
+        {
+            int unsigned * pos = (this-> find_pid_arr_pos(__shift_reg_pid, true));
+
+            return(*(this-> shift_reg_pid_list).get_darr_ilayer(pos[0], 1));
+        }
+        uint8_t
+        (get_shift_reg_cpstate(int unsigned(__shift_reg_pid)))
+        {
+            int unsigned * pos = (this-> find_pid_arr_pos(__shift_reg_pid, true));
+
+            return(*(this-> shift_reg_pid_list).get_darr_ilayer(pos[0], 2));
+        }
+        uint8_t
+        (get_shift_reg_rpstate(int unsigned(__shift_reg_pid)))
+        {
+            int unsigned * pos = (this-> find_pid_arr_pos(__shift_reg_pid, true));
+
+            return(*(this-> shift_reg_pid_list).get_darr_ilayer(pos[0], 3));
+        }
+
+        uint8_t
+        (get_shift_reg_digit_ipid(uint8_t(__shift_reg_pid), uint8_t(__shift_reg_ipid)))
+        {
+            return((__shift_reg_pid + __shift_reg_ipid));
+        }
 
         void
         (get_shift_ref_opstate());
@@ -144,6 +190,7 @@ namespace tmp { class shift_reg
         bitset_list <int unsigned> shift_reg_obitset;
 
         dynamic_array <int unsigned> shift_reg_io_type;
+        dynamic_array <bool> shift_reg_bind_state;
 
         dynamic_array <int unsigned> shift_reg_ipcount_l;
         dynamic_array <int unsigned> shift_ref_ipstate_l;

@@ -45,6 +45,7 @@ void
     if ( (this-> has_sregister_cinst_init) == true) return;
 
     static sregister_ct sregister_cinstance;
+    sregister_cinstance.set_pmanager_cinst_ptr((this-> pmanager_cinst_ptr));
 
     (this-> sregister_cinst_ptr ) = & sregister_cinstance;
 
@@ -97,14 +98,17 @@ void
     if ( (this-> is_ptr_to_ghigh_rclock_f (nullptr) ) ) return;
     if ( (this-> is_ptr_to_extern_mlinit_f (nullptr) ) ) return;
     if ( (this-> is_ptr_to_extern_mltick_f (nullptr) ) ) return;
-
+return;
     (this-> toggle_mloop_state( ) );
 
     (this-> toggle_iloop_state( ) );
 
     // create a instance of classes
     (this-> init_pmanager_cinst( ) );
+    (this-> get_pmanager_cinst_ptr()-> set_max_digit_pid_range(12));
+    (this-> get_pmanager_cinst_ptr()-> set_min_digit_pid_range(2));
     (this-> init_sregister_cinst( ) );
+
 
     for (int unsigned x = 0; x != (this-> get_pmanager_cinst_ptr( ) )-> get_dati_pcount( 0); x++)
         (this-> get_pmanager_cinst_ptr( ) )-> set_dati_pid ( (tmp_config::def_digit_dati_pids [x]), x, 0/*interface id*/);
@@ -620,6 +624,22 @@ void
 void
 (io_service::set_digit_pstate (uint8_t(__digit_pid ), uint8_t(__digit_pstate ), int unsigned(__interface_id ) ) )
 {
+    if (__digit_pid > (this-> get_pmanager_cinst_ptr())-> get_max_digit_pid_range())
+    {
+        (this-> toggle_mloop_state()); // this will stop the main loop
+        return;
+    }
+    if (__digit_pid < (this-> get_pmanager_cinst_ptr())-> get_min_digit_pid_range())
+    {
+        (this-> toggle_mloop_state()); // this will stop the main loop
+        return;
+    }
+
+    for (int unsigned(x ) = (this-> get_pmanager_cinst_ptr())-> get_min_digit_pid_range(); x != __digit_pid; x ++)
+    {
+        //if ((this-> get_sregister_cinst_ptr())-> is_pid_being_used() == true) __digit_pid += 8;
+    }
+
     (this-> set_digit_pstate_fptr (__digit_pid, __digit_pstate ) );
 
     if (__digit_pid == ((this-> get_pmanager_cinst_ptr())-> get_dato_clock_pid(__interface_id) ))

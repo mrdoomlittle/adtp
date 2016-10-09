@@ -12,6 +12,8 @@
 
 # include "dynamic_array.hpp"
 
+//# include "io_service.hpp"
+
 namespace tmp { class pin_manager
 {
     private :
@@ -26,7 +28,6 @@ namespace tmp { class pin_manager
         dynamic_array <bool> (dato_clock_pid_sstate );
         dynamic_array <bool> (dati_latch_pid_sstate );
         dynamic_array <bool> (dato_latch_pid_sstate );
-
 
         dynamic_array <int unsigned> mio_clock_ppos_count;
         dynamic_array <int unsigned> dati_clock_ppos_count;
@@ -63,6 +64,9 @@ namespace tmp { class pin_manager
 
         dynamic_array <uint8_t> digit_dati_pid_list;
         dynamic_array <uint8_t> digit_dato_pid_list;
+
+        int unsigned(max_digit_pid_range) = 0;
+        int unsigned(min_digit_pid_range) = 0;
     public :
         pin_manager (int unsigned(__interface_count));
         ~pin_manager( ) { }
@@ -76,6 +80,28 @@ namespace tmp { class pin_manager
         (is_pmode_icheck (uint8_t(__digit_pmode ) ) );
 
     public :
+        void
+        (set_max_digit_pid_range(int unsigned(__max)))
+        {
+            (this-> max_digit_pid_range) = __max;
+        }
+        void
+        (set_min_digit_pid_range(int unsigned(__min)))
+        {
+            (this-> min_digit_pid_range) = __min;
+        }
+
+        int unsigned
+        (get_max_digit_pid_range())
+        {
+            return((this-> max_digit_pid_range));
+        }
+        int unsigned
+        (get_min_digit_pid_range())
+        {
+            return((this-> min_digit_pid_range));
+        }
+
         void
         (set_mio_clock_ppos_count(int unsigned(__clock_ppos_count), int unsigned(__interface_id )));
         void

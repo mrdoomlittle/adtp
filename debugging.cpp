@@ -229,15 +229,12 @@ int unsigned
 # include "socket_manager.hpp"
 # include "cint_convert.hpp"
 # include "pin_manager.hpp"
+
+
 int
 (main( ) )
 {
     //tmp::pin_manager pm(2);
-
-
-
-
-
 /*
     tmp::port_manager pm;
 
@@ -299,16 +296,26 @@ int
     tmp::pin_manager pmanager(2);
 
 
-
+    (pmanager.set_max_digit_pid_range(12));
+    (pmanager.set_min_digit_pid_range(2));
     tmp::shift_reg sreg;
+
     sreg.set_pmanager_cinst_ptr(&pmanager);
 
-    sreg.add_shift_register(0, 2, 3, 4, 5, 8);
+    pmanager.set_dato_pid(2, 0, 0);
+
+    sreg.add_shift_register(1, 2, 3, 4, 5, 8);
+
+    std::cout << unsigned(sreg.get_shift_reg_opstate(2)) << std::endl;
+    std::cout << unsigned(sreg.get_shift_reg_lpstate(2)) << std::endl;
+    std::cout << unsigned(sreg.get_shift_reg_cpstate(2)) << std::endl;
+    std::cout << unsigned(sreg.get_shift_reg_rpstate(2)) << std::endl;
+    std::cout << pmanager.get_min_digit_pid_range() << "<->" << pmanager.get_max_digit_pid_range() << std::endl;
 
 
 
 /*
-tmp::io_service io;
+    tmp::io_service io;
 
     io.service_init
     (
@@ -318,8 +325,9 @@ tmp::io_service io;
         & get_high_res_clock,
         & external_mlinit,
         & external_mltick
-    );
-*/
+    );*/
+
+
 }
 
 # endif /*ARDUINO*/
