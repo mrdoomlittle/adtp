@@ -234,90 +234,27 @@ int unsigned
 int
 (main( ) )
 {
-    //tmp::pin_manager pm(2);
-/*
-    tmp::port_manager pm;
+    tmp::pin_manager __pin_manager(1/*iface count*/);
+    tmp::shift_reg __shift_reg;
 
-    pm.add_port_num(21299, true);
+    (__pin_manager.set_max_digit_pid_range(22));
+    (__pin_manager.set_min_digit_pid_range(2));
 
-    for (int unsigned x = 0; x != pm.get_port_num_count(); x ++)
-        std::cout << "Port Num: " << pm.get_port_num(x) << std::endl;
+    __shift_reg.set_pmanager_cinst_ptr(&__pin_manager);
+    __pin_manager.set_dato_pid(2, 1, 0);
 
+    __shift_reg.add_shift_register(0/*mode*/, 2/*pid*/, 3/*lpid*/, 4/*cpid*/, 5/*rpid*/, 8/*reg size*/);
 
-    tmp::dpacket_array a;
-
-    a.init_dpacket_array(2);
-
-    a.get_dpacket_ptr(0)-> set_dati_dpacket_size(2);
-
-    std::cout << "DPAS: " << a.get_dparray_size() << std::endl;
-    a.add_dpacket();
-
-    std::cout << "DPAS: " << a.get_dparray_size() << std::endl;
-
-    std::cout << "DPS: " << a.get_dpacket_ptr(0)-> get_dati_dpacket_size() << std::endl;
-    //std::cout << tmp::data_packet::__dato_bitset << std::endl;
-   */
-   // tmp::tmp_ip as;
-    //tmp::socket_manager sock;
-
-  //  as.set_system_ip_addr("192.168.000.100");
-
-   //std::cout << tmp::convert_to_int<int unsigned>("20299", 5) << std::endl;
-
-//    sock.create_socket("101.128.277.117", 8080);
-/*
-    int unsigned tcount = 0;
-    int unsigned nlength = 0;
-    int unsigned curr = 10;
-    for (;;)
-    {
-        for (int x = 0; x != 1000000; x++) {}
-
-        if (tcount == 0) nlength ++;
-
-        if (tcount != 0)
-        {
-            if (tcount == (curr))
-            {
-                nlength ++;
-                curr = (curr * 10);
-            }
-        }
-
-        std::cout << "CNum:" << tcount << ", NLength: " << nlength << ", C:" << curr << std::endl;
-        tcount ++;
-    }
-*/
-    //tmp::port_manager pm;
-    //pm.add_port_num(8080, true, 21);
-    //std::cout << "PORT_NUM: " << pm.get_port_num(0) << ", IFACE_ID: " << pm.get_port_iface_id(pm.get_port_num(0)) << std::endl;
-
-    tmp::pin_manager pmanager(2);
+    __shift_reg.bind_shift_register(2);
 
 
-    (pmanager.set_max_digit_pid_range(12));
-    (pmanager.set_min_digit_pid_range(2));
-    tmp::shift_reg sreg;
-
-    sreg.set_pmanager_cinst_ptr(&pmanager);
-
-    pmanager.set_dato_pid(2, 0, 0);
-
-    sreg.add_shift_register(1, 2, 3, 4, 5, 8);
-
-    std::cout << unsigned(sreg.get_shift_reg_opstate(2)) << std::endl;
-    std::cout << unsigned(sreg.get_shift_reg_lpstate(2)) << std::endl;
-    std::cout << unsigned(sreg.get_shift_reg_cpstate(2)) << std::endl;
-    std::cout << unsigned(sreg.get_shift_reg_rpstate(2)) << std::endl;
-    std::cout << pmanager.get_min_digit_pid_range() << "<->" << pmanager.get_max_digit_pid_range() << std::endl;
+    std::cout << __shift_reg.is_shift_reg_binded(true, 2) << std::endl;
 
 
 
 /*
-    tmp::io_service io;
-
-    io.service_init
+    tmp::io_service __io_service;
+    __io_service.service_init
     (
         & set_digit_pin_mode,
         & set_digit_pin_state,
@@ -325,9 +262,8 @@ int
         & get_high_res_clock,
         & external_mlinit,
         & external_mltick
-    );*/
-
-
+    );
+*/
 }
 
 # endif /*ARDUINO*/

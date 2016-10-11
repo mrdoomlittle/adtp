@@ -26,8 +26,7 @@ namespace tmp { class shift_reg
 {
     protected :
         typedef pin_manager pmanager_ct;
-        pmanager_ct
-            (* pmanager_cinst_ptr) = nullptr;
+        pmanager_ct(* pmanager_cinst_ptr) = nullptr;
     public :
         void
         (set_pmanager_cinst_ptr(pmanager_ct(* __pmanager_cinst_ptr)));
@@ -110,62 +109,52 @@ namespace tmp { class shift_reg
         (bind_shift_register(uint8_t(__digit_pid)));
 
         bool
-        (is_pid_being_used(uint8_t(__digit_pid), bool(__only_io_pin) = false));
+        (is_shift_reg_binded(bool(__is_type), uint8_t(__digit_pid)))
+        {
+            int unsigned * pos = (this-> find_pid_arr_pos(__digit_pid, true, 0));
+
+            return(*(this-> shift_reg_bind_state).get_darr_ilayer(pos[0], pos[1]) == __is_type? true : false);
+        }
+
+        bool
+        (is_pid_being_used(uint8_t(__digit_pid), bool(__specific_pid_t), int unsigned(__pid_type_id)));
         bool
         (is_pid_incheck(uint8_t(__digit_pid), int unsigned(__interface_id)));
+
         int unsigned
-        (* find_pid_arr_pos(uint8_t(__digit_pid), bool(__only_io_pin) = false));
+        (* find_pid_arr_pos(uint8_t(__digit_pid), bool(__specific_pid_t), int unsigned(__pid_type_id)));
 
         void(del_shift_register());
 
-        void
-        (set_shift_reg_opstate())
-        {
 
-        }// input
-        void
-        (set_shift_reg_lpstate())
-        {
-
-        }// latch
-        void
-        (set_shift_reg_cpstate())
-        {
-
-        }// clock
-        void
-        (set_shift_reg_rpstate())
-        {
-
-        }
 
         uint8_t
         (get_shift_reg_opstate(int unsigned(__shift_reg_pid)))
         {
-            int unsigned * pos = (this-> find_pid_arr_pos(__shift_reg_pid, true));
+            int unsigned * pos = (this-> find_pid_arr_pos(__shift_reg_pid, true, 0));
 
-            return(*(this-> shift_reg_pid_list).get_darr_ilayer(pos[0], 0));
+            return(*(this-> shift_reg_pid_list).get_darr_ilayer(pos[0], pos[1]));
         }
         uint8_t
         (get_shift_reg_lpstate(int unsigned(__shift_reg_pid)))
         {
-            int unsigned * pos = (this-> find_pid_arr_pos(__shift_reg_pid, true));
+            int unsigned * pos = (this-> find_pid_arr_pos(__shift_reg_pid, true, 0));
 
-            return(*(this-> shift_reg_pid_list).get_darr_ilayer(pos[0], 1));
+            return(*(this-> shift_reg_pid_list).get_darr_ilayer(pos[0], pos[1]));
         }
         uint8_t
         (get_shift_reg_cpstate(int unsigned(__shift_reg_pid)))
         {
-            int unsigned * pos = (this-> find_pid_arr_pos(__shift_reg_pid, true));
+            int unsigned * pos = (this-> find_pid_arr_pos(__shift_reg_pid, true, 0));
 
-            return(*(this-> shift_reg_pid_list).get_darr_ilayer(pos[0], 2));
+            return(*(this-> shift_reg_pid_list).get_darr_ilayer(pos[0], pos[1]));
         }
         uint8_t
         (get_shift_reg_rpstate(int unsigned(__shift_reg_pid)))
         {
-            int unsigned * pos = (this-> find_pid_arr_pos(__shift_reg_pid, true));
+            int unsigned * pos = (this-> find_pid_arr_pos(__shift_reg_pid, true, 0));
 
-            return(*(this-> shift_reg_pid_list).get_darr_ilayer(pos[0], 3));
+            return(*(this-> shift_reg_pid_list).get_darr_ilayer(pos[0], pos[1]));
         }
 
         uint8_t
