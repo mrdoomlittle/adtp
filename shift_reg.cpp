@@ -63,30 +63,38 @@ void
 (shift_reg::add_shift_register(int unsigned(__register_io_t), uint8_t(__shift_reg_pid), uint8_t(__shift_reg_lpid),
     uint8_t(__shift_reg_cpid), uint8_t(__shift_reg_rpid), int unsigned(__shift_reg_ipcount)))
 {
-    __shift_reg_lpid += (__shift_reg_ipcount - 1);
-    __shift_reg_cpid += (__shift_reg_ipcount - 1);
-    __shift_reg_rpid += (__shift_reg_ipcount - 1);
+    __shift_reg_lpid += (__shift_reg_ipcount-1);
+    __shift_reg_cpid += (__shift_reg_ipcount-1);
+    __shift_reg_rpid += (__shift_reg_ipcount-1);
 
-    if ((this-> is_pid_being_used(__shift_reg_pid, false, 0)) == true) return;
-    if ((this-> is_pid_being_used(__shift_reg_lpid, false, 0)) == true) return;
-    if ((this-> is_pid_being_used(__shift_reg_cpid, false, 0)) == true) return;
-    if ((this-> is_pid_being_used(__shift_reg_rpid, false, 0)) == true) return;
+    
+    if ((this-> is_pid_being_used(__shift_reg_pid, true, 0)) == true) return;
+    if ((this-> is_pid_being_used(__shift_reg_lpid, true, 1)) == true) return;
+    if ((this-> is_pid_being_used(__shift_reg_cpid, true, 2)) == true) return;
+    if ((this-> is_pid_being_used(__shift_reg_rpid, true, 3)) == true) return;
 
     (this-> shift_reg_pid_list).add_darr_layer();
-    (this-> shift_reg_io_type).add_darr_layer();
-    (this-> shift_reg_bind_state).add_darr_layer();
-    (this-> shift_reg_ipcount_l).add_darr_layer();
 
+    (this-> shift_reg_io_type).add_darr_layer();
+
+    (this-> shift_reg_bind_state).add_darr_layer();
+
+    (this-> shift_reg_ipcount_l).add_darr_layer();
+  
     bool temp = false;
     (this-> shift_reg_bind_state).set_darr_ilayer(&temp, (this-> shift_reg_arr_pos), 0);
 
     uint8_t __shift_reg_pid_list[4] = {__shift_reg_pid, __shift_reg_lpid, __shift_reg_cpid, __shift_reg_rpid};
 
     (this-> shift_reg_pid_list).set_darr_layer(__shift_reg_pid_list, (this-> shift_reg_arr_pos));
+
     (this-> shift_reg_io_type).set_darr_ilayer(&__register_io_t, (this-> shift_reg_arr_pos), 0);
 
-    (this-> shift_reg_ipcount_l).set_darr_ilayer(&__shift_reg_ipcount, (this-> shift_reg_arr_pos), 0);
 
+    
+    //(this-> shift_reg_ipcount_l).set_darr_ilayer(&__shift_reg_ipcount, (this-> shift_reg_arr_pos), 0);
+  
+    
     (this-> shift_reg_arr_pos) ++;
 }
 // this will activate the shift reg and forward all pin data to the shift reg
@@ -97,9 +105,12 @@ void
     if (__digit_pid > (this-> get_pmanager_cinst_ptr())-> get_max_digit_pid_range()) return;
     if (__digit_pid < (this-> get_pmanager_cinst_ptr())-> get_min_digit_pid_range()) return;
 
-    if((this-> is_pid_being_used(__digit_pid, true, 0) == false)) return;
 
+   
+    if((this-> is_pid_being_used(__digit_pid, true, 0) == false)) return;
+    
     int unsigned * pid_arr_pos = (this-> find_pid_arr_pos(__digit_pid, true, 0));
+ 
 
     (this-> get_pmanager_cinst_ptr())-> set_min_digit_pid_range(
         (this-> get_pmanager_cinst_ptr())-> get_min_digit_pid_range() +
@@ -110,6 +121,21 @@ void
         bool temp = true;
         (this-> shift_reg_bind_state).set_darr_ilayer(&temp, pid_arr_pos[0], 0);
     }
+    
+    std::free(pid_arr_pos);
+}
+
+bool
+(shift_reg::is_shift_reg_binded(bool(__is_type), uint8_t(__digit_pid)))
+{
+    int unsigned * pid_arr_pos = (this-> find_pid_arr_pos(__digit_pid, true, 0));
+
+
+    bool output = *(this-> shift_reg_bind_state).get_darr_ilayer(pid_arr_pos[0], 0);
+
+    return(output == __is_type? true : false);
+
+    std::free(pid_arr_pos);
 }
 
 bool
@@ -121,11 +147,13 @@ bool
     {
         if (__specific_pid_t == false)
         {
-            for (int unsigned(x ) = 0; x != 4; x ++)
-                if (*(this-> shift_reg_pid_list).get_darr_ilayer(y, x) == __digit_pid) return(true);
+            for (int unsigned(x ) = 0; x != 4; x ++) if (*(this-> shift_reg_pid_list).get_darr_ilayer(y, x) == __digit_pid) return(true);
         }
-        else
+        if (__specific_pid_t == true)    
+        {
             if (*(this-> shift_reg_pid_list).get_darr_ilayer(y, __pid_type_id) == __digit_pid) return(true);
+
+        }
     }
 
     return(false);
@@ -134,25 +162,34 @@ bool
 int unsigned
 (* shift_reg::find_pid_arr_pos(uint8_t(__digit_pid), bool(__specific_pid_t), int unsigned(__pid_type_id)))
 {
+   
     for (int unsigned(y ) = 0; y != (this-> shift_reg_arr_pos); y ++)
     {
         if (__specific_pid_t == false)
         {
             for (int unsigned(x ) = 0; x != 4; x ++)
             {
-                if (*(this-> shift_reg_pid_list).get_darr_ilayer(y, x) == __digit_pid)
+                auto * v = (this-> shift_reg_pid_list).get_darr_ilayer(y,x);
+                if (v == nullptr) return nullptr;
+                if (*v == __digit_pid)
                 {
-                    static int unsigned temp[2] = {y, x};
+                    int unsigned * temp = new int unsigned[2];
+                    temp[0] = y;
+                    temp[1] = x;
 
                     return temp;
                 }
             }
         }
-        else
+        if (__specific_pid_t == true)
         {
-            if (*(this-> shift_reg_pid_list).get_darr_ilayer(y,__pid_type_id) == __digit_pid)
+            auto * v = (this-> shift_reg_pid_list).get_darr_ilayer(y,__pid_type_id);
+            if (v == nullptr) return nullptr;
+            if (*v == __digit_pid)
             {
-                static int unsigned temp[2] = {y, __pid_type_id};
+                int unsigned * temp = new int unsigned[2];
+                temp[0] = y;
+                temp[1] = __pid_type_id;
 
                 return temp;
             }
@@ -179,6 +216,8 @@ bool
     {
         return_output = ((this-> get_pmanager_cinst_ptr())-> does_dato_pid_exist(__digit_pid, __interface_id));
     }
+
+    std::free(temp);
 
     return (return_output);
 }

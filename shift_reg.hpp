@@ -109,12 +109,13 @@ namespace tmp { class shift_reg
         (bind_shift_register(uint8_t(__digit_pid)));
 
         bool
-        (is_shift_reg_binded(bool(__is_type), uint8_t(__digit_pid)))
-        {
-            int unsigned * pos = (this-> find_pid_arr_pos(__digit_pid, true, 0));
-
-            return(*(this-> shift_reg_bind_state).get_darr_ilayer(pos[0], pos[1]) == __is_type? true : false);
-        }
+        (is_shift_reg_binded(bool(__is_type), uint8_t(__digit_pid)));
+        //{
+            //int unsigned * pos = (this-> find_pid_arr_pos(__digit_pid, true, 0));
+            //return 0;
+           
+            //return(*(this-> shift_reg_bind_state).get_darr_ilayer(pos[0], 0) == __is_type? true : false);
+        //}
 
         bool
         (is_pid_being_used(uint8_t(__digit_pid), bool(__specific_pid_t), int unsigned(__pid_type_id)));
@@ -127,7 +128,8 @@ namespace tmp { class shift_reg
         void(del_shift_register());
 
 
-
+        //REMINDER: pos's memory need to be destored because its static
+        // std::free(pos);
         uint8_t
         (get_shift_reg_opstate(int unsigned(__shift_reg_pid)))
         {
