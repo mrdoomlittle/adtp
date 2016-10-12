@@ -72,10 +72,6 @@ pin_manager::pin_manager(int unsigned(__interface_count))
         (this-> dati_latch_pmode).set_darr_ilayer(&low, y, 0);
         (this-> dato_latch_pmode).set_darr_ilayer(&low, y, 0);
     }
-    //(this-> dati_pid_sstate_list).
-    //(this-> dati_pstate_list).
-    //(this-> dati_pmode_list).
-    //(this-> digit_dati_pid_list).
 
     for (int unsigned(y ) = 0; y != __interface_count; y ++)
     {

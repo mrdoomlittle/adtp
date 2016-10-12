@@ -242,14 +242,17 @@ int
 
     __shift_reg.set_pmanager_cinst_ptr(&__pin_manager);
     __pin_manager.set_dati_pid(2, 0, 0);
-    __pin_manager.set_dato_pid(3, 0, 0);
-    
-    __shift_reg.add_shift_register(0/*mode*/, 2/*pid*/, 3/*lpid*/, 4/*cpid*/, 5/*rpid*/, 8/*reg size*/);
-   
-    __shift_reg.add_shift_register(1/*mode*/, 3/*pid*/, 6/*lpid*/, 7/*cpid*/, 8/*rpid*/, 8/*reg size*/);
+    __pin_manager.add_dati_pid_space(0);
+    __pin_manager.set_dati_pid(3, 0, 0);
+    //__pin_manager.set_dato_pid(3, 0, 0);
 
-   
-    //__shift_reg.bind_shift_register(2);
+    __shift_reg.add_shift_register((tmp_config::io_t::__i)/*mode*/, 2/*pid*/, 3/*lpid*/, 4/*cpid*/, 5/*rpid*/, 8/*reg size*/);
+
+    __shift_reg.add_shift_register((tmp_config::io_t::__i)/*mode*/, 3/*pid*/, 6/*lpid*/, 7/*cpid*/, 8/*rpid*/, 8/*reg size*/);
+
+    __shift_reg.bind_shift_register(3);
+
+    std::cout <<  __shift_reg.get_dati_pcount(0)<< std::endl;
 
     std::cout << __shift_reg.is_shift_reg_binded(true, 2) << std::endl;
     std::cout << __shift_reg.is_shift_reg_binded(true, 3) << std::endl;

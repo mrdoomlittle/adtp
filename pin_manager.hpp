@@ -247,7 +247,12 @@ namespace tmp { class pin_manager
         void
         (add_dati_pid_space(int unsigned(__interface_id )))
         {
-
+            (this-> dati_pid_sstate_list).resize_darr(0, __interface_id, (this-> get_dati_pcount(__interface_id))+1);
+            (this-> dati_pstate_list).resize_darr(0, __interface_id, (this-> get_dati_pcount(__interface_id))+1);
+            (this-> dati_pmode_list).resize_darr(0, __interface_id, (this-> get_dati_pcount(__interface_id))+1);
+            (this-> digit_dati_pid_list).resize_darr(0, __interface_id, (this-> get_dati_pcount(__interface_id))+1);
+            int unsigned t = (this-> get_dati_pcount(__interface_id))+1;
+            (this-> digit_dati_pcount).set_darr_ilayer(&t, __interface_id, 0);
         }
         void
         (add_dato_pid_space(int unsigned(__interface_id )))
