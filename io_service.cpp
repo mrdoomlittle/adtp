@@ -8,7 +8,7 @@
 */
 
 // this is for debugging
-# define INTERFACE_COUNT 1
+# define INTERFACE_COUNT 0
 
 # ifndef ARDUINO
     # include <iostream>
@@ -98,7 +98,7 @@ void
     if ( (this-> is_ptr_to_ghigh_rclock_f (nullptr) ) ) return;
     if ( (this-> is_ptr_to_extern_mlinit_f (nullptr) ) ) return;
     if ( (this-> is_ptr_to_extern_mltick_f (nullptr) ) ) return;
-return;
+return; //debugging stuff
     (this-> toggle_mloop_state( ) );
 
     (this-> toggle_iloop_state( ) );
@@ -107,6 +107,8 @@ return;
     (this-> init_pmanager_cinst( ) );
     (this-> get_pmanager_cinst_ptr()-> set_max_digit_pid_range(12));
     (this-> get_pmanager_cinst_ptr()-> set_min_digit_pid_range(2));
+
+
     (this-> init_sregister_cinst( ) );
 
 
