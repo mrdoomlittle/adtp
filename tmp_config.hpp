@@ -35,6 +35,8 @@ namespace tmp_config
         __nottaken
     } ;
 
+    enum io_t : int unsigned { __i = 0, __o = 1 } ;
+
     // this will create a default interface using the data below / some
     extern bool const
         (create_default_interface);

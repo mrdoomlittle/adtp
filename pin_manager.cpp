@@ -47,6 +47,7 @@ pin_manager::pin_manager(int unsigned(__interface_count))
     (this-> dato_clock_pstate).darr_init(1, __interface_count);
     (this-> dati_latch_pstate).darr_init(1, __interface_count);
     (this-> dato_latch_pstate).darr_init(1, __interface_count);
+
     int low = (tmp_config::digit_pin_low_state);
 
     for (int unsigned(y ) = 0; y != __interface_count; y ++)
@@ -71,6 +72,10 @@ pin_manager::pin_manager(int unsigned(__interface_count))
         (this-> dati_latch_pmode).set_darr_ilayer(&low, y, 0);
         (this-> dato_latch_pmode).set_darr_ilayer(&low, y, 0);
     }
+    //(this-> dati_pid_sstate_list).
+    //(this-> dati_pstate_list).
+    //(this-> dati_pmode_list).
+    //(this-> digit_dati_pid_list).
 
     for (int unsigned(y ) = 0; y != __interface_count; y ++)
     {

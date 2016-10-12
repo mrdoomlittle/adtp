@@ -245,6 +245,17 @@ namespace tmp { class pin_manager
         (uset_dato_pid(int unsigned(__dato_pid_pos), int unsigned(__interface_id ) ));
 
         void
+        (add_dati_pid_space(int unsigned(__interface_id )))
+        {
+
+        }
+        void
+        (add_dato_pid_space(int unsigned(__interface_id )))
+        {
+
+        }
+
+        void
         (set_dati_pid_sstate(bool(__pid_sstate ), int unsigned(__dati_pid_pos), int unsigned(__interface_id)));
         void
         (set_dato_pid_sstate(bool(__pid_sstate ), int unsigned(__dato_pid_pos), int unsigned(__interface_id)));
