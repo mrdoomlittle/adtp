@@ -31,7 +31,7 @@ namespace tmp { template <typename __darr_type> class dynamic_array
             if ((this-> is_darr_init(true)) == true) return;
             if (__darr_length < 1) return;
 
-            if (__darr_depth != 0) {
+            if (__darr_depth > 0) {
                 (this-> darr_llength [(data_id::__main)]) = new int unsigned[__darr_depth];
 
             for (int unsigned(x ) = 0; x != __darr_depth; x ++)
@@ -41,7 +41,7 @@ namespace tmp { template <typename __darr_type> class dynamic_array
             (this-> darr_length) = __darr_length;
             (this-> darr_depth) = __darr_depth;
 
-            if (__darr_depth != 0)
+            if (__darr_depth > 0)
                 (this-> darr_ilayers [(data_id::__main)]) = new __darr_type [__darr_length * __darr_depth];
 
             (this-> toggle_darr_init());
@@ -53,13 +53,13 @@ namespace tmp { template <typename __darr_type> class dynamic_array
             /* we might need to apply somthing to dected if this is not a independent var
             */
 
-            (this-> darr_ilayers [(data_id::__main)] [(this-> get_ilaye_count(__layer_arr_pos, true)) + __ilayer_arr_pos]) = *__ilayer_data;
+            (this-> darr_ilayers [(data_id::__main)] [(this-> get_ilayer_count(__layer_arr_pos, true)) + __ilayer_arr_pos]) = *__ilayer_data;
         }
 
         __darr_type
         (* get_darr_ilayer(int unsigned(__layer_arr_pos), int unsigned(__ilayer_arr_pos)))
         {
-            return (& (this-> darr_ilayers [(data_id::__main)] [(this-> get_ilaye_count(__layer_arr_pos, true)) + __ilayer_arr_pos]));
+            return (& (this-> darr_ilayers [(data_id::__main)] [(this-> get_ilayer_count(__layer_arr_pos, true)) + __ilayer_arr_pos]));
         }
 
         void
@@ -88,10 +88,11 @@ namespace tmp { template <typename __darr_type> class dynamic_array
         }
 
         // change name to get_ilayer_count. i spelt it wrong
-        int unsigned(get_ilaye_count(int unsigned(_il) = 0, bool(sp) = false))
+        int unsigned(get_ilayer_count(int unsigned(_il) = 0, bool(sp) = false))
         {
             int unsigned tmp = 0;
-            for (int unsigned(x ) = 0; x != this-> darr_depth; x ++)
+
+            for (int unsigned(x ) = 0; x != (this-> darr_depth); x ++)
             {
                 if (sp == true && x == _il) break;
                 tmp += (this-> darr_llength [(data_id::__main)][x]);
@@ -103,37 +104,45 @@ namespace tmp { template <typename __darr_type> class dynamic_array
         // NOTE: add functions to resize the array
         void(resize_darr(int unsigned(__resize_type), int unsigned(__layer_arr_pos), int unsigned(__resize_to)))
         {
-            int unsigned tt = __resize_to - (this-> darr_llength[(data_id::__main)][__layer_arr_pos]);
+            int unsigned(ilayers_to_add ) = __resize_to - (this-> darr_llength[(data_id::__main)][__layer_arr_pos]);
+
             switch(__resize_type)
             {
                 case (resize_t::__single_layer) :
                 // need to do this!!!
-                    if (__resize_to <= (this-> darr_length)) return;
+                    if (__resize_to <= (this-> get_darr_length(__layer_arr_pos))) return;
 
                     //(this-> darr_llength[(data_id::__main)][__layer_arr_pos]) = __resize_to;
 
                     //int unsigned tt = __resize_to - (this-> darr_llength[(data_id::__main)][__layer_arr_pos]);
 
-                    (this-> darr_ilayers [(data_id::__swap)]) = new __darr_type [(this-> get_ilaye_count())];
 
-                    for (int unsigned(x ) = 0; x != (this-> get_ilaye_count()); x ++)
+                    (this-> darr_ilayers [(data_id::__swap)]) = new __darr_type [(this-> get_ilayer_count())];
+
+                    for (int unsigned(x ) = 0; x != (this-> get_ilayer_count()); x ++) {
                         (this-> darr_ilayers [(data_id::__swap)] [x]) = (this-> darr_ilayers [(data_id::__main)] [x]);
+                    }
+
 
                     std::free((this-> darr_ilayers [(data_id::__main)]));
 
-                    (this-> darr_ilayers [(data_id::__main)]) = new __darr_type [(this-> get_ilaye_count()) + tt];
+                    (this-> darr_ilayers [(data_id::__main)]) = new __darr_type [(this-> get_ilayer_count()) + ilayers_to_add];
+                    //std::cout << (this-> get_ilayer_count(__layer_arr_pos+1, true)) << std::endl;
 
-                    for (int unsigned(x ) = 0; x != (this-> get_ilaye_count()) + tt; x ++)
+                    //NOTE: fixed bug. changed (this-> get_ilayer_count() + ilayers_to_add) to (this-> get_ilayer_count())
+                    for (int unsigned(x ) = 0; x != (this-> get_ilayer_count()); x ++)
                     {
 
-                        if (x >= (this-> get_ilaye_count(__layer_arr_pos+1, true)) )
-                            (this-> darr_ilayers [(data_id::__main)] [x+tt]) = (this-> darr_ilayers [(data_id::__swap)] [x]);
+                        if (x >= (this-> get_ilayer_count(__layer_arr_pos+1, true)) )
+                            (this-> darr_ilayers [(data_id::__main)] [x+ilayers_to_add]) = (this-> darr_ilayers [(data_id::__swap)] [x]);
                         else
                             (this-> darr_ilayers [(data_id::__main)] [x]) = (this-> darr_ilayers [(data_id::__swap)] [x]);
                     }
 
+                    std::free((this-> darr_ilayers [(data_id::__swap)]));
 
                     (this-> darr_llength[(data_id::__main)][__layer_arr_pos]) = __resize_to;
+
 
                     break;
                 case (resize_t::__all_layers) :
@@ -163,18 +172,9 @@ namespace tmp { template <typename __darr_type> class dynamic_array
 
         void(add_darr_layer(int unsigned(size) = 0))
         {
+
             if (size == 0) size = (this-> darr_length);
-
-            if ((this-> darr_depth) != 0)
-            {
-                (this-> darr_ilayers [(data_id::__swap)]) = new __darr_type [(this-> get_ilaye_count())];
-
-                for (int unsigned(x ) = 0; x != (this-> get_ilaye_count()); x ++)
-                    (this-> darr_ilayers [(data_id::__swap)] [x]) = (this-> darr_ilayers [(data_id::__main)] [x]);
-
-                std::free((this-> darr_ilayers [(data_id::__main)]));
-            }
-
+            //if (size <= (this-> get_ilayer_count()) ) return;
 
             if ((this-> darr_depth) == 0)
             {
@@ -182,23 +182,28 @@ namespace tmp { template <typename __darr_type> class dynamic_array
                 (this-> darr_llength [(data_id::__main)]) = new int unsigned [(this-> darr_depth)];
                 (this-> darr_llength [(data_id::__main)][((this-> darr_depth)-1)]) = size;
 
-                (this-> darr_ilayers [(data_id::__main)]) = new __darr_type [(this-> get_ilaye_count())];
+                (this-> darr_ilayers [(data_id::__main)]) = new __darr_type [(this-> get_ilayer_count())];
 
                 return;
             }
 
             if ((this-> darr_depth) != 0)
             {
-                (this-> darr_ilayers [(data_id::__main)]) = new __darr_type [(this-> get_ilaye_count())+size];
 
-                for (int unsigned(x ) = 0; x != (this-> get_ilaye_count()); x ++)
+                (this-> darr_ilayers [(data_id::__swap)]) = new __darr_type [(this-> get_ilayer_count())];
+
+                for (int unsigned(x ) = 0; x != (this-> get_ilayer_count()); x ++)
+                    (this-> darr_ilayers [(data_id::__swap)] [x]) = (this-> darr_ilayers [(data_id::__main)] [x]);
+
+                std::free((this-> darr_ilayers [(data_id::__main)]));
+
+                (this-> darr_ilayers [(data_id::__main)]) = new __darr_type [(this-> get_ilayer_count()) + size];
+
+                for (int unsigned(x ) = 0; x != (this-> get_ilayer_count()); x ++)
                     (this-> darr_ilayers [(data_id::__main)] [x]) = (this-> darr_ilayers [(data_id::__swap)] [x]);
 
                 std::free((this-> darr_ilayers [(data_id::__swap)]));
-            }
 
-            if ((this-> darr_depth) != 0)
-            {
                 (this-> darr_llength [(data_id::__swap)]) = new int unsigned [(this-> darr_depth)];
                 for (int unsigned(x ) = 0; x != (this-> darr_depth); x ++)
                     (this-> darr_llength [(data_id::__swap)][x]) = (this-> darr_llength [(data_id::__main)][x]);
@@ -220,14 +225,14 @@ namespace tmp { template <typename __darr_type> class dynamic_array
 
         void(del_darr_layer(int unsigned(__layer_arr_pos)))
         {
-            (this-> darr_ilayers [(data_id::__swap)]) = new __darr_type [(this-> get_ilaye_count())];
+            (this-> darr_ilayers [(data_id::__swap)]) = new __darr_type [(this-> get_ilayer_count())];
             (this-> darr_llength [(data_id::__swap)]) = new int unsigned [(this-> darr_depth)-1];
 
             int unsigned (r) = 0;
 
-            for (int unsigned(x ) = 0; x != (this-> get_ilaye_count()); x ++)
+            for (int unsigned(x ) = 0; x != (this-> get_ilayer_count()); x ++)
             {
-                if (x >= (this-> get_ilaye_count(__layer_arr_pos, true)) && x < (this-> get_ilaye_count(__layer_arr_pos, true)) + (this-> darr_llength[(data_id::__main)][__layer_arr_pos])) {r ++; continue;}
+                if (x >= (this-> get_ilayer_count(__layer_arr_pos, true)) && x < (this-> get_ilayer_count(__layer_arr_pos, true)) + (this-> darr_llength[(data_id::__main)][__layer_arr_pos])) {r ++; continue;}
 
                 (this-> darr_ilayers [(data_id::__swap)] [(x-r)]) = (this-> darr_ilayers [(data_id::__main)] [(x)]);
             }
@@ -254,9 +259,9 @@ namespace tmp { template <typename __darr_type> class dynamic_array
 
             std::free((this-> darr_ilayers [(data_id::__main)]));
 
-            (this-> darr_ilayers [(data_id::__main)]) = new __darr_type [(this-> get_ilaye_count())];
+            (this-> darr_ilayers [(data_id::__main)]) = new __darr_type [(this-> get_ilayer_count())];
 
-            for (int unsigned(x ) = 0; x != ((this-> get_ilaye_count())); x ++)
+            for (int unsigned(x ) = 0; x != ((this-> get_ilayer_count())); x ++)
                 (this-> darr_ilayers [(data_id::__main)] [x]) = (this-> darr_ilayers [(data_id::__swap)] [x]);
 
             std::free((this-> darr_ilayers [(data_id::__swap)]));
@@ -269,6 +274,7 @@ namespace tmp { template <typename __darr_type> class dynamic_array
 
         int unsigned(get_darr_depth())
         {
+
             return((this-> darr_depth));
         }
 
@@ -276,8 +282,8 @@ namespace tmp { template <typename __darr_type> class dynamic_array
 
         ~dynamic_array()
         {
-            std::free(this-> darr_ilayers);
-            std::free(this-> darr_layer_tmp);
+            //std::free(this-> darr_ilayers);
+            //std::free(this-> darr_layer_tmp);
         }
 
         void

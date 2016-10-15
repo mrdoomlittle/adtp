@@ -247,17 +247,32 @@ namespace tmp { class pin_manager
         void
         (add_dati_pid_space(int unsigned(__interface_id )))
         {
-            (this-> dati_pid_sstate_list).resize_darr(0, __interface_id, (this-> get_dati_pcount(__interface_id))+1);
-            (this-> dati_pstate_list).resize_darr(0, __interface_id, (this-> get_dati_pcount(__interface_id))+1);
-            (this-> dati_pmode_list).resize_darr(0, __interface_id, (this-> get_dati_pcount(__interface_id))+1);
-            (this-> digit_dati_pid_list).resize_darr(0, __interface_id, (this-> get_dati_pcount(__interface_id))+1);
-            int unsigned t = (this-> get_dati_pcount(__interface_id))+1;
+            (this-> dati_pid_sstate_list).resize_darr(0, __interface_id, ((this-> get_dati_pcount(__interface_id)) + 1));
+
+            (this-> dati_pstate_list).resize_darr(0, __interface_id, ((this-> get_dati_pcount(__interface_id)) + 1));
+
+            (this-> dati_pmode_list).resize_darr(0, __interface_id, ((this-> get_dati_pcount(__interface_id)) + 1));
+
+            (this-> digit_dati_pid_list).resize_darr(0, __interface_id, ((this-> get_dati_pcount(__interface_id)) + 1));
+
+            int unsigned t = ((this-> get_dati_pcount(__interface_id)) + 1);
+
             (this-> digit_dati_pcount).set_darr_ilayer(&t, __interface_id, 0);
         }
         void
         (add_dato_pid_space(int unsigned(__interface_id )))
         {
+            (this-> dato_pid_sstate_list).resize_darr(0, __interface_id, ((this-> get_dato_pcount(__interface_id)) + 1));
 
+            (this-> dato_pstate_list).resize_darr(0, __interface_id, ((this-> get_dato_pcount(__interface_id)) + 1));
+
+            (this-> dato_pmode_list).resize_darr(0, __interface_id, ((this-> get_dato_pcount(__interface_id)) + 1));
+
+            (this-> digit_dato_pid_list).resize_darr(0, __interface_id, ((this-> get_dato_pcount(__interface_id)) + 1));
+
+            int unsigned t = ((this-> get_dato_pcount(__interface_id)) + 1);
+
+            (this-> digit_dato_pcount).set_darr_ilayer(&t, __interface_id, 0);
         }
 
         void
@@ -288,17 +303,22 @@ namespace tmp { class pin_manager
 
         bool(does_dati_pid_exist(uint8_t(__digit_pid), int unsigned(__interface_id)))
         {
-            for (int unsigned(x ) = 0; x != (this-> get_dati_pcount(__interface_id)); x ++)
+            for (int unsigned(x ) = 0; x != (this-> get_dati_pcount(__interface_id)); x ++) {
                 if ((this-> get_dati_pid(x, __interface_id)) == __digit_pid) return (true);
+            }
+
             return (false);
         }
 
         bool(does_dato_pid_exist(uint8_t(__digit_pid), int unsigned(__interface_id)))
         {
-            for (int unsigned(x ) = 0; x != (this-> get_dato_pcount(__interface_id)); x ++)
+            for (int unsigned(x ) = 0; x != (this-> get_dato_pcount(__interface_id)); x ++) {
                 if ((this-> get_dato_pid(x, __interface_id)) == __digit_pid) return (true);
+            }
+
             return (false);
         }
+
 } ; }
 
 # endif /*__pin__manager__hpp__*/

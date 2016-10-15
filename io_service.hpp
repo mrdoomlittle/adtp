@@ -17,6 +17,7 @@
 # include "shift_reg.hpp"
 # include "time.hpp"
 # include "interface.hpp"
+# include "array.hpp"
 /* example: if the start state is 0x0 then the clock will start ticking when changes to 0x1
 */
 namespace tmp { class io_service
@@ -41,6 +42,8 @@ namespace tmp { class io_service
         sregister_ct
         (* get_sregister_cinst_ptr());
 
+
+
         void
         (init_pmanager_cinst());
 
@@ -50,6 +53,17 @@ namespace tmp { class io_service
         (init_sregister_cinst());
 
         bool(has_sregister_cinst_init ) = false;
+
+        typedef interface interface_ct;
+        interface_ct
+            (* interface_cinst_ptr ) = nullptr;
+
+        void
+        (init_interface_cinst());
+        interface_ct
+            (* get_interface_cinst_ptr());
+
+        bool(has_interface_cinst_init ) = false;
 
     private :
         int unsigned(digit_i_pin_count ) =

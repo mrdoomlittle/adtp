@@ -8,7 +8,7 @@
 */
 
 // this is for debugging
-# define INTERFACE_COUNT 0
+# define INTERFACE_COUNT 1
 
 # ifndef ARDUINO
     # include <iostream>
@@ -16,18 +16,6 @@
 
 namespace tmp
 {
-
-io_service::pmanager_ct
-(* io_service::get_pmanager_cinst_ptr( ) )
-{
-    return ( (this-> pmanager_cinst_ptr) );
-}
-io_service::sregister_ct
-(* io_service::get_sregister_cinst_ptr( ) )
-{
-    return ( (this-> sregister_cinst_ptr) );
-}
-
 void
 (io_service::init_pmanager_cinst( ) )
 {
@@ -39,33 +27,63 @@ void
 
     (this-> has_pmanager_cinst_init ) = true;
 }
+io_service::pmanager_ct
+(* io_service::get_pmanager_cinst_ptr( ) )
+{
+    return ( (this-> pmanager_cinst_ptr) );
+}
+
 void
 (io_service::init_sregister_cinst( ) )
 {
     if ( (this-> has_sregister_cinst_init) == true) return;
 
     static sregister_ct sregister_cinstance;
+    // might change this
     sregister_cinstance.set_pmanager_cinst_ptr((this-> pmanager_cinst_ptr));
 
     (this-> sregister_cinst_ptr ) = & sregister_cinstance;
 
     (this-> has_sregister_cinst_init ) = true;
 }
+io_service::sregister_ct
+(* io_service::get_sregister_cinst_ptr( ) )
+{
+    return ( (this-> sregister_cinst_ptr) );
+}
+
+void
+(io_service::init_interface_cinst( ) )
+{
+    if ( (this-> has_interface_cinst_init) == true) return;
+
+    static interface_ct interface_cinstance;
+
+    (this-> interface_cinst_ptr ) = & interface_cinstance;
+
+    (this-> has_interface_cinst_init ) = true;
+}
+io_service::interface_ct
+(* io_service::get_interface_cinst_ptr( ) )
+{
+    return ( (this-> interface_cinst_ptr) );
+}
 
 io_service::io_service( )
 {
 
 }
+
 io_service::~io_service( )
 {
     if ( (this-> has_pmanager_cinst_init) == true)
     {
-        //std::free ( (this-> get_pmanager_cinst_ptr( ) ) );
+        //delete ( (this-> get_pmanager_cinst_ptr( ) ) );
     }
 
     if ( (this-> has_sregister_cinst_init) == true)
     {
-        //std::free ( (this-> get_sregister_cinst_ptr( ) ) );
+        //delete ( (this-> get_sregister_cinst_ptr( ) ) );
     }
 }
 
@@ -85,6 +103,7 @@ void
         (* __extern_mltick_fptr)
 ) )
 {
+    bool __setup_def_interface = true;
     (this-> set_ptr_to_sdigit_pmode_f (__set_digit_pmode_fptr) );
     (this-> set_ptr_to_sdigit_pstate_f (__set_digit_pstate_fptr) );
     (this-> set_ptr_to_gdigit_pstate_f (__get_digit_pstate_fptr) );
@@ -98,7 +117,7 @@ void
     if ( (this-> is_ptr_to_ghigh_rclock_f (nullptr) ) ) return;
     if ( (this-> is_ptr_to_extern_mlinit_f (nullptr) ) ) return;
     if ( (this-> is_ptr_to_extern_mltick_f (nullptr) ) ) return;
-return; //debugging stuff
+
     (this-> toggle_mloop_state( ) );
 
     (this-> toggle_iloop_state( ) );
@@ -108,9 +127,8 @@ return; //debugging stuff
     (this-> get_pmanager_cinst_ptr()-> set_max_digit_pid_range(12));
     (this-> get_pmanager_cinst_ptr()-> set_min_digit_pid_range(2));
 
-
     (this-> init_sregister_cinst( ) );
-
+    (this-> init_interface_cinst( ) );
 
     for (int unsigned x = 0; x != (this-> get_pmanager_cinst_ptr( ) )-> get_dati_pcount( 0); x++)
         (this-> get_pmanager_cinst_ptr( ) )-> set_dati_pid ( (tmp_config::def_digit_dati_pids [x]), x, 0/*interface id*/);
@@ -118,17 +136,18 @@ return; //debugging stuff
     for (int unsigned x = 0; x != (this-> get_pmanager_cinst_ptr( ) )-> get_dato_pcount( 0); x++)
         (this-> get_pmanager_cinst_ptr( ) )-> set_dato_pid ( (tmp_config::def_digit_dato_pids [x]), x, 0/*interface id*/);
 
-    (this-> get_pmanager_cinst_ptr( ) )->
-        set_mio_clock_pid (tmp_config::def_digit_mio_clock_pid, 0);
-    (this-> get_pmanager_cinst_ptr( ) )->
-        set_dati_clock_pid (tmp_config::def_digit_dati_clock_pid, 0);
-    (this-> get_pmanager_cinst_ptr( ) )->
-        set_dato_clock_pid (tmp_config::def_digit_dato_clock_pid, 0);
-
-    (this-> get_pmanager_cinst_ptr( ) )->
-        set_dati_latch_pid (tmp_config::def_digit_dati_latch_pid, 0);
-    (this-> get_pmanager_cinst_ptr( ) )->
-        set_dato_latch_pid (tmp_config::def_digit_dato_latch_pid, 0);
+    if (__setup_def_interface == true) {
+        (this-> get_pmanager_cinst_ptr( ) )->
+            set_mio_clock_pid (tmp_config::def_digit_mio_clock_pid, 0);
+        (this-> get_pmanager_cinst_ptr( ) )->
+            set_dati_clock_pid (tmp_config::def_digit_dati_clock_pid, 0);
+        (this-> get_pmanager_cinst_ptr( ) )->
+            set_dato_clock_pid (tmp_config::def_digit_dato_clock_pid, 0);
+        (this-> get_pmanager_cinst_ptr( ) )->
+            set_dati_latch_pid (tmp_config::def_digit_dati_latch_pid, 0);
+        (this-> get_pmanager_cinst_ptr( ) )->
+            set_dato_latch_pid (tmp_config::def_digit_dato_latch_pid, 0);
+    }
 
     /* this is a simulated output so i can test if its working right
     */
@@ -141,6 +160,7 @@ return; //debugging stuff
     (this-> digit_dato_bitset [6] ) = 1;
     (this-> digit_dato_bitset [7] ) = 1;
 
+
     (this-> dati_bitset_length).darr_init(1, INTERFACE_COUNT);
     (this-> dato_bitset_length).darr_init(1, INTERFACE_COUNT);
 
@@ -150,17 +170,17 @@ return; //debugging stuff
         (this-> dato_bitset_length).set_darr_ilayer(const_cast<int unsigned *>(&(tmp_config::def_dati_bitset_length)), iface, 0);
     }
 
-    this-> ibit_read_holdup = tmp_config::def_ibit_read_holdup;
+    (this-> ibit_read_holdup ) = tmp_config::def_ibit_read_holdup;
 
-    this-> obit_write_holdup = tmp_config::def_obit_write_holdup;
+    (this-> obit_write_holdup ) = tmp_config::def_obit_write_holdup;
 
-    this-> ibyte_read_holdup = tmp_config::def_ibyte_read_holdup;
+    (this-> ibyte_read_holdup ) = tmp_config::def_ibyte_read_holdup;
 
-    this-> obyte_write_holdup = tmp_config::def_obyte_write_holdup;
+    (this-> obyte_write_holdup ) = tmp_config::def_obyte_write_holdup;
 
-    this-> ibitset_buff_size = tmp_config::def_ibitset_buff_size;
+    (this-> ibitset_buff_size ) = tmp_config::def_ibitset_buff_size;
 
-    this-> obitset_buff_size = tmp_config::def_obitset_buff_size;
+    (this-> obitset_buff_size ) = tmp_config::def_obitset_buff_size;
 
     for (int unsigned(iface ) = 0; iface != INTERFACE_COUNT; iface ++)
         (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )->
@@ -186,6 +206,7 @@ return; //debugging stuff
     //{
         (this-> digit_datio_bitset[(bitset_id::__i_bitset)]).bitset_init ( *(this-> dati_bitset_length).get_darr_ilayer(0, 0), INTERFACE_COUNT, false);
         (this-> digit_datio_bitset[(bitset_id::__o_bitset)]).bitset_init ( *(this-> dato_bitset_length).get_darr_ilayer(0, 0), INTERFACE_COUNT, false);
+
         for (int unsigned iface = 0; iface != INTERFACE_COUNT; iface ++)
         {
             (this-> digit_datio_bitset[(bitset_id::__i_bitset)]).get_bitset_cinst_ptr(iface)-> bitset_init(INTERFACE_COUNT);
@@ -218,6 +239,15 @@ return; //debugging stuff
 
         (this-> set_mltick_count ( (this-> real_mltick_count ) ) );
 
+        if ( (this-> get_mltick_count( ) ) == 0 )
+            if ( (this-> call_extern_mlinit (this ) ) == 0) return;
+
+        if ( (this-> call_extern_mltick (this ) ) == 0) return;
+
+        if ((this-> get_interface_cinst_ptr()-> get_iface_count()) == 0) continue;
+
+
+
         (this-> update_clock_reading( ) );
 
         ((this-> get_pmanager_cinst_ptr())-> update_dati_clock_pstate((this-> get_digit_pstate((this-> get_pmanager_cinst_ptr())-> get_dati_clock_pid(0))), 0/*iface id*/));
@@ -231,10 +261,7 @@ return; //debugging stuff
         (this-> ibit_read_holdup ) = ( (this-> ibit_read_holdup ) + ( ( (this-> ibyte_read_holdup ) - 1) * (8/*bitset_length*/ / ((this-> get_pmanager_cinst_ptr())-> get_dati_pcount(0)) ) ) );
         (this-> obit_write_holdup ) = ( (this-> obit_write_holdup ) + ( ( (this-> obyte_write_holdup ) - 1) * (8/*bitset_length*/ / ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount(0)) ) ) );
 
-        if ( (this-> get_mltick_count( ) ) == 0 )
-            if ( (this-> call_extern_mlinit (this ) ) == 0) return;
 
-        if ( (this-> call_extern_mltick (this ) ) == 0) return;
 return;
         for (int unsigned(x ) = 0; x != (this-> obitset_buff_size ); x ++)
             (this-> dati_bitset_buff).add_to_dbuff((this-> get_io_bitset (0, 1, 0, x)), 2, 0, 0, x, true, true, false);
