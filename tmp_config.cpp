@@ -61,10 +61,10 @@ int unsigned const tmp_config::def_obitset_buff_size = 8;
 int unsigned const tmp_config::def_digit_dati_pcount = 2;
 int unsigned const tmp_config::def_digit_dato_pcount = 2;
 
-int unsigned const tmp_config::def_digit_dati_pids
+uint8_t const tmp_config::def_digit_dati_pids
     [(tmp_config::def_digit_dati_pcount)] = {2, 3};
 
-int unsigned const tmp_config::def_digit_dato_pids
+uint8_t const tmp_config::def_digit_dato_pids
     [(tmp_config::def_digit_dato_pcount)] = {4, 5};
 
 int unsigned const

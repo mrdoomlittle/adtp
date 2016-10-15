@@ -12,7 +12,7 @@ int main()
 
     tmp::pin_manager pmanager(5);
 
-    (pmanager.set_max_digit_pid_range(12));
+    (pmanager.set_max_digit_pid_range(22));
     (pmanager.set_min_digit_pid_range(2));
 
     tmp::interface iface;
@@ -27,7 +27,7 @@ int main()
     dato[0] = 8;
     dato[1] = 9;
 
-    iface.create_iface("192.168.0.100", dati, dato, 6, 7, 8, 9);
+    iface.create_iface("192.168.0.100", dati, dato, 10, 11, 12, 13);
     std::cout << iface.update_pmanager(&pmanager, 0) << std::endl;
     std::cout << iface.update_pmanager(&pmanager, 1) << std::endl;
 

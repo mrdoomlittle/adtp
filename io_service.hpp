@@ -42,8 +42,6 @@ namespace tmp { class io_service
         sregister_ct
         (* get_sregister_cinst_ptr());
 
-
-
         void
         (init_pmanager_cinst());
 
@@ -207,7 +205,7 @@ namespace tmp { class io_service
         uint8_t
         (* get_o_bitset (int unsigned(__get_type), int unsigned(__bitset_arr_pos)));
 
-        bitset <__bitset_type> (* digit_io_bitset ) = new bitset <__bitset_type> [2];
+        //bitset <__bitset_type> (* digit_io_bitset ) = new bitset <__bitset_type> [2];
         bitset_list <__bitset_type> (* digit_datio_bitset) = new bitset_list <__bitset_type>[2];
 
         uint8_t

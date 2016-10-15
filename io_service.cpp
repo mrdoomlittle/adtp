@@ -21,7 +21,7 @@ void
 {
     if ( (this-> has_pmanager_cinst_init) == true) return;
 
-    static pmanager_ct pmanager_cinstance(2);
+    static pmanager_ct pmanager_cinstance(INTERFACE_COUNT);
 
     (this-> pmanager_cinst_ptr ) = & pmanager_cinstance;
 
@@ -124,30 +124,24 @@ void
 
     // create a instance of classes
     (this-> init_pmanager_cinst( ) );
+
     (this-> get_pmanager_cinst_ptr()-> set_max_digit_pid_range(12));
     (this-> get_pmanager_cinst_ptr()-> set_min_digit_pid_range(2));
 
     (this-> init_sregister_cinst( ) );
     (this-> init_interface_cinst( ) );
 
-    for (int unsigned x = 0; x != (this-> get_pmanager_cinst_ptr( ) )-> get_dati_pcount( 0); x++)
-        (this-> get_pmanager_cinst_ptr( ) )-> set_dati_pid ( (tmp_config::def_digit_dati_pids [x]), x, 0/*interface id*/);
+    array <uint8_t> dati(2, {(tmp_config::def_digit_dati_pids [0]), (tmp_config::def_digit_dati_pids [1])}, true);
+    array <uint8_t> dato(2, {(tmp_config::def_digit_dato_pids [0]), (tmp_config::def_digit_dato_pids [1])}, true);
+    (this-> get_interface_cinst_ptr()-> create_iface("192.168.0.100", dati, dato, 6, 7, 8, 9));
 
-    for (int unsigned x = 0; x != (this-> get_pmanager_cinst_ptr( ) )-> get_dato_pcount( 0); x++)
-        (this-> get_pmanager_cinst_ptr( ) )-> set_dato_pid ( (tmp_config::def_digit_dato_pids [x]), x, 0/*interface id*/);
+    //this will activate the default interface and  push the data to the pin manager
+    if ((this-> get_interface_cinst_ptr()-> update_pmanager ((this-> get_pmanager_cinst_ptr()), 0)) == 0) return;
 
-    if (__setup_def_interface == true) {
-        (this-> get_pmanager_cinst_ptr( ) )->
-            set_mio_clock_pid (tmp_config::def_digit_mio_clock_pid, 0);
-        (this-> get_pmanager_cinst_ptr( ) )->
-            set_dati_clock_pid (tmp_config::def_digit_dati_clock_pid, 0);
-        (this-> get_pmanager_cinst_ptr( ) )->
-            set_dato_clock_pid (tmp_config::def_digit_dato_clock_pid, 0);
-        (this-> get_pmanager_cinst_ptr( ) )->
-            set_dati_latch_pid (tmp_config::def_digit_dati_latch_pid, 0);
-        (this-> get_pmanager_cinst_ptr( ) )->
-            set_dato_latch_pid (tmp_config::def_digit_dato_latch_pid, 0);
-    }
+    /*
+        when looking thru interfaces unless the pin manager state for that iface is __does_exist we will skip it
+        NOTE: add that.
+    */
 
     /* this is a simulated output so i can test if its working right
     */
@@ -160,11 +154,10 @@ void
     (this-> digit_dato_bitset [6] ) = 1;
     (this-> digit_dato_bitset [7] ) = 1;
 
+    (this-> dati_bitset_length).darr_init(1, (this-> get_interface_cinst_ptr()-> get_iface_count()));
+    (this-> dato_bitset_length).darr_init(1, (this-> get_interface_cinst_ptr()-> get_iface_count()));
 
-    (this-> dati_bitset_length).darr_init(1, INTERFACE_COUNT);
-    (this-> dato_bitset_length).darr_init(1, INTERFACE_COUNT);
-
-    for (int unsigned iface = 0; iface != INTERFACE_COUNT; iface ++)
+    for (int unsigned iface = 0; iface != (this-> get_interface_cinst_ptr()-> get_iface_count()); iface ++)
     {
         (this-> dati_bitset_length).set_darr_ilayer(const_cast<int unsigned *>(&(tmp_config::def_dati_bitset_length)), iface, 0);
         (this-> dato_bitset_length).set_darr_ilayer(const_cast<int unsigned *>(&(tmp_config::def_dati_bitset_length)), iface, 0);
@@ -182,26 +175,28 @@ void
 
     (this-> obitset_buff_size ) = tmp_config::def_obitset_buff_size;
 
-    for (int unsigned(iface ) = 0; iface != INTERFACE_COUNT; iface ++)
+    for (int unsigned(iface ) = 0; iface != (this-> get_interface_cinst_ptr()-> get_iface_count()); iface ++)
         (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )->
             get_mio_clock_pid(iface), tmp_config::digit_pin_input_mode) );
 
-    for (int unsigned(iface ) = 0; iface != INTERFACE_COUNT; iface ++)
+    for (int unsigned(iface ) = 0; iface != (this-> get_interface_cinst_ptr()-> get_iface_count()); iface ++)
         (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )->
             get_dati_clock_pid(iface), tmp_config::digit_pin_input_mode) );
 
-    for (int unsigned(iface ) = 0; iface != INTERFACE_COUNT; iface ++)
+    for (int unsigned(iface ) = 0; iface != (this-> get_interface_cinst_ptr()-> get_iface_count()); iface ++)
         (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )->
             get_dato_clock_pid(iface), tmp_config::digit_pin_output_mode) );
 
-    for (int unsigned(iface ) = 0; iface != INTERFACE_COUNT; iface ++)
+    for (int unsigned(iface ) = 0; iface != (this-> get_interface_cinst_ptr()-> get_iface_count()); iface ++)
         for (int unsigned(x ) = 0; x != (this-> get_pmanager_cinst_ptr( ) )-> get_dati_pcount(iface); x ++)
-            (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )-> get_dati_pid (x, 0/*interface id*/), tmp_config::digit_pin_input_mode) );
+            (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )-> get_dati_pid (x, iface), tmp_config::digit_pin_input_mode) );
 
-    for (int unsigned(iface ) = 0; iface != INTERFACE_COUNT; iface ++)
+    for (int unsigned(iface ) = 0; iface != (this-> get_interface_cinst_ptr()-> get_iface_count()); iface ++)
         for (int unsigned(x ) = 0; x != (this-> get_pmanager_cinst_ptr( ) )-> get_dato_pcount(iface); x ++)
-            (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )-> get_dato_pid (x, 0/*interface id*/), tmp_config::digit_pin_output_mode) );
+            (this-> set_digit_pmode ( (this-> get_pmanager_cinst_ptr( ) )-> get_dato_pid (x, iface), tmp_config::digit_pin_output_mode) );
 
+
+return;
     //for (int unsigned iface = 0; iface != INTERFACE_COUNT; iface ++)
     //{
         (this-> digit_datio_bitset[(bitset_id::__i_bitset)]).bitset_init ( *(this-> dati_bitset_length).get_darr_ilayer(0, 0), INTERFACE_COUNT, false);
@@ -245,8 +240,6 @@ void
         if ( (this-> call_extern_mltick (this ) ) == 0) return;
 
         if ((this-> get_interface_cinst_ptr()-> get_iface_count()) == 0) continue;
-
-
 
         (this-> update_clock_reading( ) );
 

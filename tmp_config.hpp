@@ -107,9 +107,9 @@ namespace tmp_config
     extern int unsigned const
         (def_digit_dato_pcount);
 
-    extern int unsigned const
+    extern uint8_t const
         (def_digit_dati_pids[]);
-    extern int unsigned const
+    extern uint8_t const
         (def_digit_dato_pids[]);
 
     extern int unsigned const
