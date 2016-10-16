@@ -24,7 +24,7 @@ namespace tmp { template <typename __bitset_t> class bitset_list
                 return;
             }
 
-            if (__length_of_ebitset == 0)
+            if (__length_of_ebitset == 0 && __init_bitsets_now == true)
             {
                 error_detection.add_error(0);
                 return;

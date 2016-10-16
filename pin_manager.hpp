@@ -244,7 +244,7 @@ namespace tmp { class pin_manager
         void
         (uset_dato_pid(int unsigned(__dato_pid_pos), int unsigned(__interface_id ) ));
 
-        void
+        void // change to add_dati_pin_space
         (add_dati_pid_space(int unsigned(__interface_id )))
         {
             (this-> dati_pid_sstate_list).resize_darr(0, __interface_id, ((this-> get_dati_pcount(__interface_id)) + 1));
@@ -303,6 +303,7 @@ namespace tmp { class pin_manager
 
         bool(does_dati_pid_exist(uint8_t(__digit_pid), int unsigned(__interface_id)))
         {
+            if ((this-> get_dati_pcount(__interface_id)) == 0) return false;
             for (int unsigned(x ) = 0; x != (this-> get_dati_pcount(__interface_id)); x ++) {
                 if ((this-> get_dati_pid(x, __interface_id)) == __digit_pid) return (true);
             }
@@ -312,6 +313,7 @@ namespace tmp { class pin_manager
 
         bool(does_dato_pid_exist(uint8_t(__digit_pid), int unsigned(__interface_id)))
         {
+            if ((this-> get_dato_pcount(__interface_id)) == 0) return false;
             for (int unsigned(x ) = 0; x != (this-> get_dato_pcount(__interface_id)); x ++) {
                 if ((this-> get_dato_pid(x, __interface_id)) == __digit_pid) return (true);
             }

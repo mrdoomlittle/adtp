@@ -22,8 +22,9 @@
 */
 namespace tmp { class io_service
 {
+
     private :
-        int unsigned(amount_of_interfaces) = 2;
+        int unsigned(amount_of_interfaces) = 2;// not needed ?
     protected :
         typedef time time_ct;
         time_ct
@@ -55,7 +56,7 @@ namespace tmp { class io_service
         typedef interface interface_ct;
         interface_ct
             (* interface_cinst_ptr ) = nullptr;
-
+        public:
         void
         (init_interface_cinst());
         interface_ct
@@ -206,7 +207,7 @@ namespace tmp { class io_service
         (* get_o_bitset (int unsigned(__get_type), int unsigned(__bitset_arr_pos)));
 
         //bitset <__bitset_type> (* digit_io_bitset ) = new bitset <__bitset_type> [2];
-        bitset_list <__bitset_type> (* digit_datio_bitset) = new bitset_list <__bitset_type>[2];
+        bitset_list <__bitset_type> (* digit_datio_bitset) = new bitset_list <__bitset_type> [2];
 
         uint8_t
         (* digit_dati_bitset ) = new uint8_t [/*dati_bitset_length*/8];
@@ -222,11 +223,21 @@ namespace tmp { class io_service
         int unsigned(o_bitset_fcount ) = 0;
 
     public :
-        dynamic_buffer <uint8_t> (i_bitset_buffer);
+    /* NOTE: need to fix the dynamic buffer as its doing the same things that the dynamic array was doing
+        if block size is higher then 21 it will cause a core dump
+    */
+        int unsigned buffsize = 21;
+        void (add_to_obs_stream(bitset<int unsigned>(& __obs), int unsigned(__iface)))
+        {
+            for (int unsigned(x ) = 0; x != 8; x ++)
+                (this-> dato_obs_stream_buff).add_to_dbuff(__obs.get_bitset(0, x), 2, __iface, 0, 0, false, true, true);
+        }
+
+        dynamic_buffer <int unsigned> (dato_obs_stream_buff);
+
+        //dynamic_buffer <uint8_t> (* datio_bitset_buff) = new dynamic_buffer <uint8_t> [2];
+
         dynamic_buffer <uint8_t> (dati_bitset_buff); // this is the newly named one
-
-
-        dynamic_buffer <uint8_t> (o_bitset_buffer);
         dynamic_buffer <uint8_t> (dato_bitset_buff); // this is the newly named one
 
         int unsigned(i_bitset_buff_pos [2]) = {0, 0};

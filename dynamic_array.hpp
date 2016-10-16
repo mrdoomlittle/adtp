@@ -29,7 +29,7 @@ namespace tmp { template <typename __darr_type> class dynamic_array
         (darr_init (int unsigned(__darr_length), int unsigned(__darr_depth ) ) )
         {
             if ((this-> is_darr_init(true)) == true) return;
-            if (__darr_length < 1) return;
+            //if (__darr_length < 1) return; fix
 
             if (__darr_depth > 0) {
                 (this-> darr_llength [(data_id::__main)]) = new int unsigned[__darr_depth];

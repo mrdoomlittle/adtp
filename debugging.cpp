@@ -16,10 +16,6 @@
 # include <iostream>
 
 # include "dynamic_array.hpp"
-# include "carg_filter.hpp"
-# include "data_packet.hpp"
-
-# include "pin_manager.hpp"
 # include "tmp_config.hpp"
 
 void
@@ -82,7 +78,7 @@ int unsigned long (get_high_res_clock (int unsigned(__time_format) ) )
     }
     return 0;
 }
-
+// clean this up and use the dynamic_array.hpp or just array.hpp
 int unsigned(simulated_pin_state_i [3] [8]) = {
     {0x1, 0x0, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}, {0x1, 0x1, 0x0, 0x1, 0x1, 0x1, 0x1, 0x1}, {0x1, 0x1, 0x1, 0x0, 0x1, 0x1, 0x1, 0x1} } ;
 
@@ -99,6 +95,8 @@ int unsigned(current_pin_pos_c ) = 0;
 int unsigned tttt [4] = {0x1, 0x0, 0x1, 0x0};
 int unsigned xcc = 0;
 int unsigned out = 0;
+
+bool ddodhjiu = false;
 
 int
 (get_digit_pin_state (uint8_t(__digit_pid ) ) )
@@ -119,7 +117,7 @@ int
         return simulated_return_i;
     }
 
-    if (__digit_pid == 6 )
+    if (__digit_pid == 10)
     {
         simulated_return_c = (simulated_pin_state_c [current_pin_pos_c]);
         if (current_pin_pos_c == 9)
@@ -128,6 +126,14 @@ int
             current_pin_pos_c ++;
         return simulated_return_c;
     }
+
+    if (__digit_pid == 6)
+    {
+        ddodhjiu = ddodhjiu == false? true : false;
+
+        return 0x0;
+    }
+
     if (__digit_pid == 7 )
     {
         out = tttt[xcc];
@@ -138,6 +144,7 @@ int
 
         return (out);
     }
+
     return(0);
 }
 
@@ -155,111 +162,113 @@ uint8_t test[8][8] =
     {1, 1, 1, 1, 1, 1, 0, 1},
     {1, 1, 1, 1, 1, 1, 1, 0},
 };
-
+# include "bitset.hpp"
+tmp::bitset <int unsigned> obs;
 int unsigned
 (external_mlinit (tmp::io_service(* __io_service ) ) )
 {
+    obs.bitset_init(8);
     std::cout << "This Project is Still Early Development and Many things Need Fixing. Sorry :(" << std::endl;
 
-    return 0;
+    return 0; 
 }
+# include "bitset.hpp"
 
 int unsigned
 (external_mltick (tmp::io_service(* __io_service ) ) )
 {
+    //for (int unsigned x = 0; x != 8; x ++)
+        //(__io_service-> dato_bitset_buff).add_to_dbuff(&(test[pos][x]), 2, 0, 0, 0, false, true, true);
 
-    std::cout << "SET_IO_BITSET" << std::endl;
+    //std::cout << "SET_IO_BITSET" << std::endl;
+
+    int unsigned bitset[8] = {1, 0, 0, 1, 0, 0, 0, 1};
+
+    obs.set_bitset(bitset, 1, 0);
+
+    __io_service-> add_to_obs_stream(obs, 0);
+/*
+
     __io_service-> set_io_bitset(0, 1, test[pos], 1, 0);
-    return 0;
+
     __io_service-> flip_io_bitset(0, 1);
 
-    tcount = 0;
+    //tcount = 0;
     if (pos == 7)
         pos = 0;
     else
-        pos ++;
-    for (int unsigned (iface ) = 0; iface != 1; iface ++) {
-    for (int unsigned (x ) = 0; x != 8; x ++)
-        std::cout << unsigned(* __io_service-> get_io_bitset(0, 0, 0, x));
+        pos ++;*/
 
-
-    std::cout << "/I::BITSET\n" << std::endl;
-
-    for (int unsigned (x ) = 0; x != 8; x ++)
-        std::cout << unsigned(* __io_service-> get_io_bitset(0, 1, 0, x));
-
-    std::cout << "/O::BITSET\n" << std::endl;
-
-    for (int unsigned(x ) = 0; x != 8; x ++)
+    for (int unsigned iface = 0; iface != (__io_service-> get_interface_cinst_ptr()-> get_iface_count()); iface ++)
     {
-        for (int unsigned(y ) = 0; y != 8; y ++)
-            std::cout << unsigned(*__io_service-> dati_bitset_buff.get_from_dbuff(2, iface, x, y, false, false, false, true));
 
-        if ((__io_service-> dati_bitset_buff).is_block_smarker(true, iface, x) == true)
-            std::cout << " & SM: " << "USED";
-        else
-            std::cout << " & SM: " << "FREE";
+        if ((__io_service-> get_interface_cinst_ptr()-> is_iface_pmanager_state(1/*__doesent_exist*/, iface))) continue;
 
-        std::cout << " : : ";
-
-        for (int unsigned(y ) = 0; y != 8; y ++)
-            std::cout << unsigned(*__io_service-> dato_bitset_buff.get_from_dbuff(2, iface, x, y, false, false, false, true));
-
-        if (__io_service-> dato_bitset_buff.is_block_smarker(true, iface, x) == true)
-            std::cout << " & SM: " << "USED";
-        else
-            std::cout << " & SM: " << "FREE";
-
-        if (__io_service -> o_bitset_buff_pos[0] == x)
+        std::cout << "DATO OBS Stream Buffer: " << std::endl;
+        for (int unsigned(x ) = 0; x != __io_service-> buffsize; x ++)
         {
-            std::cout << " : BPOS<>";
+            std::cout << "  ";
+            for (int unsigned(y ) = 0; y != 8; y ++)
+            {
+                std::cout << unsigned(*__io_service-> dato_obs_stream_buff.get_from_dbuff(2, iface, x, y, false, false, false, true));
+            }
+            std::cout << std::endl;
         }
 
-        std::cout << std::endl;
-    }}
-    tcount++;
+
+        std::cout << "\nIFACE ID: " << iface << std::endl;
+        std::cout << "  ";
+        for (int unsigned(x ) = 0; x != 8; x ++)
+            std::cout << unsigned(* __io_service-> get_io_bitset(iface, (tmp_config::io_t::__i), 0, x));
+
+        std::cout << " / I::BITSET" << " : : ";
+
+        for (int unsigned(x ) = 0; x != 8; x ++)
+            std::cout << unsigned(* __io_service-> get_io_bitset(iface,  (tmp_config::io_t::__o), 0, x));
+
+        std::cout << " / O::BITSET\n\n";
+
+        for (int unsigned(x ) = 0; x != 8; x ++)
+        {
+            std::cout << "  ";
+            for (int unsigned(y ) = 0; y != 8; y ++)
+                std::cout << unsigned(*__io_service-> dati_bitset_buff.get_from_dbuff(2, iface, x, y, false, false, false, true));
+
+            if ((__io_service-> dati_bitset_buff).is_block_smarker(true, iface, x) == true)
+                std::cout << " & SM: " << "USED";
+            else
+                std::cout << " & SM: " << "FREE";
+
+            if (__io_service -> i_bitset_buff_pos[0] == x)
+                std::cout << " : ><";
+            else
+                std::cout << " : <>";
+
+            std::cout << " : : ";
+
+            for (int unsigned(y ) = 0; y != 8; y ++)
+                std::cout << unsigned(*__io_service-> dato_bitset_buff.get_from_dbuff(2, iface, x, y, false, false, false, true));
+
+            if (__io_service-> dato_bitset_buff.is_block_smarker(true, iface, x) == true)
+                std::cout << " & SM: " << "USED";
+            else
+                std::cout << " & SM: " << "FREE";
+
+            if (__io_service -> o_bitset_buff_pos[0] == x)
+                std::cout << " : ><";
+            else
+                std::cout << " : <>";
+
+            std::cout << std::endl;
+        }
+    }
 
     return 1;
 }
 
-# include "shift_reg.hpp"
-# include "port_manager.hpp"
-# include "dynamic_array.hpp"
-# include "dpacket_array.hpp"
-# include "tmp_ip.hpp"
-# include "socket_manager.hpp"
-# include "cint_convert.hpp"
-# include "pin_manager.hpp"
-
-
 int
 (main( ) )
 {
-
-    //tmp::pin_manager __pin_manager(1/*iface count*/);
-    /*
-    tmp::shift_reg __shift_reg;
-
-    (__pin_manager.set_max_digit_pid_range(50));
-    (__pin_manager.set_min_digit_pid_range(2));
-
-    __shift_reg.set_pmanager_cinst_ptr(&__pin_manager);
-    __pin_manager.set_dati_pid(2, 0, 0);
-    __pin_manager.add_dati_pid_space(0);
-    __pin_manager.set_dati_pid(3, 0, 0);
-    //__pin_manager.set_dato_pid(3, 0, 0);*/
-
-    //__shift_reg.add_shift_register((tmp_config::io_t::__i)/*mode*/, 2/*pid*/, 3/*lpid*/, 4/*cpid*/, 5/*rpid*/, 8/*reg size*/);
-
-    //__shift_reg.add_shift_register((tmp_config::io_t::__i)/*mode*/, 3/*pid*/, 6/*lpid*/, 7/*cpid*/, 8/*rpid*/, 8/*reg size*/);
-/*
-    __shift_reg.bind_shift_register(3);
-
-    std::cout <<  __shift_reg.get_dati_pcount(0)<< std::endl;
-
-    std::cout << __shift_reg.is_shift_reg_binded(true, 2) << std::endl;
-    std::cout << __shift_reg.is_shift_reg_binded(true, 3) << std::endl;*/
-
     tmp::io_service __io_service;
     __io_service.service_init
     (
@@ -270,7 +279,6 @@ int
         & external_mlinit,
         & external_mltick
     );
-
 }
 
 # endif /*ARDUINO*/

@@ -17,7 +17,7 @@ pin_manager::pin_manager(int unsigned(__interface_count))
     (this-> digit_dato_pcount).darr_init(1, __interface_count);
     for(int unsigned x = 0; x != __interface_count; x ++)
     {
-        int unsigned c = 2;
+        int unsigned c = 0;
         (this-> digit_dati_pcount).set_darr_ilayer(&c, x, 0);
         (this-> digit_dato_pcount).set_darr_ilayer(&c, x, 0);
     }
@@ -98,7 +98,6 @@ pin_manager::pin_manager(int unsigned(__interface_count))
     for (int unsigned(y ) = 0; y != __interface_count; y ++)
         for (int unsigned(x ) = 0; x != *(this-> digit_dato_pcount).get_darr_ilayer(y, 0); x ++)
             (this-> dato_pid_sstate_list).set_darr_ilayer(&temp, y, x);
-
 }
 
 bool
