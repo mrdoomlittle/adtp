@@ -249,22 +249,25 @@ namespace tmp { class io_service
 
         }
 
-        void (add_to_dato_bytestream(uint8_t(__iface_id), bitset <uint8_t> (* __bitset)))
+        void (add_to_dato_bytestream(uint8_t(__iface_id), bitset <uint8_t> (* __bitset_to_add)))
         {
-            if ((this-> dato_bytestream_buff).is_block_smarker(true, __iface_id, dato_bytestream_bpos[0])) return;
+            if ((this-> dato_bytestream_buff).is_block_smarker(true, __iface_id, dato_bytestream_bpos[0]))
+            {
+                if ((this-> dato_bstream_buff_offunc_ptr) != nullptr)
+                    (this-> dato_bstream_buff_overflow(__iface_id, __bitset_to_add));
+                return;
+            }
 
-            // NOTE: add func to get length of bitset
-            for (int unsigned x = 0; x != __bitset-> get_bitset_length(); x ++)
-                (this-> dato_bytestream_buff).add_to_dbuff(__bitset-> get_bitset(0, x), 2, __iface_id, dato_bytestream_bpos[0], x, false, false, false);
+            for (int unsigned(x ) = 0; x != (__bitset_to_add-> get_bitset_length()); x ++)
+                (this-> dato_bytestream_buff).add_to_dbuff((__bitset_to_add-> get_bitset(0, x)), 2, __iface_id, (this-> dato_bytestream_bpos[0]), x, false, false, false);
 
-            if (dato_bytestream_bpos[0] == dato_bytestream_bsize-1)
-                dato_bytestream_bpos[0] = 0;
+            if ((this-> dato_bytestream_bpos[0]) == (this-> dato_bytestream_bsize - 1))
+                (this-> dato_bytestream_bpos[0]) = 0;
             else
-                dato_bytestream_bpos[0]++;
-
+                (this-> dato_bytestream_bpos[0])++;
         }
 
-        bitset <uint8_t>(get_from_dato_bytestream(uint8_t(__iface_id)))
+        bitset <uint8_t> (get_from_dato_bytestream(uint8_t(__iface_id)))
         {
             bitset <uint8_t> __bitset;
 
@@ -274,38 +277,81 @@ namespace tmp { class io_service
             for (int unsigned x = 0; x != __bitset.get_bitset_length(); x ++)
                 __bitset.set_bitset(&o, 0, x);
 
-            if ((this-> dato_bytestream_buff).is_block_smarker(false, __iface_id, dato_bytestream_bpos[1])) return __bitset;
+            if ((this-> dato_bytestream_buff).is_block_smarker(false, __iface_id, (this-> dato_bytestream_bpos[1])) == true) return __bitset;
 
             for (int unsigned x = 0; x != __bitset.get_bitset_length(); x ++)
-                __bitset.set_bitset((this-> dato_bytestream_buff).get_from_dbuff(2, __iface_id, dato_bytestream_bpos[1], x, false, false, false, true), 0, x);
+                __bitset.set_bitset((this-> dato_bytestream_buff).get_from_dbuff(2, __iface_id, (this-> dato_bytestream_bpos[1]), x, false, false, false, true), 0, x);
 
-            (this-> dato_bytestream_buff).del_from_dbuffer(1, 0, dato_bytestream_bpos[1], 0);
+            (this-> dato_bytestream_buff).del_from_dbuffer(1, 0, (this-> dato_bytestream_bpos[1]), 0);
 
-            if (dato_bytestream_bpos[1] == dato_bytestream_bsize-1)
-                dato_bytestream_bpos[1] = 0;
+            if ((this-> dato_bytestream_bpos[1]) == (this-> dato_bytestream_bsize - 1))
+                (this-> dato_bytestream_bpos[1]) = 0;
             else
-                dato_bytestream_bpos[1] ++;
+                (this-> dato_bytestream_bpos[1]) ++;
 
-            return __bitset;
+            return (__bitset);
         }
 
-        void(add_to_dato_bitset_buff(uint8_t(__iface_id), bitset <uint8_t> (* __bitset)))
+        void
+        (add_to_dati_bitset_buff(uint8_t(__iface_id), bitset <uint8_t> (* __bitset)))
         {
 
         }
 
-        bool(is_dati_bitset_buff_full) = false;
-        bool(is_dato_bitset_buff_full) = false;
+        void
+        (add_to_dato_bitset_buff(uint8_t(__iface_id), bitset <uint8_t> (* __bitset)))
+        {
+
+        }
+
+        void
+        (set_dati_bstream_buff_offunc_ptr(void(* __overflow)(int unsigned iface, bitset <uint8_t> (* __bitset))))
+        {
+            (this-> dati_bstream_buff_offunc_ptr) = __overflow;
+        }
+
+        void
+        (set_dato_bstream_buff_offunc_ptr(void(* __overflow)(int unsigned iface, bitset <uint8_t> (* __bitset))))
+        {
+            (this-> dato_bstream_buff_offunc_ptr) = __overflow;
+        }
+
+        void
+        (dato_bstream_buff_overflow(int unsigned(iface_id), tmp::bitset <uint8_t> (* __bitset)))
+        {
+            (this-> dato_bstream_buff_offunc_ptr(iface_id, __bitset));
+        }
+
+        void(* dati_bstream_buff_offunc_ptr)(int unsigned, bitset <uint8_t> *) = nullptr;
+
+        void(* dato_bstream_buff_offunc_ptr)(int unsigned, bitset <uint8_t> *) = nullptr;
+
+        // NOTE add under flow
+        bool
+        (is_dati_bstream_buff_full())
+        {
+            return(this-> dati_bytestream_buff.get_sector_free_c(0) == 0? true : false);
+        }
+
+        bool
+        (is_dato_bstream_buff_full())
+        {
+            return(this-> dato_bytestream_buff.get_sector_free_c(0) == 0? true : false);
+        }
 
         array <int unsigned> dati_bytestream_bpos =
             array <int unsigned>(2, {0, 0}, true);
         array <int unsigned> dato_bytestream_bpos =
             array <int unsigned>(2, {0, 0}, true);
 
+        array <int unsigned> dati_bitset_buffpos =
+            array <int unsigned>(2, {0, 0}, true);
+        array <int unsigned> dato_bitset_buffpos =
+            array <int unsigned>(2, {0, 0}, true);
+
+
         dynamic_buffer <uint8_t> (dati_bytestream_buff);
         dynamic_buffer <uint8_t> (dato_bytestream_buff);
-
-        // array <type> (array_size, preset_data, preset_data? true / false);
 
         array <uint8_t>
         (* digit_dati_bitbuff ) = new array <uint8_t> (digit_dati_pcount, {}, false);

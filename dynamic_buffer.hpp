@@ -239,7 +239,8 @@ namespace tmp { template <typename __dbuff_type> class dynamic_buffer
             skip_auto_iblock_selc :
 
             skip_iblock_selc :
-
+            int unsigned used_c = 0;
+            int unsigned free_c = 0;
             switch (__dbuff_unit_id)
             {
                 case (unit_id::__block) :
@@ -262,6 +263,18 @@ namespace tmp { template <typename __dbuff_type> class dynamic_buffer
 
                     (this-> update_block_used_c ( (this-> sector_position [1]), (this-> block_position [1]) ) );
                     (this-> update_block_free_c ( (this-> sector_position [1]), (this-> block_position [1]) ) );
+
+
+                    // this is a temp fix as i havent made the code to do this
+                    for (int unsigned o = 0; o != (this-> blocks_per_sector); o++)
+                    {
+                        if (this-> is_block_smarker(true, (this-> sector_position [1]), o) == true) used_c++;
+                        if (this-> is_block_smarker(false, (this-> sector_position [1]), o) == true) free_c++;
+                    }
+
+                    (this-> sector_used_c [(data_id::__main)] [(this-> get_sector_arr_pos ((this-> sector_position [1])) )]) = used_c;
+                    (this-> sector_free_c [(data_id::__main)] [(this-> get_sector_arr_pos ((this-> sector_position [1])) )]) = free_c;
+
                 break;
                 default : return;
             }
@@ -310,13 +323,13 @@ namespace tmp { template <typename __dbuff_type> class dynamic_buffer
 
     public :
         int unsigned
-        (get_sector_used_c (int unsigned(__sector_pos_id ) ) )
+        (get_sector_used_c (int unsigned(__sector_pos_id )) )
         {
             return ( (this-> sector_used_c [(data_id::__main)] [(this-> get_sector_arr_pos (__sector_pos_id) )]) );
         }
 
         int unsigned
-        (get_sector_free_c (int unsigned(__sector_pos_id ) ) )
+        (get_sector_free_c (int unsigned(__sector_pos_id )) )
         {
             return ( (this-> sector_free_c [(data_id::__main)] [(this-> get_sector_arr_pos (__sector_pos_id) )]) );
         }
@@ -499,6 +512,16 @@ namespace tmp { template <typename __dbuff_type> class dynamic_buffer
             (this-> set_block_free_c ((this-> block_inner_length - 1), __sector_pos_id, __block_pos_id) );
 
             (this-> set_block_smarker (state_marker::__free__, __sector_pos_id, __block_pos_id) );
+
+            // quick fix
+            (this-> sector_used_c [(data_id::__main)] [(this-> get_sector_arr_pos ((this-> sector_position [1])) )]) = 0;
+            (this-> sector_free_c [(data_id::__main)] [(this-> get_sector_arr_pos ((this-> sector_position [1])) )]) = 0;
+
+            for (int unsigned o = 0; o != (this-> blocks_per_sector); o++)
+            {
+                if (this-> is_block_smarker(true, __sector_pos_id, o) == true) (this-> sector_used_c [(data_id::__main)] [(this-> get_sector_arr_pos ((this-> sector_position [1])) )])++;
+                if (this-> is_block_smarker(false, __sector_pos_id, o) == true) (this-> sector_free_c [(data_id::__main)] [(this-> get_sector_arr_pos ((this-> sector_position [1])) )])++;
+            }
 
             for (int unsigned (block_ipos_id ) = 0; block_ipos_id != (this-> block_inner_length); block_ipos_id ++)
                 (this-> del_dbuff_iblock (__sector_pos_id, __block_pos_id, block_ipos_id) );

@@ -164,10 +164,30 @@ uint8_t test[8][8] =
 };
 # include "bitset.hpp"
 tmp::bitset <uint8_t> obs;
+tmp::dynamic_array <uint8_t> overf;
+int unsigned overf_count = 0;
+void overflow (int unsigned(iface_id), tmp::bitset <uint8_t> (* __bitset))
+{
+    overf.add_darr_layer();
+    std::cout << "Overflow DUMP: \n";
+    for (int unsigned x = 0; x != __bitset-> get_bitset_length(); x ++)
+        overf.set_darr_ilayer(__bitset-> get_bitset(0, x), overf_count, x);
+
+    for (int unsigned y = 0; y != overf_count; y ++) {
+        for (int unsigned x = 0; x != __bitset-> get_bitset_length(); x ++)
+            std::cout << unsigned(*overf.get_darr_ilayer(y, x));
+        std::cout << "\n";
+    }
+    std::cout << "\n";
+    overf_count ++;
+}
+
 int unsigned
 (external_mlinit (tmp::io_service(* __io_service ) ) )
 {
+    overf.darr_init(8, 0);
     obs.bitset_init(8);
+    __io_service-> set_dato_bstream_buff_offunc_ptr(&overflow);
     std::cout << "This Project is Still Early Development and Many things Need Fixing. Sorry :(" << std::endl;
 
     return 0;
@@ -177,6 +197,8 @@ uint8_t bitset_c[8] = {1, 0, 0, 1, 0, 0, 0, 1};
 uint8_t bitset_a[8] = {0, 1, 1, 0, 1, 1, 1, 0};
 uint8_t c;
 uint8_t a;
+
+
 int unsigned
 (external_mltick (tmp::io_service(* __io_service ) ) )
 {
@@ -188,10 +210,11 @@ int unsigned
 
     for (int unsigned iface = 0; iface != (__io_service-> get_interface_cinst_ptr()-> get_iface_count()); iface ++)
     {
-        obs.set_bitset(bitset_c, 1, 0);
-        __io_service-> add_to_dato_bytestream(iface, &obs);
-        obs.set_bitset(bitset_a, 1, 0);
-        __io_service-> add_to_dato_bytestream(iface, &obs);
+        if (__io_service-> is_dato_bstream_buff_full() == false)
+        {
+            obs.set_bitset(bitset_c, 1, 0);
+            __io_service-> add_to_dato_bytestream(iface, &obs);
+        }
 
         if ((__io_service-> get_interface_cinst_ptr()-> is_iface_pmanager_state(1/*__doesent_exist*/, iface))) continue;
 
@@ -208,8 +231,14 @@ int unsigned
                     std::cout << "ISB: ><";
                 else
                     std::cout << "ISB: <>";
+
+                if (__io_service-> dati_bytestream_bpos[1] == x)
+                    std::cout << "><";
+                else
+                    std::cout << "<>";
                 for (int unsigned(y ) = 0; y != 8; y ++)
                     std::cout << unsigned(*__io_service-> dati_bytestream_buff.get_from_dbuff(2, iface, x, y, false, false, false, true));
+
 
                 if (x >= (__io_service-> dato_bytestream_bsize)) {
 
@@ -225,9 +254,12 @@ int unsigned
                     std::cout << " : : OSB: ><";
                 else
                     std::cout << " : : OSB: <>";
+                if (__io_service-> dato_bytestream_bpos[1] == x)
+                    std::cout << "><";
+                else
+                    std::cout << "<>";
 
             }
-
 
             if (x < (__io_service-> dato_bytestream_bsize)) {
                 for (int unsigned(y ) = 0; y != 8; y ++)
@@ -243,6 +275,11 @@ int unsigned
 
 
         }
+        std::cout << std::endl;
+        std::cout << "  I::BYTE_STREAMBUFF / SUSED: " << __io_service-> dati_bytestream_buff.get_sector_used_c(iface) << ", SFREE: " <<  __io_service-> dati_bytestream_buff.get_sector_free_c(iface) << std::endl;
+
+        std::cout << "  O::BYTE_STREAMBUFF / SUSED: " << __io_service-> dato_bytestream_buff.get_sector_used_c(iface) << ", SFREE: " <<  __io_service-> dato_bytestream_buff.get_sector_free_c(iface) << std::endl;
+
         std::cout << std::endl;
 
         std::cout << "  ";
@@ -311,9 +348,9 @@ int unsigned
 
 
         }
-        std::cout << "  I / SUSED: " << __io_service-> dati_bitset_buff.get_sector_used_c(iface) << ", SFREE: " <<  __io_service-> dati_bitset_buff.get_sector_free_c(iface) << std::endl;
+        std::cout << "  I::BITSET_BUFF / SUSED: " << __io_service-> dati_bitset_buff.get_sector_used_c(iface) << ", SFREE: " <<  __io_service-> dati_bitset_buff.get_sector_free_c(iface) << std::endl;
 
-        std::cout << "  O / SUSED: " << __io_service-> dato_bitset_buff.get_sector_used_c(iface) << ", SFREE: " <<  __io_service-> dato_bitset_buff.get_sector_free_c(iface) << std::endl;
+        std::cout << "  O::BITSET_BUFF / SUSED: " << __io_service-> dato_bitset_buff.get_sector_used_c(iface) << ", SFREE: " <<  __io_service-> dato_bitset_buff.get_sector_free_c(iface) << std::endl;
     }
 
     return 1;

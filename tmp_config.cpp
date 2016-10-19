@@ -87,7 +87,7 @@ int unsigned const
         (tmp_config::def_iltrigger_holdup ) = 300000;
 # else
     int unsigned const
-        (tmp_config::def_mltrigger_holdup ) = 3000000;
+        (tmp_config::def_mltrigger_holdup ) = 10000000;
     int unsigned const
-        (tmp_config::def_iltrigger_holdup ) = 3000000;
+        (tmp_config::def_iltrigger_holdup ) = 10000000;
 # endif
