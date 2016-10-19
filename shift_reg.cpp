@@ -207,12 +207,12 @@ bool
     // i will change this later.
     int unsigned * val = (this-> shift_reg_io_type).get_darr_ilayer(temp[0], 0);
 
-    if (*val == (tmp_config::io_t::__i))
+    if (*val == (tmp_config::io_t::__itype))
     {
         return_output = ((this-> get_pmanager_cinst_ptr())-> does_dati_pid_exist(__digit_pid, __interface_id));
     }
 
-    if (*val == (tmp_config::io_t::__o))
+    if (*val == (tmp_config::io_t::__otype))
     {
         return_output = ((this-> get_pmanager_cinst_ptr())-> does_dato_pid_exist(__digit_pid, __interface_id));
     }

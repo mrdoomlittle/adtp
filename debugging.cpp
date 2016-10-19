@@ -163,73 +163,115 @@ uint8_t test[8][8] =
     {1, 1, 1, 1, 1, 1, 1, 0},
 };
 # include "bitset.hpp"
-tmp::bitset <int unsigned> obs;
+tmp::bitset <uint8_t> obs;
 int unsigned
 (external_mlinit (tmp::io_service(* __io_service ) ) )
 {
     obs.bitset_init(8);
     std::cout << "This Project is Still Early Development and Many things Need Fixing. Sorry :(" << std::endl;
 
-    return 0; 
+    return 0;
 }
 # include "bitset.hpp"
-
+uint8_t bitset_c[8] = {1, 0, 0, 1, 0, 0, 0, 1};
+uint8_t bitset_a[8] = {0, 1, 1, 0, 1, 1, 1, 0};
+uint8_t c;
+uint8_t a;
 int unsigned
 (external_mltick (tmp::io_service(* __io_service ) ) )
 {
-    //for (int unsigned x = 0; x != 8; x ++)
-        //(__io_service-> dato_bitset_buff).add_to_dbuff(&(test[pos][x]), 2, 0, 0, 0, false, true, true);
+    uint8_t *test = __io_service-> get_from_dato_bytestream(0).get_bitset(1, 0);
 
-    //std::cout << "SET_IO_BITSET" << std::endl;
-
-    int unsigned bitset[8] = {1, 0, 0, 1, 0, 0, 0, 1};
-
-    obs.set_bitset(bitset, 1, 0);
-
-    __io_service-> add_to_obs_stream(obs, 0);
-/*
-
-    __io_service-> set_io_bitset(0, 1, test[pos], 1, 0);
-
-    __io_service-> flip_io_bitset(0, 1);
-
-    //tcount = 0;
-    if (pos == 7)
-        pos = 0;
-    else
-        pos ++;*/
+    for (int unsigned(x ) = 0; x != 8; x ++)
+        std::cout << unsigned(test[x]);
+    std::cout << "\n";
 
     for (int unsigned iface = 0; iface != (__io_service-> get_interface_cinst_ptr()-> get_iface_count()); iface ++)
     {
+        obs.set_bitset(bitset_c, 1, 0);
+        __io_service-> add_to_dato_bytestream(iface, &obs);
+        obs.set_bitset(bitset_a, 1, 0);
+        __io_service-> add_to_dato_bytestream(iface, &obs);
 
         if ((__io_service-> get_interface_cinst_ptr()-> is_iface_pmanager_state(1/*__doesent_exist*/, iface))) continue;
 
-        std::cout << "DATO OBS Stream Buffer: " << std::endl;
-        for (int unsigned(x ) = 0; x != __io_service-> buffsize; x ++)
+        std::cout << "\nIFACE ID: " << iface << std::endl;
+
+        std::cout << "  ";
+        std::cout << "BYTE_STREAMBUFF\n";
+
+        for (int unsigned(x ) = 0; x != (__io_service-> dati_bytestream_bsize) + (__io_service-> dato_bytestream_bsize); x ++)
         {
             std::cout << "  ";
-            for (int unsigned(y ) = 0; y != 8; y ++)
-            {
-                std::cout << unsigned(*__io_service-> dato_obs_stream_buff.get_from_dbuff(2, iface, x, y, false, false, false, true));
+            if (x < (__io_service-> dati_bytestream_bsize)) {
+                if (__io_service-> dati_bytestream_bpos[0] == x)
+                    std::cout << "ISB: ><";
+                else
+                    std::cout << "ISB: <>";
+                for (int unsigned(y ) = 0; y != 8; y ++)
+                    std::cout << unsigned(*__io_service-> dati_bytestream_buff.get_from_dbuff(2, iface, x, y, false, false, false, true));
+
+                if (x >= (__io_service-> dato_bytestream_bsize)) {
+
+                    std::cout << std::endl;
+                }
+
+                if ((__io_service-> dati_bytestream_buff).is_block_smarker(true, iface, x) == true)
+                    std::cout << " & SM: " << "USED";
+                else
+                    std::cout << " & SM: " << "FREE";
+
+                if (__io_service-> dato_bytestream_bpos[0] == x)
+                    std::cout << " : : OSB: ><";
+                else
+                    std::cout << " : : OSB: <>";
+
             }
-            std::cout << std::endl;
+
+
+            if (x < (__io_service-> dato_bytestream_bsize)) {
+                for (int unsigned(y ) = 0; y != 8; y ++)
+                    std::cout << unsigned(*__io_service-> dato_bytestream_buff.get_from_dbuff(2, iface, x, y, false, false, false, true));
+
+                if ((__io_service-> dato_bytestream_buff).is_block_smarker(true, iface, x) == true)
+                    std::cout << " & SM: " << "USED";
+                else
+                    std::cout << " & SM: " << "FREE";
+
+                std::cout << std::endl;
+            }
+
+
         }
+        std::cout << std::endl;
 
-
-        std::cout << "\nIFACE ID: " << iface << std::endl;
         std::cout << "  ";
         for (int unsigned(x ) = 0; x != 8; x ++)
-            std::cout << unsigned(* __io_service-> get_io_bitset(iface, (tmp_config::io_t::__i), 0, x));
+            std::cout << unsigned((*(__io_service-> digit_dati_bitbuff))[x]);
 
-        std::cout << " / I::BITSET" << " : : ";
+        std::cout << " / O::BITBUFF : -- : ";
+        for (int unsigned(x ) = 0; x != 8; x ++)
+            std::cout << unsigned((*(__io_service-> digit_dato_bitbuff))[x]);
+
+
+        std::cout << " / O::BITBUFF";
+
+        std::cout << std::endl;
+
+        std::cout << "  ";
+        for (int unsigned(x ) = 0; x != 8; x ++)
+            std::cout << unsigned(* __io_service-> get_io_bitset(iface, (tmp_config::io_t::__itype), 0, x));
+
+        std::cout << " / I::BITSET" << " : -- : ";
 
         for (int unsigned(x ) = 0; x != 8; x ++)
-            std::cout << unsigned(* __io_service-> get_io_bitset(iface,  (tmp_config::io_t::__o), 0, x));
+            std::cout << unsigned(* __io_service-> get_io_bitset(iface,  (tmp_config::io_t::__otype), 0, x));
 
         std::cout << " / O::BITSET\n\n";
 
-        for (int unsigned(x ) = 0; x != 8; x ++)
+        for (int unsigned(x ) = 0; x != (__io_service-> dati_bitset_buff_size) + (__io_service-> dato_bitset_buff_size); x ++)
         {
+            if (x < (__io_service-> dati_bitset_buff_size)) {
             std::cout << "  ";
             for (int unsigned(y ) = 0; y != 8; y ++)
                 std::cout << unsigned(*__io_service-> dati_bitset_buff.get_from_dbuff(2, iface, x, y, false, false, false, true));
@@ -239,13 +281,19 @@ int unsigned
             else
                 std::cout << " & SM: " << "FREE";
 
-            if (__io_service -> i_bitset_buff_pos[0] == x)
+            if (__io_service -> dati_bitset_buff_pos == x)
                 std::cout << " : ><";
             else
                 std::cout << " : <>";
 
             std::cout << " : : ";
 
+            if (x >= (__io_service-> dato_bitset_buff_size)) {
+                std::cout << std::endl;
+            }
+            }
+
+            if (x < (__io_service-> dato_bitset_buff_size)) {
             for (int unsigned(y ) = 0; y != 8; y ++)
                 std::cout << unsigned(*__io_service-> dato_bitset_buff.get_from_dbuff(2, iface, x, y, false, false, false, true));
 
@@ -254,21 +302,27 @@ int unsigned
             else
                 std::cout << " & SM: " << "FREE";
 
-            if (__io_service -> o_bitset_buff_pos[0] == x)
+            if (__io_service -> dato_bitset_buff_pos == x)
                 std::cout << " : ><";
             else
                 std::cout << " : <>";
-
             std::cout << std::endl;
+            }
+
+
         }
+        std::cout << "  I / SUSED: " << __io_service-> dati_bitset_buff.get_sector_used_c(iface) << ", SFREE: " <<  __io_service-> dati_bitset_buff.get_sector_free_c(iface) << std::endl;
+
+        std::cout << "  O / SUSED: " << __io_service-> dato_bitset_buff.get_sector_used_c(iface) << ", SFREE: " <<  __io_service-> dato_bitset_buff.get_sector_free_c(iface) << std::endl;
     }
 
     return 1;
 }
-
+# include "array.hpp"
 int
 (main( ) )
 {
+
     tmp::io_service __io_service;
     __io_service.service_init
     (

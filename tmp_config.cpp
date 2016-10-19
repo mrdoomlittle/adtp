@@ -49,14 +49,14 @@ int unsigned const tmp_config::def_read_uphold_tformat =
 int unsigned const tmp_config::def_write_uphold_tformat =
     (time_format::__mloop_tick_count);
 
-int unsigned const tmp_config::def_ibit_read_holdup = 1;
-int unsigned const tmp_config::def_obit_write_holdup = 1;
+int unsigned const tmp_config::def_dati_bit_read_holdup = 1;
+int unsigned const tmp_config::def_dato_bit_write_holdup = 1;
 
-int unsigned const tmp_config::def_ibyte_read_holdup = 1;
-int unsigned const tmp_config::def_obyte_write_holdup = 1;
+int unsigned const tmp_config::def_dati_byte_read_holdup = 1;
+int unsigned const tmp_config::def_dato_byte_write_holdup = 1;
 
-int unsigned const tmp_config::def_ibitset_buff_size = 8;
-int unsigned const tmp_config::def_obitset_buff_size = 8;
+int unsigned const tmp_config::def_dati_bitset_buff_size = 8;
+int unsigned const tmp_config::def_dato_bitset_buff_size = 8;
 
 int unsigned const tmp_config::def_digit_dati_pcount = 2;
 int unsigned const tmp_config::def_digit_dato_pcount = 2;
@@ -82,12 +82,12 @@ int unsigned const
 
 # ifdef ARDUINO
     int unsigned const
-        (tmp_config::def_mltick_holdup ) = 300000;
+        (tmp_config::def_mltrigger_holdup ) = 300000;
     int unsigned const
-        (tmp_config::def_iltick_holdup ) = 300000;
+        (tmp_config::def_iltrigger_holdup ) = 300000;
 # else
     int unsigned const
-        (tmp_config::def_mltick_holdup ) = 3000000;
+        (tmp_config::def_mltrigger_holdup ) = 3000000;
     int unsigned const
-        (tmp_config::def_iltick_holdup ) = 3000000;
+        (tmp_config::def_iltrigger_holdup ) = 3000000;
 # endif

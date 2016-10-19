@@ -7,8 +7,34 @@
 # include "pin_manager.hpp"
 # include "array.hpp"
 # include <iostream>
+# include "dynamic_buffer.hpp"
 int main()
 {
+    tmp::array <uint8_t> a(6 ,{}, false);
+//    tmp::array <uint8_t>
+    //(* _digit_dati_bitset ) = new tmp::array <uint8_t> (8, {}, false);
+
+//    (*_digit_dati_bitset)[0] = 21;
+
+
+    /*
+    int unsigned o = 55;
+    tmp::dynamic_buffer <int> hpp;
+
+    hpp.dbuff_init(5,o,8);
+
+    int x = 22;
+    for (int unsigned(l ) = 0; l != o; l ++)
+        for (int unsigned(y ) = 0; y != 8; y ++)
+            hpp.add_to_dbuff(&x, 2, 0, 0, 0, false, true, true);
+
+
+    for (int unsigned(l ) = 0; l != o; l ++)
+        for (int unsigned(y ) = 0; y != 8; y ++)
+            std::cout << *hpp.get_from_dbuff(2,0, l, y, false, false, false, false) << std::endl;
+
+
+
 
     tmp::pin_manager pmanager(5);
 
@@ -31,7 +57,7 @@ int main()
     std::cout << iface.update_pmanager(&pmanager, 0) << std::endl;
     std::cout << iface.update_pmanager(&pmanager, 1) << std::endl;
 
-
+*/
 
 /*
     tmp::dynamic_array <char>dy;

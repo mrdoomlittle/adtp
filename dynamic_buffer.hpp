@@ -49,9 +49,10 @@ namespace tmp { template <typename __dbuff_type> class dynamic_buffer
             return ( (this-> block_pos_id [(data_id::__main)] [( (this-> get_block_arr_pos (__sector_pos_id, __block_pos_id) ) * (this-> block_inner_length) ) + __block_ipos_id]) );
         }
     public :
-        dynamic_buffer( )
+        dynamic_buffer(int unsigned(__amount_of_sectors ) = 0, int unsigned(__blocks_per_sector) = 0, int unsigned(__block_inner_length ) = 0)
         {
-
+            if (__amount_of_sectors != 0 || __blocks_per_sector != 0 || __block_inner_length != 0)
+                (this-> dbuff_init(__amount_of_sectors, __blocks_per_sector, __block_inner_length));
         }
 
         ~dynamic_buffer( )

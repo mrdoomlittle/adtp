@@ -64,11 +64,11 @@ namespace tmp { class interface
                 (this-> iface_dato_pid_list).set_darr_ilayer(&__dato_pid_list[x], (this-> iface_ip_addr_lpos), x);
             }
 
-            (this-> iface_datio_cpid_list).set_darr_ilayer(&__dati_clock_pid, (this-> iface_ip_addr_lpos), (tmp_config::io_t::__i));
-            (this-> iface_datio_lpid_list).set_darr_ilayer(&__dati_latch_pid, (this-> iface_ip_addr_lpos), (tmp_config::io_t::__i));
+            (this-> iface_datio_cpid_list).set_darr_ilayer(&__dati_clock_pid, (this-> iface_ip_addr_lpos), (tmp_config::io_t::__itype));
+            (this-> iface_datio_lpid_list).set_darr_ilayer(&__dati_latch_pid, (this-> iface_ip_addr_lpos), (tmp_config::io_t::__itype));
 
-            (this-> iface_datio_cpid_list).set_darr_ilayer(&__dato_clock_pid, (this-> iface_ip_addr_lpos), (tmp_config::io_t::__o));
-            (this-> iface_datio_lpid_list).set_darr_ilayer(&__dato_latch_pid, (this-> iface_ip_addr_lpos), (tmp_config::io_t::__o));
+            (this-> iface_datio_cpid_list).set_darr_ilayer(&__dato_clock_pid, (this-> iface_ip_addr_lpos), (tmp_config::io_t::__otype));
+            (this-> iface_datio_lpid_list).set_darr_ilayer(&__dato_latch_pid, (this-> iface_ip_addr_lpos), (tmp_config::io_t::__otype));
 
             (this-> set_iface_pmanager_state((this-> iface_ip_addr_lpos), __doesent_exist));
 
@@ -85,19 +85,19 @@ namespace tmp { class interface
             // make sure its not being used
             for (int unsigned(iface ) = 0; iface != (this-> iface_ip_addr_lpos ); iface ++)
             {
-                if (__pmanager_cinst_ptr-> get_dati_clock_pid(iface) == *(this-> iface_datio_cpid_list).get_darr_ilayer(__iface_id, (tmp_config::io_t::__i))) return false;
-                if (__pmanager_cinst_ptr-> get_dato_clock_pid(iface) == *(this-> iface_datio_cpid_list).get_darr_ilayer(__iface_id, (tmp_config::io_t::__o))) return false;
+                if (__pmanager_cinst_ptr-> get_dati_clock_pid(iface) == *(this-> iface_datio_cpid_list).get_darr_ilayer(__iface_id, (tmp_config::io_t::__itype))) return false;
+                if (__pmanager_cinst_ptr-> get_dato_clock_pid(iface) == *(this-> iface_datio_cpid_list).get_darr_ilayer(__iface_id, (tmp_config::io_t::__otype))) return false;
 
-                if (__pmanager_cinst_ptr-> get_dati_latch_pid(iface) == *(this-> iface_datio_lpid_list).get_darr_ilayer(__iface_id, (tmp_config::io_t::__i))) return false;
-                if (__pmanager_cinst_ptr-> get_dato_latch_pid(iface) == *(this-> iface_datio_lpid_list).get_darr_ilayer(__iface_id, (tmp_config::io_t::__o))) return false;
+                if (__pmanager_cinst_ptr-> get_dati_latch_pid(iface) == *(this-> iface_datio_lpid_list).get_darr_ilayer(__iface_id, (tmp_config::io_t::__itype))) return false;
+                if (__pmanager_cinst_ptr-> get_dato_latch_pid(iface) == *(this-> iface_datio_lpid_list).get_darr_ilayer(__iface_id, (tmp_config::io_t::__otype))) return false;
 
                 array<uint8_t> ll(4, {}, false);
 
-                ll[0] = *(this-> iface_datio_cpid_list).get_darr_ilayer(__iface_id, (tmp_config::io_t::__i));
-                ll[1] = *(this-> iface_datio_cpid_list).get_darr_ilayer(__iface_id, (tmp_config::io_t::__o));
+                ll[0] = *(this-> iface_datio_cpid_list).get_darr_ilayer(__iface_id, (tmp_config::io_t::__itype));
+                ll[1] = *(this-> iface_datio_cpid_list).get_darr_ilayer(__iface_id, (tmp_config::io_t::__otype));
 
-                ll[2] = *(this-> iface_datio_lpid_list).get_darr_ilayer(__iface_id, (tmp_config::io_t::__i));
-                ll[3] = *(this-> iface_datio_lpid_list).get_darr_ilayer(__iface_id, (tmp_config::io_t::__o));
+                ll[2] = *(this-> iface_datio_lpid_list).get_darr_ilayer(__iface_id, (tmp_config::io_t::__itype));
+                ll[3] = *(this-> iface_datio_lpid_list).get_darr_ilayer(__iface_id, (tmp_config::io_t::__otype));
 
                 for (int unsigned(x ) = 0; x != (this-> iface_dati_pid_list).get_darr_length(iface); x ++) {
 
@@ -130,11 +130,11 @@ namespace tmp { class interface
             }
             cc += (this-> iface_dato_pid_list).get_darr_length(__iface_id);
 
-            ch[cc] = *(this-> iface_datio_cpid_list).get_darr_ilayer(__iface_id, (tmp_config::io_t::__i));
-            ch[cc+1] = *(this-> iface_datio_cpid_list).get_darr_ilayer(__iface_id, (tmp_config::io_t::__o));
+            ch[cc] = *(this-> iface_datio_cpid_list).get_darr_ilayer(__iface_id, (tmp_config::io_t::__itype));
+            ch[cc+1] = *(this-> iface_datio_cpid_list).get_darr_ilayer(__iface_id, (tmp_config::io_t::__otype));
 
-            ch[cc+2] = *(this-> iface_datio_lpid_list).get_darr_ilayer(__iface_id, (tmp_config::io_t::__i));
-            ch[cc+3] = *(this-> iface_datio_lpid_list).get_darr_ilayer(__iface_id, (tmp_config::io_t::__o));
+            ch[cc+2] = *(this-> iface_datio_lpid_list).get_darr_ilayer(__iface_id, (tmp_config::io_t::__itype));
+            ch[cc+3] = *(this-> iface_datio_lpid_list).get_darr_ilayer(__iface_id, (tmp_config::io_t::__otype));
 
             for (int unsigned x = 0 ; x != total_pcount; x ++)
                 for (int unsigned y = 0 ; y != total_pcount; y ++)
@@ -150,11 +150,11 @@ namespace tmp { class interface
                 (__pmanager_cinst_ptr-> set_dato_pid(*(this-> iface_dato_pid_list).get_darr_ilayer(__iface_id, x), x, __iface_id));
             }
 
-            (__pmanager_cinst_ptr-> set_dati_clock_pid(*(this-> iface_datio_cpid_list).get_darr_ilayer(__iface_id, (tmp_config::io_t::__i)), __iface_id));
-            (__pmanager_cinst_ptr-> set_dato_clock_pid(*(this-> iface_datio_cpid_list).get_darr_ilayer(__iface_id, (tmp_config::io_t::__o)), __iface_id));
+            (__pmanager_cinst_ptr-> set_dati_clock_pid(*(this-> iface_datio_cpid_list).get_darr_ilayer(__iface_id, (tmp_config::io_t::__itype)), __iface_id));
+            (__pmanager_cinst_ptr-> set_dato_clock_pid(*(this-> iface_datio_cpid_list).get_darr_ilayer(__iface_id, (tmp_config::io_t::__otype)), __iface_id));
 
-            (__pmanager_cinst_ptr-> set_dati_latch_pid(*(this-> iface_datio_lpid_list).get_darr_ilayer(__iface_id, (tmp_config::io_t::__i)), __iface_id));
-            (__pmanager_cinst_ptr-> set_dato_latch_pid(*(this-> iface_datio_lpid_list).get_darr_ilayer(__iface_id, (tmp_config::io_t::__o)), __iface_id));
+            (__pmanager_cinst_ptr-> set_dati_latch_pid(*(this-> iface_datio_lpid_list).get_darr_ilayer(__iface_id, (tmp_config::io_t::__itype)), __iface_id));
+            (__pmanager_cinst_ptr-> set_dato_latch_pid(*(this-> iface_datio_lpid_list).get_darr_ilayer(__iface_id, (tmp_config::io_t::__otype)), __iface_id));
 
             std::cout << "Updating Pin Manager with New Infomation" << std::endl;
             (this-> iface_count ) ++;

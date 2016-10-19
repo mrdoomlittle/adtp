@@ -65,9 +65,10 @@ namespace tmp { class io_service
         bool(has_interface_cinst_init ) = false;
 
     private :
-        int unsigned(digit_i_pin_count ) =
+        int unsigned(digit_dati_pcount ) =
             (tmp_config::def_digit_dati_pcount);
-        int unsigned(digit_o_pin_count ) =
+
+        int unsigned(digit_dato_pcount ) =
             (tmp_config::def_digit_dato_pcount);
 
         int unsigned(clock_sstate_ignore ) = 0x0;
@@ -75,88 +76,88 @@ namespace tmp { class io_service
         dynamic_array <int unsigned> (dati_bitset_length);
         dynamic_array <int unsigned> (dato_bitset_length);
 
-        int unsigned(ibyte_read_holdup ) = 0;
-        int unsigned(obyte_write_holdup ) = 0;
+        int unsigned(dati_byte_read_holdup ) = 0;
+        int unsigned(dato_byte_write_holdup ) = 0;
 
-        int unsigned(ibit_read_holdup ) = 0;
-        int unsigned(obit_write_holdup ) = 0;
-
-        int unsigned(ibitset_buff_size ) = 0;
-        int unsigned(obitset_buff_size ) = 0;
+        int unsigned(dati_bit_read_holdup ) = 0;
+        int unsigned(dato_bit_write_holdup ) = 0;
+    public :
+        int unsigned(dati_bitset_buff_size ) = 12;
+        int unsigned(dato_bitset_buff_size ) = 12;
     protected :
-        typedef void( (set_digit_pmode_ft ) (uint8_t, uint8_t) );
-        set_digit_pmode_ft
-            (* set_digit_pmode_fptr ) = nullptr;
+        typedef void( (set_digit_pmode_func_t ) (uint8_t, uint8_t) );
+        set_digit_pmode_func_t
+            (* set_digit_pmode_func_ptr ) = nullptr;
 
-        typedef void( (set_digit_pstate_ft) (uint8_t, uint8_t) );
-        set_digit_pstate_ft
-            (* set_digit_pstate_fptr ) = nullptr;
+        typedef void( (set_digit_pstate_func_t) (uint8_t, uint8_t) );
+        set_digit_pstate_func_t
+            (* set_digit_pstate_func_ptr ) = nullptr;
 
-        typedef int( (get_digit_pstate_ft ) (uint8_t) );
-        get_digit_pstate_ft
-            (* get_digit_pstate_fptr ) = nullptr;
+        typedef int( (get_digit_pstate_func_t ) (uint8_t) );
+        get_digit_pstate_func_t
+            (* get_digit_pstate_func_ptr ) = nullptr;
 
-        typedef int unsigned long( (get_high_rclock_ft) (int unsigned) );
-        get_high_rclock_ft
-            (* get_high_rclock_fptr ) = nullptr;
+        typedef int unsigned long( (get_high_rclock_func_t) (int unsigned) );
+        get_high_rclock_func_t
+            (* get_high_rclock_func_ptr ) = nullptr;
 
-        // change to bool  or int unsigned
-        typedef int unsigned( (extern_mlinit_ft ) (io_service *) );
-        extern_mlinit_ft
-            (* extern_mlinit_fptr ) = nullptr;
+        // NOTE change to bool or uint8_t as int unsigned takes up 4 bytes and
+        // we dont need that as we are only reading a 0 or 1
+        typedef int unsigned( (extern_mlinit_func_t ) (io_service *) );
+        extern_mlinit_func_t
+            (* extern_mlinit_func_ptr ) = nullptr;
 
-        typedef int unsigned( (extern_mltick_ft ) (io_service *) );
-        extern_mltick_ft
-            (* extern_mltick_fptr ) = nullptr;
+        typedef int unsigned( (extern_mltick_func_t ) (io_service *) );
+        extern_mltick_func_t
+            (* extern_mltick_func_ptr ) = nullptr;
     public :
         io_service( );
         ~io_service( );
 
         void
         (service_init (
-            set_digit_pmode_ft
-                (* __set_digit_pmode_fptr) = nullptr,
-            set_digit_pstate_ft
-                (* __set_digit_pstate_fptr) = nullptr,
-            get_digit_pstate_ft
-                (* __get_digit_pstate_fptr) = nullptr,
-            get_high_rclock_ft
-                (* __get_high_rclock_fptr ) = nullptr,
-            extern_mlinit_ft
-                (* __extern_mlinit_fptr) = nullptr,
-            extern_mltick_ft
-                (* __extern_mltick_fptr) = nullptr
+            set_digit_pmode_func_t(* __set_digit_pmode_func_ptr) = nullptr,
+            set_digit_pstate_func_t(* __set_digit_pstate_func_ptr) = nullptr,
+            get_digit_pstate_func_t(* __get_digit_pstate_func_ptr) = nullptr,
+            get_high_rclock_func_t(* __get_high_rclock_func_ptr ) = nullptr,
+            extern_mlinit_func_t(* __extern_mlinit_func_ptr) = nullptr,
+            extern_mltick_func_t(* __extern_mltick_func_ptr) = nullptr
         ) );
 
         void
-        (set_ptr_to_sdigit_pmode_f (set_digit_pmode_ft(* __set_digit_pmode_fptr) ) );
+        (set_ptr_to_sdigit_pmode_func (set_digit_pmode_func_t(* __set_digit_pmode_func_ptr) ) );
         void
-        (set_ptr_to_sdigit_pstate_f (set_digit_pstate_ft(* __set_digit_pstate_fptr) ) );
+        (set_ptr_to_sdigit_pstate_func (set_digit_pstate_func_t(* __set_digit_pstate_func_ptr) ) );
         void
-        (set_ptr_to_gdigit_pstate_f (get_digit_pstate_ft(* __get_digit_pstate_fptr) ) );
+        (set_ptr_to_gdigit_pstate_func (get_digit_pstate_func_t(* __get_digit_pstate_func_ptr) ) );
         void
-        (set_ptr_to_ghigh_rclock_f (get_high_rclock_ft(* __get_high_rclock_fptr) ) );
+        (set_ptr_to_ghigh_rclock_func (get_high_rclock_func_t(* __get_high_rclock_func_ptr) ) );
         void
-        (set_ptr_to_extern_mlinit_f (extern_mlinit_ft(* __extern_mlinit_fptr) ) );
+        (set_ptr_to_extern_mlinit_func (extern_mlinit_func_t(* __extern_mlinit_func_ptr) ) );
         void
-        (set_ptr_to_extern_mltick_f (extern_mltick_ft(* __extern_mltick_fptr) ) );
+        (set_ptr_to_extern_mltick_func (extern_mltick_func_t(* __extern_mltick_func_ptr) ) );
 
         bool
-        (is_ptr_to_sdigit_pmode_f (set_digit_pmode_ft(* __is_type) ) );
+        (is_ptr_to_sdigit_pmode_func (set_digit_pmode_func_t(* __is_type) ) );
         bool
-        (is_ptr_to_sdigit_pstate_f (set_digit_pstate_ft(* __is_type) ) );
+        (is_ptr_to_sdigit_pstate_func (set_digit_pstate_func_t(* __is_type) ) );
         bool
-        (is_ptr_to_gdigit_pstate_f (get_digit_pstate_ft(* __is_type) ) );
+        (is_ptr_to_gdigit_pstate_func (get_digit_pstate_func_t(* __is_type) ) );
         bool
-        (is_ptr_to_ghigh_rclock_f (get_high_rclock_ft(* __is_type) ) );
+        (is_ptr_to_ghigh_rclock_func (get_high_rclock_func_t(* __is_type) ) );
         bool
-        (is_ptr_to_extern_mlinit_f (extern_mlinit_ft(* __is_type) ) );
+        (is_ptr_to_extern_mlinit_func (extern_mlinit_func_t(* __is_type) ) );
         bool
-        (is_ptr_to_extern_mltick_f (extern_mltick_ft(* __is_type) ) );
+        (is_ptr_to_extern_mltick_func (extern_mltick_func_t(* __is_type) ) );
+
     private :
-        int unsigned(mltick_holdup) = tmp_config::def_mltick_holdup;
-        int unsigned(iltick_holdup) = tmp_config::def_iltick_holdup;
+        int unsigned(mltrigger_holdup) =
+            tmp_config::def_mltrigger_holdup;
 
+        int unsigned(iltrigger_holdup) =
+            tmp_config::def_iltrigger_holdup;
+
+        // might change to mltrigger_count
         int unsigned(real_mltick_count) = 0;
         int unsigned(real_iltick_count) = 0;
         int unsigned(temp_iltick_count) = 0;
@@ -196,70 +197,121 @@ namespace tmp { class io_service
         (flip_io_bitset (int unsigned(__interface_id), int unsigned(__bitset_id)));
 
     private :
-        void
-        (set_i_bitset (uint8_t(* __i_bitset), int unsigned(__set_type), int unsigned(__bitset_arr_pos)));
-        void
-        (set_o_bitset (uint8_t(* __o_bitset), int unsigned(__set_type), int unsigned(__bitset_arr_pos)));
-
-        uint8_t
-        (* get_i_bitset (int unsigned(__get_type), int unsigned(__bitset_arr_pos)));
-        uint8_t
-        (* get_o_bitset (int unsigned(__get_type), int unsigned(__bitset_arr_pos)));
-
-        //bitset <__bitset_type> (* digit_io_bitset ) = new bitset <__bitset_type> [2];
         bitset_list <__bitset_type> (* digit_datio_bitset) = new bitset_list <__bitset_type> [2];
 
-        uint8_t
-        (* digit_dati_bitset ) = new uint8_t [/*dati_bitset_length*/8];
-        uint8_t
-        (* digit_dato_bitset ) = new uint8_t [/*dati_bitset_length*/8];
+        void
+        (set_dati_bitset (array <uint8_t> (* __dati_bitset)));
+        void
+        (set_dato_bitset (array <uint8_t> (* __dato_bitset)));
 
-        bool
-        (* i_bitset_finished ) = new bool [(/*dati_bitset_length*/8 / digit_i_pin_count)];
-        bool
-        (* o_bitset_finished ) = new bool [(/*dati_bitset_length*/8 / digit_o_pin_count)];
+        array <uint8_t>
+        (* get_dati_bitset ());
+        array <uint8_t>
+        (* get_dato_bitset ());
 
-        int unsigned(i_bitset_fcount ) = 0;
-        int unsigned(o_bitset_fcount ) = 0;
+        array <uint8_t>
+        (* digit_dati_bitset ) = new array <uint8_t> (8, {}, false);
+        array <uint8_t>
+        (* digit_dato_bitset ) = new array <uint8_t> (8, {}, false);
 
+        array <bool>
+        (* dati_bitset_finished ) = new array <bool> ((8 / digit_dati_pcount), {}, false);
+        array <bool>
+        (* dato_bitset_finished ) = new array <bool> ((8 / digit_dato_pcount), {}, false);
+
+        int unsigned(dati_bitset_fcount ) = 0;
+        int unsigned(dato_bitset_fcount ) = 0;
     public :
-    /* NOTE: need to fix the dynamic buffer as its doing the same things that the dynamic array was doing
-        if block size is higher then 21 it will cause a core dump
-    */
-        int unsigned buffsize = 21;
-        void (add_to_obs_stream(bitset<int unsigned>(& __obs), int unsigned(__iface)))
-        {
-            for (int unsigned(x ) = 0; x != 8; x ++)
-                (this-> dato_obs_stream_buff).add_to_dbuff(__obs.get_bitset(0, x), 2, __iface, 0, 0, false, true, true);
-        }
+        dynamic_buffer <uint8_t> (dati_bitset_buff);
+        dynamic_buffer <uint8_t> (dato_bitset_buff);
 
-        dynamic_buffer <int unsigned> (dato_obs_stream_buff);
-
-        //dynamic_buffer <uint8_t> (* datio_bitset_buff) = new dynamic_buffer <uint8_t> [2];
-
-        dynamic_buffer <uint8_t> (dati_bitset_buff); // this is the newly named one
-        dynamic_buffer <uint8_t> (dato_bitset_buff); // this is the newly named one
-
-        int unsigned(i_bitset_buff_pos [2]) = {0, 0};
-        int unsigned(o_bitset_buff_pos [2]) = {0, 0};
+        int unsigned(dati_bitset_buff_pos ) = 0;
+        int unsigned(dato_bitset_buff_pos ) = 0;
     private :
-        int unsigned(digit_i_buffer_pos ) = 0;
-        int unsigned(digit_o_buffer_pos ) = 0;
+        int unsigned(digit_dati_buff_pos ) = 0;
+        int unsigned(digit_dato_buff_pos ) = 0;
 
         int unsigned(ibp_pcount_multiplier ) = 0;
         int unsigned(obp_pcount_multiplier ) = 0;
 
-        int unsigned(i_bitsetf_truec ) = 0;
-        int unsigned(o_bitsetf_truec ) = 0;
+        int unsigned(dati_bitsetf_truec ) = 0;
+        int unsigned(dato_bitsetf_truec ) = 0;
 
         int unsigned(dati_clock_ltcount ) = 0;
         bool(is_dati_clock_ppos) = false;
 
-        uint8_t
-        (* digit_i_buffer ) = new uint8_t [digit_i_pin_count];
-        uint8_t
-        (* digit_o_buffer ) = new uint8_t [digit_o_pin_count];
+    public :
+        int unsigned(dati_bytestream_bsize) = 17;
+        int unsigned(dato_bytestream_bsize) = 17;
 
+        void (add_to_dati_bytestream(bitset <uint8_t> (* __bitset)))
+        {
+
+        }
+
+        void (add_to_dato_bytestream(uint8_t(__iface_id), bitset <uint8_t> (* __bitset)))
+        {
+            if ((this-> dato_bytestream_buff).is_block_smarker(true, __iface_id, dato_bytestream_bpos[0])) return;
+
+            // NOTE: add func to get length of bitset
+            for (int unsigned x = 0; x != __bitset-> get_bitset_length(); x ++)
+                (this-> dato_bytestream_buff).add_to_dbuff(__bitset-> get_bitset(0, x), 2, __iface_id, dato_bytestream_bpos[0], x, false, false, false);
+
+            if (dato_bytestream_bpos[0] == dato_bytestream_bsize-1)
+                dato_bytestream_bpos[0] = 0;
+            else
+                dato_bytestream_bpos[0]++;
+
+        }
+
+        bitset <uint8_t>(get_from_dato_bytestream(uint8_t(__iface_id)))
+        {
+            bitset <uint8_t> __bitset;
+
+            __bitset.bitset_init(8);
+
+            uint8_t o = 0;
+            for (int unsigned x = 0; x != __bitset.get_bitset_length(); x ++)
+                __bitset.set_bitset(&o, 0, x);
+
+            if ((this-> dato_bytestream_buff).is_block_smarker(false, __iface_id, dato_bytestream_bpos[1])) return __bitset;
+
+            for (int unsigned x = 0; x != __bitset.get_bitset_length(); x ++)
+                __bitset.set_bitset((this-> dato_bytestream_buff).get_from_dbuff(2, __iface_id, dato_bytestream_bpos[1], x, false, false, false, true), 0, x);
+
+            (this-> dato_bytestream_buff).del_from_dbuffer(1, 0, dato_bytestream_bpos[1], 0);
+
+            if (dato_bytestream_bpos[1] == dato_bytestream_bsize-1)
+                dato_bytestream_bpos[1] = 0;
+            else
+                dato_bytestream_bpos[1] ++;
+
+            return __bitset;
+        }
+
+        void(add_to_dato_bitset_buff(uint8_t(__iface_id), bitset <uint8_t> (* __bitset)))
+        {
+
+        }
+
+        bool(is_dati_bitset_buff_full) = false;
+        bool(is_dato_bitset_buff_full) = false;
+
+        array <int unsigned> dati_bytestream_bpos =
+            array <int unsigned>(2, {0, 0}, true);
+        array <int unsigned> dato_bytestream_bpos =
+            array <int unsigned>(2, {0, 0}, true);
+
+        dynamic_buffer <uint8_t> (dati_bytestream_buff);
+        dynamic_buffer <uint8_t> (dato_bytestream_buff);
+
+        // array <type> (array_size, preset_data, preset_data? true / false);
+
+        array <uint8_t>
+        (* digit_dati_bitbuff ) = new array <uint8_t> (digit_dati_pcount, {}, false);
+        array <uint8_t>
+        (* digit_dato_bitbuff ) = new array <uint8_t> (digit_dato_pcount, {}, false);
+    private :
         bool(i_buffer_finished ) = false;
         bool(o_buffer_finished ) = false;
 
@@ -289,6 +341,7 @@ namespace tmp { class io_service
         int unsigned
         (call_extern_mltick (io_service(* __class_ptr ) ) );
 
+        // rename to extern
         int unsigned(external_clock_ptcount ) = 0;
         int unsigned(external_clock_ntcount ) = 0;
 
@@ -309,41 +362,43 @@ namespace tmp { class io_service
         (is_external_clock (bool(__is_type ), int unsigned(__interface_id) = 0 ) );
 
         void
-        (toggle_mloop_state( ) );
+        (toggle_mloop_serv_state(std::uint8_t(__if_type), bool(__logic)));
         void
-        (toggle_iloop_state( ) );
-        void
-        (update_clock_reading( ) );
+        (toggle_iloop_serv_state(std::uint8_t(__if_type), bool(__logic)));
 
         void
-        (update_mltick_count (int unsigned(__update_amount ) ) );
+        (update_clock_reading( ) ); //
+
         void
-        (update_iltick_count (int unsigned(__update_amount ) ) );
+        (update_mltrigger_count (int unsigned(__update_amount ) ) );
         void
-        (set_mltick_count (int unsigned(__mltick_count ) ) );
+        (update_iltrigger_count (int unsigned(__update_amount ) ) );
+
         void
-        (set_iltick_count (int unsigned(__iltick_count ) ) );
+        (set_mltrigger_count (int unsigned(__mltick_count ) ) );
+        void
+        (set_iltrigger_count (int unsigned(__iltick_count ) ) );
 
         int unsigned
-        (get_mltick_count( ) );
+        (get_mltrigger_count( ) );
         int unsigned
-        (get_iltick_count( ) );
+        (get_iltrigger_count( ) );
 
         void
-        (reset_mltick_count( ) );
+        (reset_mltrigger_count( ) );
         void
-        (reset_iltick_count( ) );
+        (reset_iltrigger_count( ) );
 
         bool
-        (is_mloop_running (bool(__is_type ) ) );
+        (is_mloop_serv_running (std::uint8_t(__is_type ) ) );
         bool
-        (is_iloop_running (bool(__is_type ) ) );
+        (is_iloop_serv_running (std::uint8_t(__is_type ) ) );
 
-        int unsigned(service_mltick_count ) = 0;
-        int unsigned(service_iltick_count ) = 0;
+        int unsigned(serv_mltrigger_count ) = 0;
+        int unsigned(serv_iltrigger_count ) = 0;
 
-        bool(service_mloop_running ) = false;
-        bool(service_iloop_running ) = false;
+        std::uint8_t(serv_mloop_running ) = (tmp_config::lstate::__not_running);
+        std::uint8_t(serv_iloop_running ) = (tmp_config::lstate::__not_running);
 } ; }
 
 # endif /*__io__service__hpp__*/

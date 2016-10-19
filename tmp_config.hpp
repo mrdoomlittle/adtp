@@ -20,6 +20,7 @@
 
 namespace tmp_config
 {
+    // change int unsigned to uint8_t as we are not using a large num
     enum time_format : int unsigned {
         __nano_seconds,
         __mloop_tick_count
@@ -35,7 +36,9 @@ namespace tmp_config
         __nottaken
     } ;
 
-    enum io_t : int unsigned { __i = 0, __o = 1 } ;
+    enum io_t : std::uint8_t { __itype, __otype };
+
+    enum lstate : std::uint8_t { __not_running, __running };
 
     // this will create a default interface using the data below / some
     extern bool const
@@ -82,25 +85,25 @@ namespace tmp_config
         (def_write_uphold_tformat);
 
     extern int unsigned const
-        (def_ibit_read_holdup);
+        (def_dati_bit_read_holdup);
     extern int unsigned const
-        (def_obit_write_holdup);
+        (def_dato_bit_write_holdup);
 
     extern int unsigned const
-        (def_ibyte_read_holdup);
+        (def_dati_byte_read_holdup);
     extern int unsigned const
-        (def_obyte_write_holdup);
+        (def_dato_byte_write_holdup);
 
     extern int unsigned const
-        (def_ibitset_buff_size);
+        (def_dati_bitset_buff_size);
     extern int unsigned const
-        (def_obitset_buff_size);
+        (def_dato_bitset_buff_size);
 
     // REMINDER: change name for this
     extern int unsigned const
-        (def_mltick_holdup);
+        (def_mltrigger_holdup);
     extern int unsigned const
-        (def_iltick_holdup);
+        (def_iltrigger_holdup);
 
     extern int unsigned const
         (def_digit_dati_pcount);

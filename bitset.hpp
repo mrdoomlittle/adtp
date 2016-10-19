@@ -118,6 +118,10 @@ namespace tmp { template <typename __bitset_type> class bitset
                 (this-> bitset_list).set_darr_ilayer((this-> bitset_temp).get_darr_ilayer(0, ((this-> bitset_length - 1) - x)), 0, x);
         }
 
+        int unsigned(get_bitset_length())
+        {
+            return(this-> bitset_length);
+        }
     private :
         enum sg_type : int unsigned { __individual = 0, __total_array = 1 } ;
         enum shift_direction : int unsigned { __right = 0, __left = 1 };
