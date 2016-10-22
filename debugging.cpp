@@ -80,7 +80,9 @@ int unsigned long (get_high_res_clock (int unsigned(__time_format) ) )
 }
 // clean this up and use the dynamic_array.hpp or just array.hpp
 int unsigned(simulated_pin_state_i [3] [8]) = {
-    {0x1, 0x0, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1}, {0x1, 0x1, 0x0, 0x1, 0x1, 0x1, 0x1, 0x1}, {0x1, 0x1, 0x1, 0x0, 0x1, 0x1, 0x1, 0x1} } ;
+    {0x1, 0x0, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1},
+    {0x1, 0x1, 0x0, 0x1, 0x1, 0x1, 0x1, 0x1},
+    {0x1, 0x1, 0x1, 0x0, 0x1, 0x1, 0x1, 0x1} } ;
 
 int unsigned(simulated_pin_state_c [10]) = {0x1, 0x0, 0x1, 0x0, 0x1, 0x1, 0x1, 0x1, 0x1, 0x1} ;
 
@@ -195,50 +197,81 @@ int unsigned
 # include "bitset.hpp"
 uint8_t bitset_c[8] = {1, 0, 0, 1, 0, 0, 0, 1};
 uint8_t bitset_a[8] = {0, 1, 1, 0, 1, 1, 1, 0};
-uint8_t c;
-uint8_t a;
+uint8_t c = false;
 
 
 int unsigned
 (external_mltick (tmp::io_service(* __io_service ) ) )
 {
-    uint8_t *test = __io_service-> get_from_dato_bytestream(0).get_bitset(1, 0);
+    //uint8_t *test = __io_service-> get_from_dato_bytestream(0).get_bitset(1, 0);
 
-    for (int unsigned(x ) = 0; x != 8; x ++)
-        std::cout << unsigned(test[x]);
-    std::cout << "\n";
+    //for (int unsigned(x ) = 0; x != 8; x ++)
+        //std::cout << unsigned(test[x]);
+    //std::cout << "\n";
 
     for (int unsigned iface = 0; iface != (__io_service-> get_interface_cinst_ptr()-> get_iface_count()); iface ++)
     {
         if (__io_service-> is_dato_bstream_buff_full() == false)
         {
+            if (c == false) {
             obs.set_bitset(bitset_c, 1, 0);
-            __io_service-> add_to_dato_bytestream(iface, &obs);
+            __io_service-> add_to_dato_bytestream(iface, &obs);}
+            if (c == true) {
+            obs.set_bitset(bitset_a, 1, 0);
+            __io_service-> add_to_dato_bytestream(iface, &obs);}
+
+            c = c == false? true : false;
         }
 
         if ((__io_service-> get_interface_cinst_ptr()-> is_iface_pmanager_state(1/*__doesent_exist*/, iface))) continue;
 
-        std::cout << "\nIFACE ID: " << iface << std::endl;
+        std::cout << "\nINTERFACE_ID: " << iface << std::endl;
 
         std::cout << "  ";
-        std::cout << "BYTE_STREAMBUFF\n";
+        for (int unsigned(x ) = 0; x != 8; x ++)
+            std::cout << unsigned((*(__io_service-> digit_dati_bitbuff))[x]);
+
+        std::cout << ", O::BITBUFF, ";
+        for (int unsigned(x ) = 0; x != 8; x ++)
+            std::cout << unsigned((*(__io_service-> digit_dato_bitbuff))[x]);
+
+        std::cout << ", O::BITBUFF";
+
+        std::cout << std::endl;
+
+        std::cout << "  ";
+        for (int unsigned(x ) = 0; x != 8; x ++)
+            std::cout << unsigned((*(__io_service-> digit_dati_bitset))[x]);
+
+        std::cout << ", I::BITSET" << ", ";
+
+        for (int unsigned(x ) = 0; x != 8; x ++)
+            std::cout << unsigned((*(__io_service-> digit_dato_bitset))[x]);
+
+        std::cout << ", O::BITSET\n\n";
+
+        std::cout << "  ";
+        for (int unsigned(x ) = 0; x != 8; x ++)
+            std::cout << unsigned(* __io_service-> get_io_bitset(iface, (tmp_config::io_t::__itype), 0, x));
+
+        std::cout << ", IO::I::BITSET" << ", ";
+
+        for (int unsigned(x ) = 0; x != 8; x ++)
+            std::cout << unsigned(* __io_service-> get_io_bitset(iface,  (tmp_config::io_t::__otype), 0, x));
+
+        std::cout << ", IO::O::BITSET\n\n";
+        std::cout << "  ";
+
+        std::cout << "  ";
+        std::cout << "\nBYTE_STREAMBUFF\n";
 
         for (int unsigned(x ) = 0; x != (__io_service-> dati_bytestream_bsize) + (__io_service-> dato_bytestream_bsize); x ++)
         {
             std::cout << "  ";
             if (x < (__io_service-> dati_bytestream_bsize)) {
-                if (__io_service-> dati_bytestream_bpos[0] == x)
-                    std::cout << "ISB: ><";
-                else
-                    std::cout << "ISB: <>";
 
-                if (__io_service-> dati_bytestream_bpos[1] == x)
-                    std::cout << "><";
-                else
-                    std::cout << "<>";
                 for (int unsigned(y ) = 0; y != 8; y ++)
                     std::cout << unsigned(*__io_service-> dati_bytestream_buff.get_from_dbuff(2, iface, x, y, false, false, false, true));
-
 
                 if (x >= (__io_service-> dato_bytestream_bsize)) {
 
@@ -246,19 +279,19 @@ int unsigned
                 }
 
                 if ((__io_service-> dati_bytestream_buff).is_block_smarker(true, iface, x) == true)
-                    std::cout << " & SM: " << "USED";
+                    std::cout << ", SM: " << "USED, ";
                 else
-                    std::cout << " & SM: " << "FREE";
+                    std::cout << ", SM: " << "FREE, ";
 
-                if (__io_service-> dato_bytestream_bpos[0] == x)
-                    std::cout << " : : OSB: ><";
+                if (__io_service-> dati_bytestream_bpos[0] == x)
+                    std::cout << "SG_POS: X:";
                 else
-                    std::cout << " : : OSB: <>";
-                if (__io_service-> dato_bytestream_bpos[1] == x)
-                    std::cout << "><";
-                else
-                    std::cout << "<>";
+                    std::cout << "SG_POS: O:";
 
+                if (__io_service-> dati_bytestream_bpos[1] == x)
+                    std::cout << "X : : ";
+                else
+                    std::cout << "O : : ";
             }
 
             if (x < (__io_service-> dato_bytestream_bsize)) {
@@ -266,9 +299,18 @@ int unsigned
                     std::cout << unsigned(*__io_service-> dato_bytestream_buff.get_from_dbuff(2, iface, x, y, false, false, false, true));
 
                 if ((__io_service-> dato_bytestream_buff).is_block_smarker(true, iface, x) == true)
-                    std::cout << " & SM: " << "USED";
+                    std::cout << ", SM: " << "USED,";
                 else
-                    std::cout << " & SM: " << "FREE";
+                    std::cout << ", SM: " << "FREE,";
+
+                if (__io_service-> dato_bytestream_bpos[0] == x)
+                    std::cout << " SG_POS: X:";
+                else
+                    std::cout << " SG_POS: O:";
+                if (__io_service-> dato_bytestream_bpos[1] == x)
+                    std::cout << "X, ";
+                else
+                    std::cout << "O, ";
 
                 std::cout << std::endl;
             }
@@ -277,35 +319,11 @@ int unsigned
         }
         std::cout << std::endl;
         std::cout << "  I::BYTE_STREAMBUFF / SUSED: " << __io_service-> dati_bytestream_buff.get_sector_used_c(iface) << ", SFREE: " <<  __io_service-> dati_bytestream_buff.get_sector_free_c(iface) << std::endl;
-
         std::cout << "  O::BYTE_STREAMBUFF / SUSED: " << __io_service-> dato_bytestream_buff.get_sector_used_c(iface) << ", SFREE: " <<  __io_service-> dato_bytestream_buff.get_sector_free_c(iface) << std::endl;
 
         std::cout << std::endl;
 
-        std::cout << "  ";
-        for (int unsigned(x ) = 0; x != 8; x ++)
-            std::cout << unsigned((*(__io_service-> digit_dati_bitbuff))[x]);
-
-        std::cout << " / O::BITBUFF : -- : ";
-        for (int unsigned(x ) = 0; x != 8; x ++)
-            std::cout << unsigned((*(__io_service-> digit_dato_bitbuff))[x]);
-
-
-        std::cout << " / O::BITBUFF";
-
-        std::cout << std::endl;
-
-        std::cout << "  ";
-        for (int unsigned(x ) = 0; x != 8; x ++)
-            std::cout << unsigned(* __io_service-> get_io_bitset(iface, (tmp_config::io_t::__itype), 0, x));
-
-        std::cout << " / I::BITSET" << " : -- : ";
-
-        for (int unsigned(x ) = 0; x != 8; x ++)
-            std::cout << unsigned(* __io_service-> get_io_bitset(iface,  (tmp_config::io_t::__otype), 0, x));
-
-        std::cout << " / O::BITSET\n\n";
-
+        std::cout << "BITSET_BUFF\n";
         for (int unsigned(x ) = 0; x != (__io_service-> dati_bitset_buff_size) + (__io_service-> dato_bitset_buff_size); x ++)
         {
             if (x < (__io_service-> dati_bitset_buff_size)) {
@@ -314,15 +332,18 @@ int unsigned
                 std::cout << unsigned(*__io_service-> dati_bitset_buff.get_from_dbuff(2, iface, x, y, false, false, false, true));
 
             if ((__io_service-> dati_bitset_buff).is_block_smarker(true, iface, x) == true)
-                std::cout << " & SM: " << "USED";
+                std::cout << ", SM: " << "USED,";
             else
-                std::cout << " & SM: " << "FREE";
+                std::cout << ", SM: " << "FREE,";
 
-            if (__io_service -> dati_bitset_buff_pos == x)
-                std::cout << " : ><";
+            if (__io_service -> dati_bitset_buff_pos[0] == x)
+                std::cout << " SG_POS: X:";
             else
-                std::cout << " : <>";
-
+                std::cout << " SG_POS: O:";
+            if (__io_service -> dati_bitset_buff_pos[1] == x)
+                std::cout << "X";
+            else
+                std::cout << "O";
             std::cout << " : : ";
 
             if (x >= (__io_service-> dato_bitset_buff_size)) {
@@ -335,21 +356,25 @@ int unsigned
                 std::cout << unsigned(*__io_service-> dato_bitset_buff.get_from_dbuff(2, iface, x, y, false, false, false, true));
 
             if (__io_service-> dato_bitset_buff.is_block_smarker(true, iface, x) == true)
-                std::cout << " & SM: " << "USED";
+                std::cout << ", SM: " << "USED";
             else
-                std::cout << " & SM: " << "FREE";
+                std::cout << ", SM: " << "FREE";
 
-            if (__io_service -> dato_bitset_buff_pos == x)
-                std::cout << " : ><";
+            if (__io_service -> dato_bitset_buff_pos[0] == x)
+                std::cout << ", SG_POS: X:";
             else
-                std::cout << " : <>";
+                std::cout << ", SG_POS: O:";
+            if (__io_service -> dato_bitset_buff_pos[1] == x)
+                std::cout << "X";
+            else
+                std::cout << "O";
             std::cout << std::endl;
             }
 
 
         }
+        std::cout << std::endl;
         std::cout << "  I::BITSET_BUFF / SUSED: " << __io_service-> dati_bitset_buff.get_sector_used_c(iface) << ", SFREE: " <<  __io_service-> dati_bitset_buff.get_sector_free_c(iface) << std::endl;
-
         std::cout << "  O::BITSET_BUFF / SUSED: " << __io_service-> dato_bitset_buff.get_sector_used_c(iface) << ", SFREE: " <<  __io_service-> dato_bitset_buff.get_sector_free_c(iface) << std::endl;
     }
 

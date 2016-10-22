@@ -16,19 +16,23 @@
 * See the File Called: ( INFOMATION )
 */
 
+// still have alot to do one this
 namespace tmp { class interface
 {
     public :
         interface()
         {
-
             (this-> iface_ip_addr_list).darr_init(1, 0);
             (this-> iface_dati_pid_list).darr_init(1, 0);
             (this-> iface_dato_pid_list).darr_init(1, 0);
             (this-> iface_datio_cpid_list).darr_init(2, 0);
             (this-> iface_datio_lpid_list).darr_init(2, 0);
             (this-> iface_pmanager_state).darr_init(1, 0);
+
+//            (this-> dati_packet_buff)
+//            (this-> dato_packet_buff)
         }
+
         void (create_iface(char const(* __iface_ip_addr), array<uint8_t>(& __dati_pid_list), array<uint8_t>(& __dato_pid_list),
             uint8_t(__dati_clock_pid), uint8_t(__dato_clock_pid), uint8_t(__dati_latch_pid), uint8_t(__dato_latch_pid)))
         {
@@ -78,6 +82,7 @@ namespace tmp { class interface
         }
 
     // change to submit_to_pmanager()
+    // need renaming and cleaning
         bool
         (update_pmanager(pin_manager(* __pmanager_cinst_ptr), int unsigned(__iface_id)))
         {
@@ -144,7 +149,7 @@ namespace tmp { class interface
                 (__pmanager_cinst_ptr-> add_dati_pid_space(__iface_id));
                 (__pmanager_cinst_ptr-> set_dati_pid(*(this-> iface_dati_pid_list).get_darr_ilayer(__iface_id, x), x , __iface_id));
             }
-            
+
             for (int unsigned(x ) = 0; x != (this-> iface_dato_pid_list).get_darr_length(__iface_id); x ++) {
                 (__pmanager_cinst_ptr-> add_dato_pid_space(__iface_id));
                 (__pmanager_cinst_ptr-> set_dato_pid(*(this-> iface_dato_pid_list).get_darr_ilayer(__iface_id, x), x, __iface_id));
@@ -193,12 +198,14 @@ namespace tmp { class interface
         {
             return ((this-> iface_ip_addr_lpos));
         }
+
         enum : int unsigned {
             __does_exist,
             __doesent_exist
         };
     private :
         int unsigned(iface_count ) = 0;
+
         int unsigned(iface_ip_addr_lpos ) = 0;
         dynamic_array <char> iface_ip_addr_list;
 
@@ -208,9 +215,13 @@ namespace tmp { class interface
         dynamic_array <uint8_t> iface_datio_cpid_list;
         dynamic_array <uint8_t> iface_datio_lpid_list;
 
+        // this is where we will store the incomming packets from the interface I/O
+
+        dynamic_buffer <uint8_t> dati_packet_buff;
+        dynamic_buffer <uint8_t> dato_packet_buff;
+        // might need to change name. this just states if the iface has been uploaded to the pin manager allready
+        // NOTE: change to uint8_t using int unsigned is a wast of memory
         dynamic_array <int unsigned> iface_pmanager_state;
-
-
 } ; }
 
 # endif /*__interface__hpp__*/

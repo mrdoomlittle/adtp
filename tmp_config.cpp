@@ -7,8 +7,15 @@
 * See the File Called: ( INFOMATION )
 */
 
-bool const
+uint8_t const
     (tmp_config::create_default_interface ) = true;
+
+uint8_t const
+    (tmp_config::use_signal_compressing) = false;
+
+uint8_t const
+    (tmp_config::signal_compressing_type) = 0;
+
 // reminder keep as it is for now but might change it by removing tmp_config:: and adding a namespace tmp_config {}
 int unsigned const
     (tmp_config::dpacket_header_size ) = 8;
@@ -79,7 +86,25 @@ int unsigned const
 int unsigned const
     (tmp_config::def_clock_ttrigger_method ) = 0;
 
+int unsigned const
+    (tmp_config::def_dati_clock_ppslength) = 0;
+int unsigned const
+    (tmp_config::def_dato_clock_ppslength) = 0;
 
+int unsigned const
+    (tmp_config::def_dati_clock_pnslength) = 0;
+int unsigned const
+    (tmp_config::def_dato_clock_pnslength) = 0;
+
+int unsigned const
+    (tmp_config::def_dati_latch_ppslength) = 0;
+int unsigned const
+    (tmp_config::def_dato_latch_ppslength) = 0;
+
+int unsigned const
+    (tmp_config::def_dati_latch_pnslength) = 0;
+int unsigned const
+    (tmp_config::def_dato_latch_pnslength) = 0;
 # ifdef ARDUINO
     int unsigned const
         (tmp_config::def_mltrigger_holdup ) = 300000;
@@ -87,7 +112,7 @@ int unsigned const
         (tmp_config::def_iltrigger_holdup ) = 300000;
 # else
     int unsigned const
-        (tmp_config::def_mltrigger_holdup ) = 10000000;
+        (tmp_config::def_mltrigger_holdup ) = 40000000;
     int unsigned const
-        (tmp_config::def_iltrigger_holdup ) = 10000000;
+        (tmp_config::def_iltrigger_holdup ) = 40000000;
 # endif

@@ -238,7 +238,7 @@ void
         (this-> ilclockn_tcount ) = 1;
     }
 
-    do
+    do // main serv loop
     {
         if ( (this-> get_mltrigger_count( ) ) != ( (this-> mltrigger_holdup - 1) ) )
         {
@@ -246,7 +246,7 @@ void
             continue;
         }
 
-        (this-> set_mltrigger_count ( (this-> real_mltick_count ) ) );
+        (this-> set_mltrigger_count ( (this-> real_mltrigger_count ) ) );
 
         if ( (this-> get_mltrigger_count( ) ) == 0 )
             if ( (this-> call_extern_mlinit (this ) ) == 0) return;
@@ -268,26 +268,46 @@ void
         (this-> dati_bit_read_holdup ) = ( (this-> dati_bit_read_holdup ) + ( ( (this-> dati_byte_read_holdup ) - 1) * (8/*bitset_length*/ / ((this-> get_pmanager_cinst_ptr())-> get_dati_pcount(0)) ) ) );
         (this-> dato_bit_write_holdup ) = ( (this-> dato_bit_write_holdup ) + ( ( (this-> dato_byte_write_holdup ) - 1) * (8/*bitset_length*/ / ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount(0)) ) ) );
 
+        //for (int unsigned(iface ) = 0; iface != (this-> get_interface_cinst_ptr()-> get_iface_count()); iface ++)
+            //for (int unsigned(x ) = 0; x != (this-> dati_bitset_buff_size ); x ++)
+                //(this-> dato_bitset_buff).add_to_dbuff((this-> get_io_bitset (0, 1, 0, x)), 2, 0, 0, x, false, true, false);
 
-        for (int unsigned(iface ) = 0; iface != (this-> get_interface_cinst_ptr()-> get_iface_count()); iface ++)
-            for (int unsigned(x ) = 0; x != (this-> dati_bitset_buff_size ); x ++)
-                (this-> dato_bitset_buff).add_to_dbuff((this-> get_io_bitset (0, 1, 0, x)), 2, 0, 0, x, false, true, false);
+        if (dato_bitset_buff.get_sector_free_c(0) != 0)
+        {
+            bitset <std::uint8_t> ii = (this-> get_from_dato_bytestream(0));
+
+            (this-> add_to_dato_bitset_buff(0, &ii));
+        }
+
+        if (dati_bytestream_buff.get_sector_free_c(0) != 0)
+        {
+            bool inf = false;
+
+            if (this-> dati_bitset_buff_pos[0] != 0)
+                inf = (this-> dati_bitset_buff).is_block_smarker(true, 0, (dati_bitset_buff_pos[0] -1));
+
+            bitset <std::uint8_t> ii = (this-> get_from_dati_bitset_buff(0));
+
+            if (this-> dati_bitset_buff_pos[0] != 0)
+                if (inf)
+                    (this-> add_to_dati_bytestream(0, &ii));
+        }
 
 # ifndef ARDUINO
         for (int unsigned(iface ) = 0; iface != (this-> get_interface_cinst_ptr()-> get_iface_count()); iface ++)
         {
             if ((this-> get_interface_cinst_ptr()-> is_iface_pmanager_state(1/*__doesent_exist*/, iface))) continue;
 
-            std::cout << "IFACE ID: " << iface << std::endl;
+            std::cout << "INTERFACE ID: " << iface << std::endl;
             std::cout << "  ";
 
             for (int unsigned(x ) = 0; x != ( *(this-> dati_bitset_length).get_darr_ilayer(iface, 0) / ((this-> get_pmanager_cinst_ptr())-> get_dati_pcount(iface)) ); x ++ )
                 std::cout << ((*(this-> dati_bitset_finished)) [x] );
-            std::cout << " :IFBIT, ";
+            std::cout << ":IBSF, ";
 
             for (int unsigned(x ) = 0; x != ( *(this-> dato_bitset_length).get_darr_ilayer(iface, 0) / ((this-> get_pmanager_cinst_ptr())-> get_dato_pcount(iface)) ); x ++ )
                 std::cout << ((*(this-> dato_bitset_finished)) [x] );
-            std::cout << " :OFBIT";
+            std::cout << ":OBSF";
 
             std::cout << std::endl;
         }
@@ -314,16 +334,16 @@ void
                     for (int unsigned(x ) = 0; x != *(this-> dati_bitset_length ).get_darr_ilayer(iface, 0); x ++ )
                         std::cout << "STATE: " << dati_bitset_buff.is_block_smarker(true, iface, x) << ", DBUFF_ID: " << x << std::endl;
 
-                    std::cout << "DBUFF_POS: " << dati_bitset_buff_pos << std::endl;
+                    std::cout << "DBUFF_POS: " << dati_bitset_buff_pos[0] << std::endl;
 
 # endif
-                    for (int unsigned(x ) = 0; x != *(this-> dati_bitset_length ).get_darr_ilayer(iface, 0); x ++ )
-                        (this-> dati_bitset_buff).add_to_dbuff(&((*(this-> digit_dati_bitset)) [x]), 2, iface, 0, 0, false, true, true);
+                    bitset <std::uint8_t> oo;
+                    oo.bitset_init(8);
 
-                    if ( (this-> dati_bitset_buff_pos ) == (this-> dati_bitset_buff_size ) - 1)
-                        (this-> dati_bitset_buff_pos ) = 0;
-                    else
-                        (this-> dati_bitset_buff_pos ) ++;
+                    for (int unsigned(x ) = 0; x != *(this-> dati_bitset_length ).get_darr_ilayer(iface, 0); x ++ )
+                        oo.set_bitset(&((*(this-> digit_dati_bitset)) [x]), 0, x);
+
+                    (this-> add_to_dati_bitset_buff(iface, &oo));
 
                     for (int unsigned(x ) = 0; x != ( *(this-> dati_bitset_length ).get_darr_ilayer(iface, 0) / ((this-> get_pmanager_cinst_ptr())-> get_dati_pcount(iface)) ); x ++ )
                         ((*(this-> dati_bitset_finished)) [x] ) = false;
@@ -349,16 +369,9 @@ void
                     for (int unsigned(x ) = 0; x != ( *(this-> dato_bitset_length ).get_darr_ilayer(iface, 0) / (this-> get_pmanager_cinst_ptr())->get_dato_pcount(iface)); x ++ )
                         ((*(this-> dato_bitset_finished)) [x] ) = false;
 
-                    if ((this-> dato_bitset_buff).is_block_smarker(true, iface, (this-> dato_bitset_buff_pos )) == true)
-                    {
-                        for (int unsigned x = 0; x != 8; x ++)
-                            ((*(this-> digit_dato_bitset)) [x]) = *(this-> dato_bitset_buff).get_from_dbuff(2, iface, (this-> dato_bitset_buff_pos ), x, false, false, false, true);
-                    }
-
-                    if ( (this-> dato_bitset_buff_pos ) == (this-> dato_bitset_buff_size ) - 1)
-                        (this-> dato_bitset_buff_pos ) = 0;
-                    else
-                        (this-> dato_bitset_buff_pos ) ++;
+                    bitset <std::uint8_t> oo = this-> get_from_dato_bitset_buff(iface);
+                    for (int unsigned x = 0; x != (oo.get_bitset_length()); x ++)
+                        ((*(this-> digit_dato_bitset)) [x]) = *oo.get_bitset(0, x);
                 }
             }
         }
@@ -370,19 +383,15 @@ void
 
             if ((this-> get_mltrigger_count( ) ) == 0)
             {
-                if ((this-> dato_bitset_buff).is_block_smarker(true, iface, (this-> dato_bitset_buff_pos )) == true)
-                {
-                    for (int unsigned x = 0; x != 8; x ++)
-                        ((*(this-> digit_dato_bitset)) [x]) = * (this-> dato_bitset_buff).get_from_dbuff(2, iface, (this-> dato_bitset_buff_pos ), x, false, false, false, true);
-
-                    (this-> dato_bitset_buff_pos ) ++;
-                }
+                bitset <std::uint8_t> oo = this-> get_from_dato_bitset_buff(iface);
+                for (int unsigned x = 0; x != (oo.get_bitset_length()); x ++)
+                    ((*(this-> digit_dato_bitset)) [x]) = *oo.get_bitset(0, x);
             }
         }
 
         (this-> dato_bitsetf_truec ) = 0;
 
-        do
+        do // inner service loop
         {
             if ( (this-> get_iltrigger_count( ) ) != ( (this-> iltrigger_holdup - 1) ) )
             {
@@ -390,8 +399,7 @@ void
                 continue;
             }
 
-
-            (this-> set_iltrigger_count ( (this-> real_iltick_count ) ) );
+            (this-> set_iltrigger_count ( (this-> real_iltrigger_count ) ) );
 
             if ((this-> get_iltrigger_count( ) ) == 0)
             {
@@ -419,9 +427,9 @@ void
                     (this-> ilclockn_tcount ) ++;
             }
 
-            (this-> temp_iltick_count ) = (this-> get_iltrigger_count( ) );
+            (this-> tmp_iltrigger_count ) = (this-> get_iltrigger_count( ) );
 
-            (this-> set_iltrigger_count ( (this-> i_iltick_count ) ) );
+            (this-> set_iltrigger_count ( (this-> dati_iltrigger_count ) ) );
 
             /*
                 NOTE: e.g. digit_dati_buff_pos needs to have an array size of how many interfaces
@@ -486,7 +494,7 @@ void
                 }
             }
 
-            (this-> set_iltrigger_count ( (this-> o_iltick_count ) ) );
+            (this-> set_iltrigger_count ( (this-> dato_iltrigger_count ) ) );
 
             for (int unsigned(iface ) = 0; iface != (this-> get_interface_cinst_ptr()-> get_iface_count()); iface ++)
             {
@@ -533,44 +541,48 @@ void
                 }
             }
 
-            (this-> set_iltrigger_count ( (this-> temp_iltick_count ) ) );
+            (this-> set_iltrigger_count ( (this-> tmp_iltrigger_count ) ) );
 
             // this need editing so it works with interfaces
             if ( ( (((this-> get_pmanager_cinst_ptr())-> get_dati_pcount(0)) - 1) + (this-> dati_bit_read_holdup - 1) ) == ( (((this-> get_pmanager_cinst_ptr())-> get_dato_pcount(0)) - 1) + (this-> dato_bit_write_holdup - 1) ) )
             {
                 if ( (this-> get_iltrigger_count( ) ) == ( ( (((this-> get_pmanager_cinst_ptr())-> get_dati_pcount(0)) - 1) + (this-> dati_bit_read_holdup - 1) ) + ( (((this-> get_pmanager_cinst_ptr())-> get_dato_pcount(0)) - 1) + (this-> dato_bit_write_holdup - 1) ) ) )
                 {
-                    (this-> i_iltick_count ) = 0;
-                    (this-> o_iltick_count ) = 0;
+                    (this-> dati_iltrigger_count ) = 0;
+                    (this-> dato_iltrigger_count ) = 0;
                     break;
                 }
             }
             else
             {
-                if ( (this-> i_iltick_count ) == ( (((this-> get_pmanager_cinst_ptr())-> get_dati_pcount(0)) - 1) + (this-> dati_bit_read_holdup - 1) ) )
+                if ( (this-> dati_iltrigger_count ) == ( (((this-> get_pmanager_cinst_ptr())-> get_dati_pcount(0)) - 1) + (this-> dati_bit_read_holdup - 1) ) )
                 {
-                    (this-> i_iltick_count ) = 0;
+                    (this-> dati_iltrigger_count ) = 0;
                     break;
                 }
 
-                if ( (this-> o_iltick_count ) == ( (((this-> get_pmanager_cinst_ptr())-> get_dato_pcount(0)) - 1) + (this-> dato_bit_write_holdup - 1) ) )
+                if ( (this-> dato_iltrigger_count ) == ( (((this-> get_pmanager_cinst_ptr())-> get_dato_pcount(0)) - 1) + (this-> dato_bit_write_holdup - 1) ) )
                 {
-                    (this-> o_iltick_count ) = 0;
+                    (this-> dato_iltrigger_count ) = 0;
                     break;
                 }
             }
 
             (this-> reset_iltrigger_count( ) );
 
-            (this-> i_iltick_count ) ++;
-            (this-> o_iltick_count ) ++;
+            (this-> update_dat_iltrigger_count(1,
+                    (tmp_config::io_t::__itype)));
 
-            (this-> update_rimltick_count (1) );
-        } while ( (this-> is_iloop_serv_running ((tmp_config::lstate::__running)) ) == true);
+            (this-> update_dat_iltrigger_count(1,
+                    (tmp_config::io_t::__otype)));
+
+            (this-> update_riltrigger_count (1) );
+
+        } while ( (this-> is_iloop_serv_running ((tmp_config::lstate::__running) ) ) == true);
 
         (this-> reset_iltrigger_count( ) );
 
-        (this-> real_iltick_count ) = 0;
+        (this-> reset_riltrigger_count( ) );
 
         if ((this-> is_clock_reading (true) ) == true) (this-> update_clock_ptcount (1) );
 
@@ -578,8 +590,9 @@ void
 
         (this-> reset_mltrigger_count( ) );
 
-        (this-> update_rmltick_count (1) );
-    } while ( (this-> is_mloop_serv_running ((tmp_config::lstate::__running)) ) == true);
+        (this-> update_rmltrigger_count (1) );
+
+    } while ( (this-> is_mloop_serv_running ((tmp_config::lstate::__running) ) ) == true);
 }
 
 void
@@ -645,14 +658,14 @@ bool
 }
 
 void
-(io_service::update_rmltick_count(int unsigned(__update_amount )))
+(io_service::update_rmltrigger_count(int unsigned(__update_amount )))
 {
-    (this-> real_mltick_count ) += __update_amount;
+    (this-> real_mltrigger_count ) += __update_amount;
 }
 void
-(io_service::update_rimltick_count(int unsigned(__update_amount )))
+(io_service::update_riltrigger_count(int unsigned(__update_amount )))
 {
-    (this-> real_iltick_count ) += __update_amount;
+    (this-> real_iltrigger_count ) += __update_amount;
 }
 
 void

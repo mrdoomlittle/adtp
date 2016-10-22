@@ -40,10 +40,28 @@ namespace tmp_config
 
     enum lstate : std::uint8_t { __not_running, __running };
 
+    //enum sig_comp_t std::uint8_t
+    //{
+        // will add other options
+        ///__all_of_them
+    //};
+
     // this will create a default interface using the data below / some
-    extern bool const
+    extern uint8_t const
         (create_default_interface);
 
+
+    // this will compress the clock and latch to gether into one wire
+    // and the all i pins and all o pins
+    // 0 i clock and latch
+    // 1 o clock and latch
+    // 3 i data stream << all of the pins
+    // 4 o data stream << all of the pins
+    extern uint8_t const
+        (use_signal_compressing);
+
+    extern uint8_t const
+        (signal_compressing_type);
     // this will be the size of the header for eatch packet of data
     // it will be fixed because it need to include the packet size without the header size
     extern int unsigned const
@@ -127,6 +145,26 @@ namespace tmp_config
         (def_clock_sstate_ignore);
     extern int unsigned const
         (def_clock_ttrigger_method);
+
+    extern int unsigned const
+        (def_dati_clock_ppslength);
+    extern int unsigned const
+        (def_dato_clock_ppslength);
+
+    extern int unsigned const
+        (def_dati_clock_pnslength);
+    extern int unsigned const
+        (def_dato_clock_pnslength);
+
+    extern int unsigned const
+        (def_dati_latch_ppslength);
+    extern int unsigned const
+        (def_dato_latch_ppslength);
+
+    extern int unsigned const
+        (def_dati_latch_pnslength);
+    extern int unsigned const
+        (def_dato_latch_pnslength);
 }
 
 # endif /*__tmp__config__hpp__*/
