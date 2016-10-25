@@ -30,17 +30,20 @@ namespace tmp { template <typename __bitset_t> class bitset_list
                 return;
             }
 
-            (this-> bitset_list) = new bitset <__bitset_t> * [2];
-
             if (__amount_of_bitsets != 0)
             {
-                (this-> bitset_list[0]) = new bitset <__bitset_t> [__amount_of_bitsets];
+                (this-> bitset_list) = new array <bitset <__bitset_t>*> (__amount_of_bitsets, {}, false);
+
+                for (int unsigned(x ) = 0; x != __amount_of_bitsets; x ++)
+                {
+                    (*(this-> bitset_list)) [x] = new bitset <__bitset_t>;
+                }
 
                 if (__init_bitsets_now == true)
                 {
                     for (int unsigned(x ) = 0; x != __amount_of_bitsets; x ++)
                     {
-                        (this-> bitset_list [0][x]).bitset_init(__length_of_ebitset);
+                        ((*(this-> bitset_list)) [x])-> bitset_init(__length_of_ebitset);
                     }
                 }
             }
@@ -58,7 +61,7 @@ namespace tmp { template <typename __bitset_t> class bitset_list
                 return (nullptr);
             }
 
-            return (& (this-> bitset_list[0][__bitset_list_pos]) );
+            return ( ((*(this-> bitset_list))[__bitset_list_pos]) );
         }
 
         void
@@ -70,7 +73,7 @@ namespace tmp { template <typename __bitset_t> class bitset_list
                 return;
             }
 
-            (this-> bitset_list [0][__bitset_arr_pos]).set_bitset(__bitset, __set_type , __ibitset_arr_pos);
+            ((*(this-> bitset_list))[__bitset_arr_pos])-> set_bitset(__bitset, __set_type , __ibitset_arr_pos);
         }
 
         __bitset_t
@@ -82,7 +85,7 @@ namespace tmp { template <typename __bitset_t> class bitset_list
                 return (nullptr);
             }
 
-            return((this-> bitset_list [0][__bitset_list_pos]).get_bitset(__get_type, __ibitset_list_pos));
+            return(((*(this-> bitset_list))[__bitset_list_pos])-> get_bitset(__get_type, __ibitset_list_pos));
         }
 
         void
@@ -94,7 +97,7 @@ namespace tmp { template <typename __bitset_t> class bitset_list
                 return;
             }
 
-            (this-> bitset_list [0][__bitset_list_pos]).shift_bitset(__shift_direction, __shift_amount);
+            ((*(this-> bitset_list))[__bitset_list_pos])-> shift_bitset(__shift_direction, __shift_amount);
         }
 
         void
@@ -106,45 +109,23 @@ namespace tmp { template <typename __bitset_t> class bitset_list
                 return;
             }
 
-            (this-> bitset_list [0][__bitset_list_pos]).flip_bitset();
+            ((*(this-> bitset_list))[__bitset_list_pos])-> flip_bitset();
         }
 
         void
         (add_bitset())
         {
-            if (amount_of_bitsets != 0)
-            {
-
-                // this take memory up by *2 so might need to fix that
-                (this-> bitset_list[1]) = new bitset <__bitset_t> [(this-> amount_of_bitsets)];
-
-                for (int unsigned(x ) = 0; x != (this-> amount_of_bitsets); x ++)
-                {
-                    (this-> bitset_list[1][x]).bitset_init((this-> length_of_ebitset));
-                    (this-> bitset_list[1][x]).set_bitset((this-> bitset_list [0][x]).get_bitset(1, x), 1, x);
-                }
-
-                delete[] (this-> bitset_list[0]);
-            }
-
-            if (amount_of_bitsets == 0)
-            {
-                (this-> bitset_list[0]) = new bitset <__bitset_t> [(this-> amount_of_bitsets) + 1];
-                (this-> bitset_list[0][0]).bitset_init((this-> length_of_ebitset));
-            }
-
-            if (amount_of_bitsets != 0)
-            {
-                for (int unsigned(x ) = 0; x != (this-> amount_of_bitsets); x ++)
-                {
-                    (this-> bitset_list[0][x]).bitset_init((this-> length_of_ebitset));
-                    (this-> bitset_list[0][x]).set_bitset((this-> bitset_list [1][x]).get_bitset(1, x), 1, x);
-                }
-
-                delete[] (this-> bitset_list [1]);
-            }
-
             (this-> amount_of_bitsets) ++;
+
+            (this-> bitset_list)-> resize_arr((this-> amount_of_bitsets));
+
+            //(this-> bitset_list).arr_data[0][0].get_bitset_length();
+
+            (*(this-> bitset_list)) [(this-> amount_of_bitsets)-1] = new bitset <__bitset_t>;
+
+            (*(this-> bitset_list)) [(this-> amount_of_bitsets)-1]-> bitset_init((this-> length_of_ebitset));
+
+
         }
 
         int unsigned
@@ -164,7 +145,9 @@ namespace tmp { template <typename __bitset_t> class bitset_list
         int unsigned(amount_of_bitsets) = 0;
 
     private :
-        bitset <__bitset_t> * * bitset_list;
+
+        array <bitset <__bitset_t>*> * bitset_list;
+
         error error_detection;
 } ; }
 

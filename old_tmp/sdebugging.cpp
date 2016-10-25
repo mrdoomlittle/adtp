@@ -2,15 +2,70 @@
 // as you change onething and many error/s appear
 
 
-# include "interface.hpp"
-# include "dynamic_array.hpp"
-# include "pin_manager.hpp"
+
 # include "array.hpp"
 # include <iostream>
+
+# include "bitset_list.hpp"
+# include "bitset.hpp"
 # include "dynamic_buffer.hpp"
 int main()
 {
-    tmp::array <uint8_t> a(6 ,{}, false);
+/*
+    tmp::bitset_list <int> a;
+    a.bitset_init(8, 2, true);
+    int test[8] = {1, 1};
+
+    a.set_bitset(test, 1, 0, 0);
+a.add_bitset();
+a.add_bitset();
+a.add_bitset();
+    for (int unsigned x = 0; x != 5; x ++) {
+        for (int unsigned y = 0; y != 8; y ++)
+        {
+            std::cout << *a.get_bitset(0, y, x);
+        }
+        std::cout << std::endl;
+    }
+*/
+
+
+    tmp::dynamic_buffer <int> a;
+
+    a.dbuff_init(3,2,2);
+
+    int jj = 21;
+    //for (int unsigned x = 0; x != 2; x ++)
+    a.add_to_dbuff(&jj, 2, 0, 0, 0, false, false, true);
+    a.add_to_dbuff(&jj, 2, 0, 0, 0, false, false, true);
+
+
+    //for (int unsigned x = 0; x != a.get_iblock_pos(0, 0, false); x ++)
+    //{
+    //    std::cout << unsigned(a.dbuff_iblocks[0][x]) << std::endl;
+    //}
+
+    //std::cout << a.get_iblock_pos(0, 2, true) << std::endl;
+    a.resize_dbuff(0, 0, 4, 0, 0, 0, 0); std::cout << "Resizing Dbuff" << std::endl;
+    //std::cout << a.get_iblock_pos(0, 2, true) << std::endl;
+
+    std::cout << "------------------------------------------------------" << a.get_iblock_count(1, 1, 0) << std::endl;
+
+    for (int unsigned x = 0; x != 2; x ++)
+    {
+        std::cout << "Sector: " << x << std::endl;
+        for (int unsigned y = 0; y != a.sector_length[0][x]; y ++)
+        {
+            std::cout << "  Block: " << y << " : SM: " << a.is_block_smarker(true, x, y) << std::endl;
+            for (int unsigned z = 0; z != a.block_length[0][y]; z ++)
+            {
+                if (a.get_from_dbuff(2, x, y, z, false, false, false, true) != nullptr)
+                    std::cout << "      " << unsigned(*a.get_from_dbuff(2, x, y, z, false, false, false, true)) << std::endl;
+            }
+        }
+    }
+
+
 //    tmp::array <uint8_t>
     //(* _digit_dati_bitset ) = new tmp::array <uint8_t> (8, {}, false);
 

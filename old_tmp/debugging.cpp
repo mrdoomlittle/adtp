@@ -168,7 +168,12 @@ uint8_t test[8][8] =
 tmp::bitset <uint8_t> obs;
 tmp::dynamic_array <uint8_t> overf;
 int unsigned overf_count = 0;
-void overflow (int unsigned(iface_id), tmp::bitset <uint8_t> (* __bitset))
+void overflow_i (int unsigned(iface_id), tmp::bitset <uint8_t> (* __bitset))
+{
+
+}
+
+void overflow_o (int unsigned(iface_id), tmp::bitset <uint8_t> (* __bitset))
 {
     overf.add_darr_layer();
     std::cout << "Overflow DUMP: \n";
@@ -189,10 +194,11 @@ int unsigned
 {
     overf.darr_init(8, 0);
     obs.bitset_init(8);
-    __io_service-> set_dato_bstream_buff_offunc_ptr(&overflow);
+    __io_service-> set_dati_bstream_buff_offunc_ptr(&overflow_i);
+    __io_service-> set_dato_bstream_buff_offunc_ptr(&overflow_o);
     std::cout << "This Project is Still Early Development and Many things Need Fixing. Sorry :(" << std::endl;
 
-    return 0;
+    return 1;
 }
 # include "bitset.hpp"
 uint8_t bitset_c[8] = {1, 0, 0, 1, 0, 0, 0, 1};

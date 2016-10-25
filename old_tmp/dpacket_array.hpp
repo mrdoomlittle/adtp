@@ -11,9 +11,7 @@
 
 // need to work on this more and test it as i speed coded it
 // so there might be alot of problems + might need to fix
-// the add_packet func as i dont know if it works i was going
-// to delete it and reinit it with the data from the other
-// but i will test it later
+// the add_packet func as i dont know if it works
 // this requires cleaning up and renaming vars
 namespace tmp { class dpacket_array
 {

@@ -22,6 +22,8 @@
     # include <iostream>
 # endif
 
+# include "array.hpp"
+
 namespace tmp { template <typename __darr_type> class dynamic_array
 {
     public :
@@ -32,10 +34,10 @@ namespace tmp { template <typename __darr_type> class dynamic_array
             //if (__darr_length < 1) return; fix
 
             if (__darr_depth > 0) {
-                (this-> darr_llength [(data_id::__main)]) = new int unsigned[__darr_depth];
+                (this-> darr_llength) = new array <int unsigned>(__darr_depth, {}, false);
 
             for (int unsigned(x ) = 0; x != __darr_depth; x ++)
-                (this-> darr_llength [(data_id::__main)][x]) = __darr_length;
+                ((*(this-> darr_llength))[x]) = __darr_length;
             }
 
             (this-> darr_length) = __darr_length;
@@ -65,7 +67,7 @@ namespace tmp { template <typename __darr_type> class dynamic_array
         void
         (set_darr_layer(__darr_type(* __layer_data), int unsigned(__layer_arr_pos)))
         {
-            for (int unsigned(ilayer_arr_pos) = 0; ilayer_arr_pos != (this-> darr_llength[(data_id::__main)][__layer_arr_pos]); ilayer_arr_pos ++)
+            for (int unsigned(ilayer_arr_pos) = 0; ilayer_arr_pos != ((*(this-> darr_llength))[__layer_arr_pos]); ilayer_arr_pos ++)
                 (this-> set_darr_ilayer((& __layer_data [ilayer_arr_pos]), __layer_arr_pos, ilayer_arr_pos));
         }
 
@@ -78,9 +80,9 @@ namespace tmp { template <typename __darr_type> class dynamic_array
                 (this-> darr_layer_tmp) = nullptr;
             }
 
-            (this-> darr_layer_tmp) = new __darr_type [(this-> darr_llength[(data_id::__main)][__layer_arr_pos])];
+            (this-> darr_layer_tmp) = new __darr_type [((*(this-> darr_llength))[__layer_arr_pos])];
 
-            for (int unsigned(ilayer_arr_pos ) = 0; ilayer_arr_pos != (this-> darr_llength[(data_id::__main)][__layer_arr_pos]); ilayer_arr_pos ++)
+            for (int unsigned(ilayer_arr_pos ) = 0; ilayer_arr_pos != ((*(this-> darr_llength))[__layer_arr_pos]); ilayer_arr_pos ++)
                 (this-> darr_layer_tmp [ilayer_arr_pos]) = *(this-> get_darr_ilayer (__layer_arr_pos, ilayer_arr_pos));
 
 
@@ -95,7 +97,7 @@ namespace tmp { template <typename __darr_type> class dynamic_array
             for (int unsigned(x ) = 0; x != (this-> darr_depth); x ++)
             {
                 if (sp == true && x == _il) break;
-                tmp += (this-> darr_llength [(data_id::__main)][x]);
+                tmp += ((*(this-> darr_llength))[x]);
             }
 
             return tmp;
@@ -104,7 +106,7 @@ namespace tmp { template <typename __darr_type> class dynamic_array
         // NOTE: add functions to resize the array
         void(resize_darr(int unsigned(__resize_type), int unsigned(__layer_arr_pos), int unsigned(__resize_to)))
         {
-            int unsigned(ilayers_to_add ) = __resize_to - (this-> darr_llength[(data_id::__main)][__layer_arr_pos]);
+            int unsigned(ilayers_to_add ) = __resize_to - ((*(this-> darr_llength))[__layer_arr_pos]);
 
             switch(__resize_type)
             {
@@ -141,7 +143,7 @@ namespace tmp { template <typename __darr_type> class dynamic_array
 
                     std::free((this-> darr_ilayers [(data_id::__swap)]));
 
-                    (this-> darr_llength[(data_id::__main)][__layer_arr_pos]) = __resize_to;
+                    ((*(this-> darr_llength))[__layer_arr_pos]) = __resize_to;
 
 
                     break;
@@ -179,8 +181,10 @@ namespace tmp { template <typename __darr_type> class dynamic_array
             if ((this-> darr_depth) == 0)
             {
                 (this-> darr_depth) ++;
-                (this-> darr_llength [(data_id::__main)]) = new int unsigned [(this-> darr_depth)];
-                (this-> darr_llength [(data_id::__main)][((this-> darr_depth)-1)]) = size;
+
+                (this-> darr_llength) = new array <int unsigned>(darr_depth, {}, false);
+
+                ((*(this-> darr_llength))[((this-> darr_depth)-1)]) = size;
 
                 (this-> darr_ilayers [(data_id::__main)]) = new __darr_type [(this-> get_ilayer_count())];
 
@@ -204,58 +208,28 @@ namespace tmp { template <typename __darr_type> class dynamic_array
 
                 std::free((this-> darr_ilayers [(data_id::__swap)]));
 
-                (this-> darr_llength [(data_id::__swap)]) = new int unsigned [(this-> darr_depth)];
-                for (int unsigned(x ) = 0; x != (this-> darr_depth); x ++)
-                    (this-> darr_llength [(data_id::__swap)][x]) = (this-> darr_llength [(data_id::__main)][x]);
-
-                std::free((this-> darr_llength [(data_id::__main)]));
-
                 (this-> darr_depth) ++;
 
-                (this-> darr_llength [(data_id::__main)]) = new int unsigned [(this-> darr_depth)];
+                (this-> darr_llength)-> resize_arr((this-> darr_depth));
 
-                for (int unsigned(x ) = 0; x != (this-> darr_depth)-1; x ++)
-                    (this-> darr_llength [(data_id::__main)][x]) = (this-> darr_llength [(data_id::__swap)][x]);
-
-                std::free((this-> darr_llength [(data_id::__swap)]));
-
-                (this-> darr_llength [(data_id::__main)][((this-> darr_depth)-1)]) = size;
+                ((*(this-> darr_llength)) [((this-> darr_depth)-1)]) = size;
             }
         }
 
         void(del_darr_layer(int unsigned(__layer_arr_pos)))
         {
             (this-> darr_ilayers [(data_id::__swap)]) = new __darr_type [(this-> get_ilayer_count())];
-            (this-> darr_llength [(data_id::__swap)]) = new int unsigned [(this-> darr_depth)-1];
 
             int unsigned (r) = 0;
 
             for (int unsigned(x ) = 0; x != (this-> get_ilayer_count()); x ++)
             {
-                if (x >= (this-> get_ilayer_count(__layer_arr_pos, true)) && x < (this-> get_ilayer_count(__layer_arr_pos, true)) + (this-> darr_llength[(data_id::__main)][__layer_arr_pos])) {r ++; continue;}
+                if (x >= (this-> get_ilayer_count(__layer_arr_pos, true)) && x < (this-> get_ilayer_count(__layer_arr_pos, true)) + (this-> darr_llength[__layer_arr_pos])) {r ++; continue;}
 
                 (this-> darr_ilayers [(data_id::__swap)] [(x-r)]) = (this-> darr_ilayers [(data_id::__main)] [(x)]);
             }
 
-            r = 0;
-
-            for (int unsigned(x ) = 0; x != (this-> darr_depth); x ++)
-            {
-                if (x == __layer_arr_pos) {r ++; continue;}
-
-                (this-> darr_llength [(data_id::__swap)][(x-r)]) = (this-> darr_llength [(data_id::__main)][x]);
-            }
-
-            std::free((this-> darr_llength [(data_id::__main)]));
-
-            (this-> darr_depth) --;
-
-            (this-> darr_llength [(data_id::__main)]) = new int unsigned [(this-> darr_depth)];
-
-            for (int unsigned(x ) = 0; x != (this-> darr_depth); x ++)
-                (this-> darr_llength [(data_id::__main)][x]) = (this-> darr_llength [(data_id::__swap)][x]);
-
-            std::free((this-> darr_llength [(data_id::__swap)]));
+            (this-> darr_llength).del_from_arr(__layer_arr_pos);
 
             std::free((this-> darr_ilayers [(data_id::__main)]));
 
@@ -269,7 +243,7 @@ namespace tmp { template <typename __darr_type> class dynamic_array
 
         int unsigned(get_darr_length(int unsigned(__layer_arr_pos) = 0))
         {
-            return((this-> darr_llength[(data_id::__main)][__layer_arr_pos]));
+            return(((*(this-> darr_llength))[__layer_arr_pos]));
         }
 
         int unsigned(get_darr_depth())
@@ -282,8 +256,7 @@ namespace tmp { template <typename __darr_type> class dynamic_array
 
         ~dynamic_array()
         {
-            //std::free(this-> darr_ilayers);
-            //std::free(this-> darr_layer_tmp);
+
         }
 
         void
@@ -308,7 +281,9 @@ namespace tmp { template <typename __darr_type> class dynamic_array
 
         int unsigned(darr_length ) = 0;
         int unsigned(darr_depth ) = 0;
-        int unsigned(* * darr_llength ) = new int unsigned * [2];
+
+        array <int unsigned> (* darr_llength );
+
         __darr_type(* * darr_ilayers ) = new __darr_type * [2];
 } ; }
 

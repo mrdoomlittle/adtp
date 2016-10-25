@@ -126,7 +126,7 @@ namespace tmp { template <typename __bitset_type> class bitset
         enum sg_type : int unsigned { __individual = 0, __total_array = 1 } ;
         enum shift_direction : int unsigned { __right = 0, __left = 1 };
 
-        int unsigned(bitset_length) = 0;;
+        int unsigned(bitset_length) = 0;
 
         int unsigned(max_right_shift) = 0;
         int unsigned(max_left_shift) = 0;

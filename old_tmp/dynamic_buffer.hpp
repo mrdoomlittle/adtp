@@ -10,7 +10,65 @@
 
 namespace tmp { template <typename __dbuff_type> class dynamic_buffer
 {
-    private :
+    public :
+        int unsigned
+        (get_iblock_pos(std::uint8_t(__unit_id), int unsigned(_il) = 0, bool(sp) = false))
+        {
+            int unsigned tmp = 0;
+            switch(__unit_id)
+            {
+                case
+                (unit_id::__sector):
+                    for (int unsigned(x ) = 0; x != (this-> amount_of_sectors); x ++)
+                    {
+                        if (sp == true && x == _il) break;
+                        tmp += ((this-> sector_length [(data_id::__main)][x])* (this-> get_iblock_pos(1, 0, false)));
+                    }
+                    break;
+                case
+                (unit_id::__block):
+                    for (int unsigned(x ) = 0; x != (this-> blocks_per_sector); x ++)
+                    {
+                        if (sp == true && x == _il) break;
+                        tmp += (this-> block_length [(data_id::__main)][x]);
+                    }
+                    break;
+            }
+            return tmp;
+        }
+
+        int unsigned
+        (get_iblock_count(std::uint8_t(__unit_id), int unsigned(__sector_pos_id), int unsigned(__block_pos_id)))
+        {
+            int unsigned tmp = 0, ll = 0;
+            switch(__unit_id)
+            {
+                case
+                (unit_id::__sector):
+                    for (int unsigned(x ) = 0; x != (this-> sector_length [(data_id::__main)][__sector_pos_id]); x ++)
+                    {
+                        tmp += (this-> get_iblock_count(1, __sector_pos_id, x));
+                    }
+
+                    break;
+                case
+                (unit_id::__block):
+                    for (int unsigned(x ) = 0; x != __sector_pos_id; x ++)
+                    {
+                        ll += (this-> sector_length [(data_id::__main)][x]);
+                    }
+                    for (int unsigned(x ) = 0; x != 6; x ++)
+                    {
+                        std::cout << (this-> block_length [(data_id::__main)][x]) << std::endl;
+                    }
+
+                    tmp = (this-> block_length [(data_id::__main)][ll + __block_pos_id]);
+
+                    break;
+            }
+            return tmp;
+        }
+
         void
         (set_sector_arr_pos (int unsigned(__sector_pos_id ), int unsigned(__sector_arr_pos ) ) )
         {
@@ -27,7 +85,8 @@ namespace tmp { template <typename __dbuff_type> class dynamic_buffer
         void
         (set_block_iarr_pos (int unsigned(__sector_pos_id ), int unsigned(__block_pos_id ), int unsigned(__block_ipos_id ), int unsigned(__block_iarr_pos ) ) )
         {
-            (this-> block_pos_id [(data_id::__main)] [( (this-> get_block_arr_pos (__sector_pos_id, __block_pos_id) ) * (this-> block_inner_length) ) + __block_ipos_id]) =
+
+            (this-> block_ipos_id [(data_id::__main)] [( (this-> get_block_arr_pos (__sector_pos_id, __block_pos_id) ) * (this-> block_inner_length) ) + __block_ipos_id]) =
                 ( ( (this-> get_block_arr_pos (__sector_pos_id, __block_pos_id) ) * (this-> block_inner_length) ) + __block_ipos_id);
         }
 
@@ -71,26 +130,34 @@ namespace tmp { template <typename __dbuff_type> class dynamic_buffer
 
             (this-> total_block_count) = (__amount_of_sectors * __blocks_per_sector);
             (this-> total_block_icount) = ( (this-> total_block_count) * __block_inner_length);
+
             (this-> amount_of_sectors) = __amount_of_sectors;
             (this-> blocks_per_sector) = __blocks_per_sector;
             (this-> block_inner_length) = __block_inner_length;
 
-            (this-> sector_smarker [(data_id::__main)]) = new bool [__amount_of_sectors];
-            (this-> block_smarker [(data_id::__main)]) = new bool [(this-> total_block_count)];
-            (this-> block_ismarker [(data_id::__main)]) = new bool [(this-> total_block_icount)];
+            (this-> sector_smarker [(data_id::__main)]) = new std::uint8_t [__amount_of_sectors];
+            (this-> block_smarker [(data_id::__main)]) = new std::uint8_t [(this-> total_block_count)];
+            (this-> block_ismarker [(data_id::__main)]) = new std::uint8_t [(this-> total_block_icount)];
 
             (this-> sector_pos_id [(data_id::__main)]) = new int unsigned [__amount_of_sectors];
             (this-> block_pos_id [(data_id::__main)]) = new int unsigned [(this-> total_block_count)];
             (this-> block_ipos_id [(data_id::__main)]) = new int unsigned [(this-> total_block_icount)];
 
+            (this-> sector_length [(data_id::__main)]) = new int unsigned[__amount_of_sectors];
+            (this-> block_length [(data_id::__main)]) = new int unsigned[total_block_count];
+
             for (int unsigned(sector_pos_id ) = 0; sector_pos_id != __amount_of_sectors; sector_pos_id ++)
             {
+                (this-> sector_length [(data_id::__main)][sector_pos_id]) = __blocks_per_sector;
+
                 (this-> set_sector_arr_pos (sector_pos_id, sector_pos_id) );
 
                 (this-> set_sector_smarker (state_marker::__free__, sector_pos_id) );
 
                 for (int unsigned(block_pos_id ) = 0; block_pos_id != __blocks_per_sector; block_pos_id ++)
                 {
+                    (this-> block_length [(data_id::__main)][(sector_pos_id * __blocks_per_sector) + block_pos_id]) = __block_inner_length;
+
                     (this-> set_block_arr_pos (sector_pos_id, block_pos_id, block_pos_id) );
 
                     (this-> set_block_smarker (state_marker::__free__, sector_pos_id, block_pos_id) );
@@ -159,7 +226,8 @@ namespace tmp { template <typename __dbuff_type> class dynamic_buffer
         }
     public :
         void
-        (add_to_dbuff (__dbuff_type(* __block_data ), int unsigned(__dbuff_unit_id ), int unsigned(__sector_pos_id ), int unsigned(__block_pos_id ), int unsigned(__block_ipos_id ), bool(__auto_sector_selc ), bool(__auto_block_selc ), bool(__auto_iblock_selc ) ) )
+        (add_to_dbuff (__dbuff_type(* __block_data ), int unsigned(__dbuff_unit_id ), int unsigned(__sector_pos_id ), int unsigned(__block_pos_id ),
+        int unsigned(__block_ipos_id ), bool(__auto_sector_selc ), bool(__auto_block_selc ), bool(__auto_iblock_selc ) ) )
         {
             if (! (this-> sector_pos_id_incheck (__sector_pos_id) ) )
                 return;
@@ -424,6 +492,190 @@ namespace tmp { template <typename __dbuff_type> class dynamic_buffer
             }
         }
 
+        void
+        (resize_dbuff(int unsigned(__resize_t ), int unsigned(__sector_pos_id ), int unsigned(__size_of_sector), int unsigned(__block_pos_id ),
+        int unsigned(__size_of_block), int unsigned(__block_ipos_id ), int unsigned(__amount_of_iblocks)))
+        {
+            int unsigned(iblocks_to_add ) = 0;
+            int unsigned blocks_to_add = 0;
+            int unsigned oo = 0, ok = 0, ssi = 0;
+            int unsigned bcount = 0, oj = 0;
+            int unsigned be = 0, kk = 0, tmt = 0, lol = 0;
+            switch(__resize_t)
+            {
+                case
+                (unit_id::__sector):
+                    blocks_to_add = __size_of_sector - (this-> sector_length[(data_id::__main)][__sector_pos_id]);
+
+                    for (int unsigned(x ) = 0; x != (this-> sector_length[(data_id::__main)][__sector_pos_id]); x ++) {
+                        oo += (this-> block_length [(data_id::__main)][x]);
+                    }
+
+                    // NOTE: block_inner_length is the default amount of iblock inside 1 block
+                    iblocks_to_add = (__size_of_sector * block_inner_length) - oo;// amount of iblocks in sector;
+
+                    std::cout << iblocks_to_add << std::endl;
+
+                    (this-> dbuff_iblocks[(data_id::__swap)]) = new __dbuff_type [(this-> get_iblock_pos(0, 0, false))];
+
+                    for (int unsigned(x ) = 0; x != (this-> get_iblock_pos(0, 0, false)); x ++) {
+                        (this-> dbuff_iblocks [(data_id::__swap)] [x]) = (this-> dbuff_iblocks [(data_id::__main)] [x]);
+                    }
+
+                    std::free((this-> dbuff_iblocks [(data_id::__main)]));
+
+                    (this-> dbuff_iblocks[(data_id::__main)]) = new __dbuff_type [(this-> get_iblock_pos(0, 0, false)) + iblocks_to_add];
+                    // this works fine
+                    for (int unsigned(x ) = 0; x != (this-> get_iblock_pos(0, 0, false)); x ++)
+                    {
+                        if (x >= (this-> get_iblock_pos(0, __sector_pos_id, true)) )
+                            (this-> dbuff_iblocks [(data_id::__main)] [x+iblocks_to_add]) = (this-> dbuff_iblocks [(data_id::__swap)] [x]);
+                        else
+                            (this-> dbuff_iblocks [(data_id::__main)] [x]) = (this-> dbuff_iblocks [(data_id::__swap)] [x]);
+                    }
+
+                    std::free((this-> dbuff_iblocks [(data_id::__swap)]));
+
+                    be = (this-> sector_length[(data_id::__main)][__sector_pos_id]);
+
+                    (this-> sector_length[(data_id::__main)][__sector_pos_id]) = __size_of_sector;
+
+                    for (int unsigned(x) = 0; x != (this-> amount_of_sectors); x ++)
+                    {
+                        bcount += this-> sector_length[0][x];
+                    }
+
+
+                    oj = (bcount - (__size_of_sector - be)); //??????????
+
+                    for (int unsigned(x ) = 0; x != (bcount - (__size_of_sector - be)); x ++)
+                    {
+                        tmt+= this-> block_length[0][x];
+                    }
+
+                    (this-> block_length[(data_id::__swap)]) = new int unsigned[oj];
+
+                    (this-> block_pos_id[(data_id::__swap)]) = new int unsigned [oj];
+                    (this-> block_ipos_id[(data_id::__swap)]) = new int unsigned [tmt];
+                    (this-> block_smarker[(data_id::__swap)]) = new std::uint8_t [oj];
+                    (this-> block_ismarker[(data_id::__swap)]) = new std::uint8_t [tmt];
+
+                    for (int unsigned(x ) = 0; x != (bcount - (__size_of_sector - be)); x ++)
+                    {
+                        (this-> block_length [(data_id::__swap)] [x]) = (this-> block_length [(data_id::__main)] [x]);
+                        std::cout << "------------------->" << (this-> block_pos_id[(data_id::__main)] [x]) << std::endl;
+                        (this-> block_pos_id[(data_id::__swap)] [x]) = (this-> block_pos_id[(data_id::__main)] [x]);
+
+                        (this-> block_smarker[(data_id::__swap)] [x]) = (this-> block_smarker[(data_id::__main)] [x]);
+
+                    }
+
+                    for (int unsigned(x ) = 0; x != tmt; x ++)
+                    {
+                        (this-> block_ipos_id[(data_id::__swap)] [x]) = (this-> block_ipos_id[(data_id::__main)] [x]);
+                        (this-> block_ismarker[(data_id::__swap)] [x]) = (this-> block_ismarker[(data_id::__main)] [x]);
+                    }
+
+                    std::free((this-> block_length [(data_id::__main)]));
+
+                    std::free((this-> block_pos_id [(data_id::__main)]));
+                    std::free((this-> block_ipos_id [(data_id::__main)]));
+                    std::free((this-> block_smarker [(data_id::__main)]));
+                    std::free((this-> block_ismarker [(data_id::__main)]));
+
+                    (this-> block_length[(data_id::__main)]) = new int unsigned[bcount];
+                    (this-> block_pos_id [(data_id::__main)]) = new int unsigned [bcount];
+                    (this-> block_smarker [(data_id::__main)]) = new std::uint8_t [bcount];
+
+
+                    for (int unsigned(x) = 0; x != __sector_pos_id; x ++)
+                    {
+                        kk += this-> sector_length[0][x];
+                    }
+
+
+                    for (int unsigned(x ) = 0; x != (bcount - (__size_of_sector - be)); x ++)
+                    {
+
+                        if (x >= kk)
+                        {
+                            (this-> block_length [(data_id::__main)] [x+kk]) = (this-> block_length [(data_id::__swap)] [x]);
+                            (this-> block_pos_id[(data_id::__main)] [x+kk]) = (this-> block_pos_id[(data_id::__swap)] [x]);
+
+                            (this-> block_smarker[(data_id::__main)] [x+kk]) = (this-> block_smarker[(data_id::__swap)] [x]);
+                        }
+                        else
+                        {
+                            (this-> block_length [(data_id::__main)] [x]) = (this-> block_length [(data_id::__swap)] [x]);
+                            (this-> block_pos_id[(data_id::__main)] [x]) = (this-> block_pos_id[(data_id::__swap)] [x]);
+                            (this-> block_smarker[(data_id::__main)] [x]) = (this-> block_smarker[(data_id::__swap)] [x]);
+
+                        }
+
+                    }
+
+                    for (int unsigned(x ) = kk; x != bcount; x ++)
+                    {
+                        std::cout << "A" << std::endl;
+                        (this-> block_length [(data_id::__main)] [x]) = (this-> block_inner_length);
+                        (this-> block_smarker[(data_id::__main)] [x]) = 0;
+                        //(this-> block_ismarker[(data_id::__main)] [x]) = 0;
+                    }
+
+
+
+                    for (int unsigned(x ) = 0; x != (this-> sector_length [(data_id::__main)] [__sector_pos_id]); x ++)
+                    {
+                        lol += (this-> block_length [(data_id::__main)] [x]);
+                    }
+                    ok = (get_iblock_pos(0, __sector_pos_id, true) + lol) - ((this-> block_inner_length) * blocks_to_add);
+                    lol -= ((this-> block_inner_length) * blocks_to_add);
+
+                    for (int unsigned y = 0; y != (this-> amount_of_sectors); y ++)
+                        for (int unsigned x = 0; x != (this-> sector_length [(data_id::__main)] [y]); x ++)
+                            ssi += (this-> block_length [(data_id::__main)] [x]);
+
+                    (this-> block_ipos_id [(data_id::__main)]) = new int unsigned [tmt];
+                    (this-> block_ismarker [(data_id::__main)]) = new std::uint8_t [tmt];
+
+                    for (int unsigned(x ) = 0; x != tmt; x ++)
+                    {
+                        if (x >= ok)
+                        {
+                            (this-> block_ipos_id [(data_id::__main)][x+lol]) = (this-> block_ipos_id [(data_id::__swap)][x]);
+                            (this-> block_ismarker [(data_id::__main)][x+lol]) = (this-> block_ismarker [(data_id::__swap)][x]);
+                            (this-> block_ismarker [(data_id::__main)][x]) = state_marker::__free__;
+                        }
+                        else
+                        {
+                            (this-> block_ipos_id [(data_id::__main)][x]) = (this-> block_ipos_id [(data_id::__swap)][x]);
+                            (this-> block_ismarker [(data_id::__main)][x]) = (this-> block_ismarker [(data_id::__swap)][x]);
+                        }
+                    }
+
+                    for (int unsigned(x ) = 0; x != bcount; x ++)
+                    {
+                        std::cout << x << std::endl;
+                        (this-> block_pos_id[(data_id::__main)] [x]) = x;
+                    }
+
+                    for (int unsigned(x ) = 0; x != ssi; x ++)
+                    {
+                        std::cout << x << std::endl;
+                        (this-> block_ipos_id[(data_id::__main)] [x]) = x;
+                    }
+
+
+
+
+                    break;
+                case
+                (unit_id::__block):
+
+                    break;
+            }
+        }
+
     private :
         void
         (set_sector_smarker (bool(__sector_state ), int unsigned(__sector_pos_id ) ) )
@@ -554,7 +806,7 @@ namespace tmp { template <typename __dbuff_type> class dynamic_buffer
             __used__ = true,
             __free__ = false
         } ;
-
+public:
         int unsigned(total_block_count ) = 0;
         int unsigned(total_block_icount ) = 0;
 
@@ -563,10 +815,20 @@ namespace tmp { template <typename __dbuff_type> class dynamic_buffer
         int unsigned(blocks_per_sector ) = 0;
         int unsigned(block_inner_length ) = 0;
 
+
+        // this need renaming
+        int unsigned
+        (* * sector_length) = new int unsigned *[2];
+
+        int unsigned
+        (* *block_length) = new int unsigned* [2];
+
         int unsigned
         (* sector_position ) = new int unsigned [2];
+
         int unsigned
         (* block_position ) = new int unsigned [2];
+
         int unsigned
         (* block_iposition ) = new int unsigned [2];
 
@@ -586,19 +848,18 @@ namespace tmp { template <typename __dbuff_type> class dynamic_buffer
         int unsigned
         (* * block_ipos_id ) = new int unsigned * [2];
 
-        bool
-        (* * sector_smarker ) = new bool * [2];
-        bool
-        (* * block_smarker ) = new bool * [2];
-        bool
-        (* * block_ismarker ) = new bool * [2];
+        std::uint8_t
+        (* * sector_smarker ) = new std::uint8_t * [2];
+        std::uint8_t
+        (* * block_smarker ) = new std::uint8_t * [2];
+        std::uint8_t
+        (* * block_ismarker ) = new std::uint8_t * [2];
 
         bool(has_dbuff_init ) = false;
 
+    public:
         __dbuff_type
         (* * dbuff_iblocks ) = new __dbuff_type * [2];
-} ;
-    typedef dynamic_buffer <int> dbint_t;
-}
+} ; }
 
 # endif /*__dynamic__buffer__hpp__*/

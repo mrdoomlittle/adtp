@@ -268,8 +268,8 @@ namespace tmp { class io_service
         {
             if ((this-> dati_bytestream_buff).is_block_smarker(true, __iface_id, dati_bytestream_bpos[0]))
             {
-                //if ((this-> dati_bytestream_buff) != nullptr)
-                    //(this-> dato_bstream_buff_overflow(__iface_id, __bitset_to_add));
+                if ((this-> dati_bstream_buff_offunc_ptr) != nullptr)
+                    (this-> dati_bstream_buff_overflow(__iface_id, __bitset_to_add));
                 return;
             }
 
@@ -455,6 +455,12 @@ namespace tmp { class io_service
         (set_dato_bstream_buff_offunc_ptr(void(* __overflow)(int unsigned iface, bitset <uint8_t> (* __bitset))))
         {
             (this-> dato_bstream_buff_offunc_ptr) = __overflow;
+        }
+
+        void
+        (dati_bstream_buff_overflow(int unsigned(iface_id), tmp::bitset <uint8_t> (* __bitset)))
+        {
+            (this-> dati_bstream_buff_offunc_ptr(iface_id, __bitset));
         }
 
         void

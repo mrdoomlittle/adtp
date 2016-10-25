@@ -1,3 +1,4 @@
 get the time working to fix up time/.hpp/.cpp
 fix up shift reg as its still not complete
 clean up code and get interfaces working
+NEED: change the way that resizing and del work for arrays as its inefficient
