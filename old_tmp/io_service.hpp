@@ -115,6 +115,58 @@ namespace tmp { class io_service
         ~io_service( );
 
         void
+        (io_service::set_ptr_to_sdigit_pmode_func (set_digit_pmode_func_t(* __set_digit_pmode_func_ptr) ) )
+        {
+            (this-> set_digit_pmode_func_ptr ) = __set_digit_pmode_func_ptr;
+        }
+        void
+        (io_service::set_ptr_to_sdigit_pstate_func (set_digit_pstate_func_t(* __set_digit_pstate_func_ptr) ) )
+        {
+            (this-> set_digit_pstate_func_ptr ) = __set_digit_pstate_func_ptr;
+        }
+        void
+        (io_service::set_ptr_to_gdigit_pstate_func (get_digit_pstate_func_t(* __get_digit_pstate_func_ptr) ) )
+        {
+            (this-> get_digit_pstate_func_ptr ) = __get_digit_pstate_func_ptr;
+        }
+        void
+        (io_service::set_ptr_to_extern_mlinit_func (extern_mlinit_func_t(* __extern_mlinit_func_ptr) ) )
+        {
+            (this-> extern_mlinit_func_ptr ) = __extern_mlinit_func_ptr;
+        }
+        void
+        (io_service::set_ptr_to_extern_mltick_func (extern_mltick_func_t(* __extern_mltick_func_ptr) ) )
+        {
+            (this-> extern_mltick_func_ptr ) = __extern_mltick_func_ptr;
+        }
+
+        bool
+        (io_service::is_ptr_to_sdigit_pmode_func (set_digit_pmode_func_t(* __is_type) ) )
+        {
+            return ( (this-> set_digit_pmode_func_ptr) == __is_type? true : false);
+        }
+        bool
+        (io_service::is_ptr_to_sdigit_pstate_func (set_digit_pstate_func_t(* __is_type) ) )
+        {
+            return ( (this-> set_digit_pstate_func_ptr) == __is_type? true : false);
+        }
+        bool
+        (io_service::is_ptr_to_gdigit_pstate_func (get_digit_pstate_func_t(* __is_type) ) )
+        {
+            return ( (this-> get_digit_pstate_func_ptr) == __is_type? true : false);
+        }
+        bool
+        (io_service::is_ptr_to_extern_mlinit_func (extern_mlinit_func_t(* __is_type) ) )
+        {
+            return ( (this-> extern_mlinit_func_ptr) == __is_type? true : false);
+        }
+        bool
+        (io_service::is_ptr_to_extern_mltick_func (extern_mltick_func_t(* __is_type) ) )
+        {
+            return ( (this-> extern_mltick_func_ptr) == __is_type? true : false);
+        }
+
+        void
         (service_init (
             set_digit_pmode_func_t(* __set_digit_pmode_func_ptr) = nullptr,
             set_digit_pstate_func_t(* __set_digit_pstate_func_ptr) = nullptr,
