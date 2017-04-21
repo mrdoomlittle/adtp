@@ -1,8 +1,7 @@
-all:
-	avr-gcc -c -g -std=c11 -DF_CPU=16000000UL -Os -mmcu=atmega328p -o io.o io.c
-	gcc -c -std=c11 -o io_.o io.c
-	gcc -std=c11 -o main main.c io_.o
-	#ar rcs libtmp_io.a io.o
-	#g++ -std=c++11 -L. -o main main.cpp -ltmp_io
+CXXFLAGS=-I/usr/local/include -D__DEBUG_ENABLED
+ARC=-DARC32
+debug: clean
+	gcc -std=c11 -c $(ARC) $(CXXFLAGS) -Wall -o tmp_io.o tmp_io.c
+	gcc -std=c11 $(ARC) $(CXXFLAGS) -Iinc -Llib -o debug debug.c tmp_io.o -lpthread
 clean:
-	rm -f *.o
+	rm -f *.o *.exec debug
