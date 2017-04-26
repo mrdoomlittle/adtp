@@ -1,7 +1,7 @@
 # ifndef __tmp__io
 # define __tmp__io
 # include <eint_t.h>
-
+# include <stdlib.h>
 struct tmp_io_t {
 	mdl_u8_t rx_pid, tx_pid;
 	mdl_u8_t rx_ci_pid, tx_ci_pid;

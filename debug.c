@@ -12,8 +12,8 @@
 
 uint8_t se_pinset[12] = {0x0}, cl_pinset[12] = {0x0};
 
-void se_set_pmode(uint8_t __pid, uint8_t __pmode) {}
-void se_set_pstate(uint8_t __pid, uint8_t __pstate) {
+void se_set_pmode(uint8_t __pmode, uint8_t __pid) {}
+void se_set_pstate(uint8_t __pstate, uint8_t __pid) {
 	if (__pid == TMP_RX_OC_PID) {
 		cl_pinset[TMP_RX_IC_PID] = __pstate;
 		return;
@@ -31,8 +31,8 @@ uint8_t se_get_pstate(uint8_t __pid) {
 	return se_pinset[__pid];
 }
 
-void cl_set_pmode(uint8_t __pid, uint8_t __pmode) {}
-void cl_set_pstate(uint8_t __pid, uint8_t __pstate) {
+void cl_set_pmode(uint8_t __pmode, uint8_t __pid) {}
+void cl_set_pstate(uint8_t __pstate, uint8_t __pid) {
 	if (__pid == TMP_RX_OC_PID) {
 		se_pinset[TMP_RX_IC_PID] = __pstate;
 		return;
