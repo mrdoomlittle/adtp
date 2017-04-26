@@ -1,13 +1,13 @@
 # TMP
 #### Connection:
 ##### __NODE 0
-TMP_RX_OC_PID -> TMP_RX_IC_PID of NODE 1
-TMP_TX_OC_PID -> TMP_TX_IC_PID of NODE 1
-TMP_TX_PID -> TMP_RX_PID of NODE 1
+TMP_RX_OC_PID -> TMP_RX_IC_PID of NODE 1 <br />
+TMP_TX_OC_PID -> TMP_TX_IC_PID of NODE 1 <br />
+TMP_TX_PID -> TMP_RX_PID of NODE 1 <br />
 #### __NODE 1
-TMP_RX_OC_PID -> TMP_RX_IC_PID of NODE 0
-TMP_TX_OC_PID -> TMP_TX_IC_PID of NODE 0
-TMP_TX_PID -> TMP_RX_PID of NODE 0
+TMP_RX_OC_PID -> TMP_RX_IC_PID of NODE 0 <br />
+TMP_TX_OC_PID -> TMP_TX_IC_PID of NODE 0 <br />
+TMP_TX_PID -> TMP_RX_PID of NODE 0 <br />
 #### Example:
 ```
 # define TMP_RX_IC_PID 2
