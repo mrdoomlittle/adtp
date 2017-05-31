@@ -1,5 +1,5 @@
 CXXFLAGS=-I/usr/local/include
-ARC=-DARC32
+ARC=-DARC64
 F_CPU=16000000UL
 DEVICE=atmega328p
 all: clean

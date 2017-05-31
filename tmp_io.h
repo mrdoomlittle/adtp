@@ -11,11 +11,15 @@ struct tmp_io_t {
 	mdl_u8_t rx_co_pid, tx_co_pid;
 
 	mdl_uint_t snd_timeo, rcv_timeo;
-	mdl_uint_t snd_timeo_c, rcv_timeo_c;
+	mdl_uint_t snd_timeo_ic, rcv_timeo_ic;
 
-	void (* set_pmode_fptr) (mdl_u8_t, mdl_u8_t);
-	void (* set_pstate_fptr) (mdl_u8_t, mdl_u8_t);
-	mdl_u8_t (* get_pstate_fptr) (mdl_u8_t);
+	mdl_uint_t snd_holdup_ic, rcv_holdup_ic;
+	mdl_uint_t snd_holdup, rcv_holdup;
+
+	void (*set_pmode_fptr) (mdl_u8_t, mdl_u8_t);
+	void (*set_pstate_fptr) (mdl_u8_t, mdl_u8_t);
+	mdl_u8_t (*get_pstate_fptr) (mdl_u8_t);
+	void (*holdup_fptr)(mdl_uint_t);
 };
 
 void tmp_set_pmode(struct tmp_io_t*, mdl_u8_t, mdl_u8_t);
@@ -24,12 +28,15 @@ mdl_u8_t tmp_get_pstate(struct tmp_io_t*, mdl_u8_t);
 
 mdl_i8_t tmp_init(struct tmp_io_t*, void (*) (mdl_u8_t, mdl_u8_t), void (*) (mdl_u8_t, mdl_u8_t), mdl_u8_t (*) (mdl_u8_t));
 
+void tmp_set_holdup_fptr(struct tmp_io_t*, void (*)(mdl_uint_t));
+void tmp_holdup(struct tmp_io_t*, mdl_uint_t, mdl_uint_t);
+
 typedef struct {
 	mdl_u8_t *ptr;
 	mdl_uint_t bytes;
 } tmp_io_buff_t;
 
-tmp_io_buff_t tmp_io_buff(mdl_u8_t *, mdl_uint_t);
+tmp_io_buff_t tmp_io_buff(mdl_u8_t*, mdl_uint_t);
 
 mdl_i8_t tmp_send(struct tmp_io_t*, tmp_io_buff_t);
 mdl_i8_t tmp_recv(struct tmp_io_t*, tmp_io_buff_t);
@@ -57,15 +64,21 @@ enum tmp_opt {TMP_OPT_SND_TIMEO, TMP_OPT_RCV_TIMEO};
 typedef enum tmp_opt tmp_opt_t;
 void tmp_set_opt(struct tmp_io_t *, tmp_opt_t, void *);
 void tmp_get_opt(struct tmp_io_t *, tmp_opt_t, void *);
-mdl_u8_t __inline__ static tmp_timeo(mdl_uint_t *__timeo_c, mdl_uint_t __timeo) {
+mdl_u8_t __inline__ static tmp_timeo(mdl_uint_t *__timeo_ic, mdl_uint_t __timeo) {
 	if (!__timeo) return 0;
-	if (*__timeo_c >= __timeo) {*__timeo_c = 0;return 1;} else (*__timeo_c)++;
+	if (*__timeo_ic >= __timeo) {*__timeo_ic = 0;return 1;} else (*__timeo_ic)++;
 	return 0;
 }
 
 mdl_u8_t __inline__ static tmp_snd_timeo(struct tmp_io_t *__tmp_io) {
-	return tmp_timeo(&__tmp_io-> snd_timeo_c, __tmp_io-> snd_timeo);}
+	mdl_u8_t result = tmp_timeo(&__tmp_io-> snd_timeo_ic, __tmp_io-> snd_timeo);
+	tmp_holdup(__tmp_io, 1, 1);
+	return result;
+}
 
 mdl_u8_t __inline__ static tmp_rcv_timeo(struct tmp_io_t *__tmp_io) {
-	return tmp_timeo(&__tmp_io-> rcv_timeo_c, __tmp_io-> rcv_timeo);}
+	mdl_u8_t result = tmp_timeo(&__tmp_io-> rcv_timeo_ic, __tmp_io-> rcv_timeo);
+	tmp_holdup(__tmp_io, 1, 1);
+	return result;
+}
 # endif /*__tmp__io*/
