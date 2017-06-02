@@ -49,11 +49,13 @@ mdl_i8_t tmp_recv_byte(struct tmp_io_t *__tmp_io, mdl_u8_t *__byte) {
 		if ((any_err = tmp_recv_bit(__tmp_io, &point_bit)) != TMP_SUCCESS) return any_err;
 		*__byte |= point_bit << bit_point;
 	}
+	if (tmp_is_rcv_optflag(__tmp_io, TMP_FLIP_BYTE_OPT)) *__byte = ~(*__byte);
 	return TMP_SUCCESS;
 }
 
 mdl_i8_t tmp_send_byte(struct tmp_io_t *__tmp_io, mdl_u8_t __byte) {
 	mdl_u8_t any_err = TMP_SUCCESS;
+	if (tmp_is_snd_optflag(__tmp_io, TMP_FLIP_BYTE_OPT)) __byte = ~__byte;
 	for (mdl_u8_t bit_point = 0; bit_point != 8; bit_point++)
 		if ((any_err = tmp_send_bit(__tmp_io, (__byte >> bit_point) & 1)) != TMP_SUCCESS) return any_err;
 	return TMP_SUCCESS;
@@ -220,4 +222,14 @@ void tmp_get_opt(struct tmp_io_t *__tmp_io, tmp_opt_t __tmp_opt, void *__data) {
 			*(mdl_uint_t *)__data = __tmp_io-> rcv_timeo;
 		break;
 	}
+}
+
+mdl_u8_t tmp_is_optflag(mdl_u8_t __optflags, mdl_u8_t __optflag) {
+	if ((__optflags & __optflag) == __optflag) return 1; return 0;}
+
+void tmp_tog_optflag(mdl_u8_t *__optflags, mdl_u8_t __optflag) {
+	if (tmp_is_optflag(*__optflags, __optflag))
+		(*__optflags) ^= __optflag;
+	else
+		(*__optflags) |= __optflag;
 }

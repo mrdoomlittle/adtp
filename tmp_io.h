@@ -5,6 +5,8 @@
 # define TMP_SUCCESS 0
 # define TMP_TIMEO 1
 # define TMP_FAILURE -1
+
+# define TMP_FLIP_BYTE_OPT 0b10000000
 struct tmp_io_t {
 	mdl_u8_t rx_pid, tx_pid;
 	mdl_u8_t rx_ci_pid, tx_ci_pid;
@@ -15,6 +17,7 @@ struct tmp_io_t {
 
 	mdl_uint_t snd_holdup_ic, rcv_holdup_ic;
 	mdl_uint_t snd_holdup, rcv_holdup;
+	mdl_u8_t snd_optflags, rcv_optflags;
 
 	void (*set_pmode_fptr) (mdl_u8_t, mdl_u8_t);
 	void (*set_pstate_fptr) (mdl_u8_t, mdl_u8_t);
@@ -81,4 +84,17 @@ mdl_u8_t __inline__ static tmp_rcv_timeo(struct tmp_io_t *__tmp_io) {
 	tmp_holdup(__tmp_io, 1, 1);
 	return result;
 }
+
+mdl_u8_t tmp_is_optflag(mdl_u8_t, mdl_u8_t);
+void tmp_tog_optflag(mdl_u8_t*, mdl_u8_t);
+
+void __inline__ static tmp_tog_snd_optflag(struct tmp_io_t *__tmp_io, mdl_u8_t __optflag) {
+	tmp_tog_optflag(&__tmp_io-> snd_optflags, __optflag);}
+mdl_u8_t __inline__ static tmp_is_snd_optflag(struct tmp_io_t *__tmp_io, mdl_u8_t __optflag) {
+	return tmp_is_optflag(__tmp_io-> snd_optflags, __optflag);}
+
+void __inline__ static tmp_tog_rcv_optflag(struct tmp_io_t *__tmp_io, mdl_u8_t __optflag) {
+	tmp_tog_optflag(&__tmp_io-> rcv_optflags, __optflag);}
+mdl_u8_t __inline__ static tmp_is_rcv_optflag(struct tmp_io_t *__tmp_io, mdl_u8_t __optflag) {
+	return tmp_is_optflag(__tmp_io-> rcv_optflags, __optflag);}
 # endif /*__tmp__io*/
