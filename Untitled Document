@@ -1,0 +1,104 @@
+mdl_u8_t no_name(mdl_u8_t koc, mdl_u8_t kzc, mdl_u8_t(*__one_c)[2][64], mdl_u8_t(*__zero_c)[2][64], mdl_u8_t *__no_dist, mdl_u8_t *__nz_dist, mdl_u8_t __one_dist, mdl_u8_t __zero_disc, mdl_u8_t __ic, mdl_u8_t __shift_dir) {
+	if ((*__one_c)[__shift_dir][__ic] > koc) {
+		if (((*__one_c)[__shift_dir][__ic] - koc) > __one_dist) return 1;
+		else
+			*__no_dist = (*__one_c)[__shift_dir][__ic] - koc;
+	}
+
+	if ((*__one_c)[__shift_dir][__ic] < koc) {
+		if ((koc - (*__one_c)[__shift_dir][__ic]) > __one_dist) return 1;
+		else
+			*__no_dist = koc - (*__one_c)[__shift_dir][__ic];
+	}
+
+	if ((*__zero_c)[__shift_dir][__ic] > kzc) {
+		if (((*__zero_c)[__shift_dir][__ic] - kzc) > __zero_disc) return 1;
+		else
+			*__nz_dist = (*__zero_c)[__shift_dir][__ic] - kzc;
+	}
+
+	if ((*__zero_c)[__shift_dir][__ic] < kzc) {
+		if ((kzc - (*__zero_c)[__shift_dir][__ic]) > __zero_disc) return 1;
+		else
+			*__nz_dist = kzc - (*__zero_c)[__shift_dir][__ic];
+	}
+	return 0;
+}
+
+mdl_u8_t fix_offsync(struct tmp_io_t *__tmp_io, mdl_u64_t __recved_key) {
+	mdl_u8_t key_one_c = 0, key_zero_c = 0;
+	mdl_u8_t rkey_one_c = 0, rkey_zero_c = 0;
+
+	for (mdl_u8_t ic = 0; ic != 64; ic++) {
+		mdl_u8_t bit_val;
+
+		bit_val = (KEY >> ic) & 1;
+		if (bit_val) key_one_c++; else key_zero_c++;
+
+		bit_val = (__recved_key >> ic) & 1;
+		if (bit_val) rkey_one_c++; else rkey_zero_c++;
+	}
+
+	mdl_u8_t one_c[2][64], zero_c[2][64];
+	mdl_u8_t match_table[2][64];
+	for (mdl_u8_t ic = 0; ic != 64; ic++) {
+		mdl_u8_t shifted_data;
+		one_c[0][ic] = 0;
+		zero_c[0][ic] = 0;
+		match_table[0][ic] = 0;
+		shifted_data = __recved_key >> ic;
+		for (mdl_u8_t bit_point = 0; bit_point != 8; bit_point++) {
+			mdl_u8_t bit_val = (shifted_data >> 1) & 1;
+			if (bit_val == ((KEY >> ic) & 1)) match_table[0][ic]++;
+			if (bit_val) one_c[0][ic]++; else zero_c[0][ic]++;
+		}
+
+		one_c[1][ic] = 0;
+		zero_c[1][ic] = 0;
+		match_table[1][ic] = 0;
+		shifted_data = __recved_key >> ic;
+		for (mdl_u8_t bit_point = 0; bit_point != 8; bit_point++) {
+			mdl_u8_t bit_val = (shifted_data << 1) & 1;
+			if (bit_val == ((KEY << ic) & 1)) match_table[1][ic]++;
+			if (bit_val) one_c[1][ic]++; else zero_c[1][ic]++;
+		}
+	}
+
+	mdl_u8_t match_c = 0, shift_fs = 0, shift_dir = 0;
+	mdl_u8_t one_dist = 0, zero_dist = 0;
+	for (mdl_u8_t ic = 0; ic != 64; ic++) {
+		if (match_table[0][ic] > shift_fs) {
+			mdl_u8_t no_dist = 0, nz_dist = 0;
+			if (no_name(key_one_c, key_zero_c, one_c, zero_c, &no_dist, &nz_dist, one_dist, zero_dist, ic, 0)) goto sk;
+			one_dist = no_dist;
+			zero_dist = nz_dist;
+
+			match_c = match_table[1][ic];
+			shift_fs = ic;
+
+
+			shift_dir = 0;
+		}
+		sk:
+
+		if (match_table[1][ic] > shift_fs) {
+			mdl_u8_t no_dist = 0, nz_dist = 0;
+			if (no_name(key_one_c, key_zero_c, one_c, zero_c, &no_dist, &nz_dist, one_dist, zero_dist, ic, 1)) continue;
+			one_dist = no_dist;
+			zero_dist = nz_dist;
+
+			match_c = match_table[1][ic];
+			shift_fs = ic;
+
+			shift_dir = 1;
+		}
+	}
+
+	if (shift_dir == 0) {
+		printf("right shift, %d.\n", shift_fs);
+	}
+
+	if (shift_dir == 1) {
+		printf("left shift, %d.\n", shift_fs);
+	}
+}

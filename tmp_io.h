@@ -25,6 +25,8 @@ struct tmp_io_t {
 	void (*holdup_fptr)(mdl_uint_t);
 };
 
+mdl_u8_t extern tmp_errno;
+
 void tmp_set_pmode(struct tmp_io_t*, mdl_u8_t, mdl_u8_t);
 void tmp_set_pstate(struct tmp_io_t*, mdl_u8_t, mdl_u8_t);
 mdl_u8_t tmp_get_pstate(struct tmp_io_t*, mdl_u8_t);
@@ -43,8 +45,11 @@ tmp_io_buff_t tmp_io_buff(mdl_u8_t*, mdl_uint_t);
 
 mdl_i8_t tmp_send(struct tmp_io_t*, tmp_io_buff_t);
 mdl_i8_t tmp_recv(struct tmp_io_t*, tmp_io_buff_t);
+mdl_i8_t tmp_recv_nibble(struct tmp_io_t*, mdl_u8_t*);
+mdl_i8_t tmp_send_nibble(struct tmp_io_t*, mdl_u8_t);
 mdl_i8_t tmp_recv_byte(struct tmp_io_t*, mdl_u8_t*);
 mdl_i8_t tmp_send_byte(struct tmp_io_t*, mdl_u8_t);
+
 mdl_i8_t tmp_recv_bit(struct tmp_io_t*, mdl_u8_t*);
 mdl_i8_t tmp_send_bit(struct tmp_io_t*, mdl_u8_t);
 

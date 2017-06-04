@@ -51,7 +51,8 @@ uint8_t cl_get_pstate(uint8_t __pid) {
 }
 
 void holdup(mdl_uint_t __holdup) {
-	for (int x = 0; x != 12872; x ++){}
+//	usleep(0.001);
+	for (int x = 0; x != 2762; x ++);
 }
 
 void se() {
@@ -71,11 +72,17 @@ struct tmp_io_t tmp_io = {
 	tmp_io.rcv_holdup_ic = 12;
 	tmp_set_opt(&tmp_io, TMP_OPT_SND_TIMEO, &timeo);
 	tmp_set_opt(&tmp_io, TMP_OPT_RCV_TIMEO, &timeo);
-
+	static mdl_u8_t in = 0;
 	while(1) {
+	if (!in) {
+		tmp_send_bit(&tmp_io, 0);
+		tmp_send_bit(&tmp_io, 0);
+		tmp_send_bit(&tmp_io, 0);
+		in = 1;
+	}
 	static mdl_u8_t hello[6] = {'H', 'e', 'l', 'l', 'o', '\0'};
 	tmp_send(&tmp_io, tmp_io_buff(hello, 6));
-//	holdup(0);
+//	holdup(10);
 	static mdl_u8_t world[6] = {'W', 'o', 'r', 'l', 'd', '\0'};
 	tmp_send(&tmp_io, tmp_io_buff(world, 6));
 	printf("sent data.\n");
