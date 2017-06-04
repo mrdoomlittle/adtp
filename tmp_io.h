@@ -6,7 +6,7 @@
 # define TMP_TIMEO 1
 # define TMP_FAILURE -1
 
-# define TMP_FLIP_BYTE_OPT 0b10000000
+# define TMP_FLIP_BITS_OPT 0b10000000
 struct tmp_io_t {
 	mdl_u8_t rx_pid, tx_pid;
 	mdl_u8_t rx_ci_pid, tx_ci_pid;
@@ -42,6 +42,12 @@ typedef struct {
 } tmp_io_buff_t;
 
 tmp_io_buff_t tmp_io_buff(mdl_u8_t*, mdl_uint_t);
+
+void tmp_flip_rx_clk_trig_val();
+mdl_u8_t tmp_is_rx_clk_trig_val(mdl_u8_t);
+
+void tmp_flip_tx_clk_trig_val();
+mdl_u8_t tmp_is_tx_clk_trig_val(mdl_u8_t);
 
 mdl_i8_t tmp_send(struct tmp_io_t*, tmp_io_buff_t);
 mdl_i8_t tmp_recv(struct tmp_io_t*, tmp_io_buff_t);
@@ -102,4 +108,17 @@ void __inline__ static tmp_tog_rcv_optflag(struct tmp_io_t *__tmp_io, mdl_u8_t _
 	tmp_tog_optflag(&__tmp_io-> rcv_optflags, __optflag);}
 mdl_u8_t __inline__ static tmp_is_rcv_optflag(struct tmp_io_t *__tmp_io, mdl_u8_t __optflag) {
 	return tmp_is_optflag(__tmp_io-> rcv_optflags, __optflag);}
+
+
+void invert_rcv_tx_trig_val();
+void uinvert_rcv_tx_trig_val();
+
+void invert_rcv_rx_trig_val();
+void uinvert_rcv_rx_trig_val();
+
+void invert_snd_tx_trig_val();
+void uinvert_snd_tx_trig_val();
+
+void invert_snd_rx_trig_val();
+void uinvert_snd_rx_trig_val();
 # endif /*__tmp__io*/
