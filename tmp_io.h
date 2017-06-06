@@ -6,7 +6,7 @@
 # define TMP_TIMEO 1
 # define TMP_FAILURE -1
 
-# define TMP_FLIP_BITS_OPT 0b10000000
+# define TMP_FLIP_BIT_OPT 0b10000000
 struct tmp_io_t {
 	mdl_u8_t rx_pid, tx_pid;
 	mdl_u8_t rx_ci_pid, tx_ci_pid;
