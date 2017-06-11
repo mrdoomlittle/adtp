@@ -59,6 +59,8 @@ void holdup(mdl_uint_t __holdup) {
 	for (int x = 0; x != 2762; x ++);
 }
 
+
+mdl_u8_t data_to_send[] = "abcdefghijklmnopqrstuvwxyz - abcdefghijklmnopqrstuvwxyz";
 void se() {
 struct tmp_io_t tmp_io = { 
 	.rx_pid = TMP_RX_PID,
@@ -77,21 +79,11 @@ struct tmp_io_t tmp_io = {
 	tmp_tog_rcv_optflag(&tmp_io, TMP_FLIP_BIT_OPT);
 	tmp_set_opt(&tmp_io, TMP_OPT_SND_TIMEO, &timeo);
 	tmp_set_opt(&tmp_io, TMP_OPT_RCV_TIMEO, &timeo);
-	invert_snd_tx_trig_val(); invert_rcv_rx_trig_val();
-	//tmp_tog_rcv_optflag(&tmp_io, TMP_FLIP_BITS_OPT);
-	static mdl_u8_t in = 0;
+	tmp_tog_snd_optflag(&tmp_io, TMP_INVERT_TX_TRIG_VAL_OPT);
+	tmp_tog_rcv_optflag(&tmp_io, TMP_INVERT_RX_TRIG_VAL_OPT);
+
 	while(1) {
-	if (!in) {
-//		tmp_send_bit(&tmp_io, 0);
-//		tmp_send_bit(&tmp_io, 0);
-//		tmp_send_bit(&tmp_io, 0);
-		in = 1;
-	}
-	static mdl_u8_t hello[6] = {'H', 'e', 'l', 'l', 'o', '\0'};
-	printf("%d\n", tmp_send(&tmp_io, tmp_io_buff(hello, 1)));
-	holdup(10);
-	static mdl_u8_t world[6] = {'W', 'o', 'r', 'l', 'd', '\0'};
-	printf("%d\n", tmp_send(&tmp_io, tmp_io_buff(world, 1)));
+	printf("%d\n", tmp_send(&tmp_io, tmp_io_buff(data_to_send, sizeof(data_to_send))));
 	}
 }
 
@@ -112,19 +104,15 @@ struct tmp_io_t tmp_io = {
 	tmp_tog_rcv_optflag(&tmp_io, TMP_FLIP_BIT_OPT);
 	tmp_io.snd_holdup_ic = 12;
 	tmp_io.rcv_holdup_ic = 12;
-	invert_snd_tx_trig_val(); invert_rcv_rx_trig_val();
+	tmp_tog_snd_optflag(&tmp_io, TMP_INVERT_TX_TRIG_VAL_OPT);
+	tmp_tog_rcv_optflag(&tmp_io, TMP_INVERT_RX_TRIG_VAL_OPT);
 	tmp_set_opt(&tmp_io, TMP_OPT_SND_TIMEO, &timeo);
 	tmp_set_opt(&tmp_io, TMP_OPT_RCV_TIMEO, &timeo);
 	while(1) {
-	mdl_u8_t data[6] = {'\0'};
-	printf("%d\n", tmp_recv(&tmp_io, tmp_io_buff(data, 1)));
+	mdl_u8_t data[sizeof(data_to_send)];
+	memset(data, 0x0, sizeof(data_to_send));
+	printf("%d\n", tmp_recv(&tmp_io, tmp_io_buff(data, sizeof(data_to_send))));
 	printf("recved: %s\n", data);
-	memset(data, '\0', 6);
-	printf("%d\n", tmp_recv(&tmp_io, tmp_io_buff(data, 1)));
-	printf("recved: %s\n", data);
-//	mdl_u8_t incomming_byte = 0;
-//	tmp_recv_byte(&tmp_io, &incomming_byte);
-//	printf("recved: %d\n", incomming_byte);
 	}
 }
 
