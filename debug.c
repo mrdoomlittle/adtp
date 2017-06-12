@@ -117,6 +117,9 @@ struct tmp_io_t tmp_io = {
 }
 
 int main() {
+	tmp_err_t a;
+	printf("addr: %d\n", tmp_addr_from_str("192.168.0.100", &a));
+
 	pthread_t se_th, cl_th;
 	pthread_create(&se_th, NULL, se, NULL);
 	pthread_create(&cl_th, NULL, cl, NULL);

@@ -3,6 +3,9 @@
 # include <eint_t.h>
 # include <stdlib.h>
 # include <math.h>
+# ifdef __AVR
+#	include <avr/interrupt.h>
+# endif
 
 # define TMP_SUCCESS 0
 # define TMP_TIMEO 1
@@ -103,8 +106,8 @@ tmp_err_t tmp_recv_w64(struct tmp_io_t*, mdl_u64_t*);
 tmp_err_t tmp_send_w32(struct tmp_io_t*, mdl_u32_t);
 tmp_err_t tmp_recv_w32(struct tmp_io_t*, mdl_u32_t*);
 
-tmp_err_t tmp_send_w16(struct tmp_io_t *, mdl_u16_t);
-tmp_err_t tmp_recv_w16(struct tmp_io_t *, mdl_u16_t*);
+tmp_err_t tmp_send_w16(struct tmp_io_t*, mdl_u16_t);
+tmp_err_t tmp_recv_w16(struct tmp_io_t*, mdl_u16_t*);
 
 tmp_err_t __inline__ static tmp_send_w8(struct tmp_io_t *__tmp_io, mdl_u8_t __data) {
 	return tmp_send_byte(__tmp_io, __data);}
@@ -114,8 +117,8 @@ tmp_err_t __inline__ static tmp_recv_w8(struct tmp_io_t *__tmp_io, mdl_u8_t *__d
 enum tmp_opt {TMP_OPT_SND_TIMEO, TMP_OPT_RCV_TIMEO};
 
 typedef enum tmp_opt tmp_opt_t;
-void tmp_set_opt(struct tmp_io_t *, tmp_opt_t, void *);
-void tmp_get_opt(struct tmp_io_t *, tmp_opt_t, void *);
+void tmp_set_opt(struct tmp_io_t*, tmp_opt_t, void*);
+void tmp_get_opt(struct tmp_io_t*, tmp_opt_t, void*);
 
 mdl_u8_t __inline__ static tmp_timeo(mdl_uint_t *__timeo_ic, mdl_uint_t __timeo) {
 	if (!__timeo) return 0;
@@ -134,7 +137,6 @@ mdl_u8_t __inline__ static tmp_rcv_timeo(struct tmp_io_t *__tmp_io) {
 	tmp_holdup(__tmp_io, 1, 1);
 	return result;
 }
-
 
 mdl_u8_t tmp_is_optflag(mdl_u8_t, mdl_u8_t);
 void tmp_tog_optflag(mdl_u8_t*, mdl_u8_t);
