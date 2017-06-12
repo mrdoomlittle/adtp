@@ -395,15 +395,8 @@ tmp_io_buff_t tmp_io_buff(mdl_u8_t *__ptr, mdl_uint_t __bytes) {
 
 tmp_err_t tmp_send_w64(struct tmp_io_t *__tmp_io, mdl_u64_t __data) {
 	tmp_err_t any_err;
-	mdl_u32_t _64b_part;
-
-	_64b_part = 0;
-	_64b_part = __data & 0xFFFFFFFF;
-	if ((any_err = tmp_send_w32(__tmp_io, _64b_part)) != TMP_SUCCESS) return any_err;
-
-	_64b_part = 0;
-	_64b_part = __data >> 32 & 0xFFFFFFFF;
-	if ((any_err = tmp_send_w32(__tmp_io, _64b_part)) != TMP_SUCCESS) return any_err;
+	if ((any_err = tmp_send_w32(__tmp_io, __data & 0xFFFFFFFF)) != TMP_SUCCESS) return any_err;
+	if ((any_err = tmp_send_w32(__tmp_io, __data >> 32 & 0xFFFFFFFF)) != TMP_SUCCESS) return any_err;
 	return TMP_SUCCESS;
 }
 
@@ -423,15 +416,8 @@ tmp_err_t tmp_recv_w64(struct tmp_io_t *__tmp_io, mdl_u64_t *__data) {
 
 tmp_err_t tmp_send_w32(struct tmp_io_t *__tmp_io, mdl_u32_t __data) {
 	tmp_err_t any_err;
-	mdl_u16_t _32b_part;
-
-	_32b_part = 0;
-	_32b_part = __data & 0xFFFF;
-	if ((any_err = tmp_send_w16(__tmp_io, _32b_part)) != TMP_SUCCESS) return any_err;
-
-	_32b_part = 0;
-	_32b_part = __data >> 16 & 0xFFFF;
-	if ((any_err = tmp_send_w16(__tmp_io, _32b_part)) != TMP_SUCCESS) return any_err;
+	if ((any_err = tmp_send_w16(__tmp_io, __data & 0xFFFF)) != TMP_SUCCESS) return any_err;
+	if ((any_err = tmp_send_w16(__tmp_io, __data >> 16 & 0xFFFF)) != TMP_SUCCESS) return any_err;
 	return TMP_SUCCESS;
 }
 
@@ -451,15 +437,8 @@ tmp_err_t tmp_recv_w32(struct tmp_io_t *__tmp_io, mdl_u32_t *__data) {
 
 tmp_err_t tmp_send_w16(struct tmp_io_t *__tmp_io, mdl_u16_t __data) {
 	tmp_err_t any_err;
-	mdl_u8_t _16b_part;
-
-	_16b_part = 0;
-	_16b_part = __data & 0xFF;
-	if ((any_err = tmp_send_byte(__tmp_io, _16b_part)) != TMP_SUCCESS) return any_err;
-
-	_16b_part = 0;
-	_16b_part = __data >> 8 & 0xFF;
-	if ((any_err = tmp_send_byte(__tmp_io, _16b_part)) != TMP_SUCCESS) return any_err;
+	if ((any_err = tmp_send_byte(__tmp_io, __data & 0xFF)) != TMP_SUCCESS) return any_err;
+	if ((any_err = tmp_send_byte(__tmp_io, __data >> 8 & 0xFF)) != TMP_SUCCESS) return any_err;
 	return TMP_SUCCESS;
 }
 
