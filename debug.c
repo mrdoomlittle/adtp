@@ -62,7 +62,7 @@ void holdup(mdl_uint_t __holdup) {
 
 mdl_u8_t data_to_send[] = "abcdefghijklmnopqrstuvwxyz - abcdefghijklmnopqrstuvwxyz";
 void se() {
-struct tmp_io_t tmp_io = { 
+struct tmp_io tmp_io = {
 	.rx_pid = TMP_RX_PID,
 	.tx_pid = TMP_TX_PID,
 	.rx_ci_pid = TMP_RX_IC_PID,
@@ -88,7 +88,7 @@ struct tmp_io_t tmp_io = {
 }
 
 void cl() {
-struct tmp_io_t tmp_io = {
+struct tmp_io tmp_io = {
 .rx_pid = TMP_RX_PID,
 .tx_pid = TMP_TX_PID,
 .rx_ci_pid = TMP_RX_IC_PID,
@@ -118,8 +118,6 @@ struct tmp_io_t tmp_io = {
 
 int main() {
 	tmp_err_t a;
-	printf("addr: %d\n", tmp_addr_from_str("192.168.0.100", &a));
-
 	pthread_t se_th, cl_th;
 	pthread_create(&se_th, NULL, se, NULL);
 	pthread_create(&cl_th, NULL, cl, NULL);
