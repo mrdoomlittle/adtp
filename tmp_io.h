@@ -43,10 +43,10 @@ struct tmp_io {
 	mdl_uint_t snd_holdup, rcv_holdup;
 	mdl_u8_t snd_optflags, rcv_optflags;
 
-	void (*set_pmode_fptr )(mdl_u8_t, mdl_u8_t);
-	void (*set_pstate_fptr)(mdl_u8_t, mdl_u8_t);
-	mdl_u8_t (*get_pstate_fptr)(mdl_u8_t);
-	void (*holdup_fptr)(mdl_uint_t);
+	void(*set_pin_mode_fp)(mdl_u8_t, mdl_u8_t);
+	void(*set_pin_state_fp)(mdl_u8_t, mdl_u8_t);
+	mdl_u8_t(*get_pin_state_fp)(mdl_u8_t);
+	void(*holdup_fp)(mdl_uint_t);
 # ifndef __TMP_LIGHT
 	tmp_addr_t iface_addr;
 # endif
@@ -64,8 +64,8 @@ mdl_u32_t tmp_addr_from_str(char unsigned const*, tmp_err_t*);
 # endif
 
 typedef struct {
-	mdl_u8_t *ptr;
-	mdl_uint_t bytes;
+	mdl_u8_t *p;
+	mdl_uint_t bc;
 } tmp_io_buff_t;
 
 # define TMP_PACKET_LENGTH 126
@@ -92,7 +92,7 @@ mdl_u8_t tmp_get_pstate(struct tmp_io*, mdl_u8_t);
 
 tmp_err_t tmp_init(struct tmp_io*, void (*)(mdl_u8_t, mdl_u8_t), void (*)(mdl_u8_t, mdl_u8_t), mdl_u8_t (*)(mdl_u8_t));
 
-void tmp_set_holdup_fptr(struct tmp_io*, void (*)(mdl_uint_t));
+void tmp_set_holdup_fp(struct tmp_io*, void (*)(mdl_uint_t));
 void tmp_holdup(struct tmp_io*, mdl_uint_t, mdl_uint_t);
 
 tmp_io_buff_t tmp_io_buff(mdl_u8_t*, mdl_uint_t);

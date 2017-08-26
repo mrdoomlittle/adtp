@@ -1,6 +1,7 @@
 # include <pthread.h>
 # include "tmp_io.h"
-
+# include <stdio.h>
+# include <string.h>
 # define TMP_RX_IC_PID 2
 # define TMP_RX_OC_PID 3
 
@@ -61,7 +62,7 @@ void holdup(mdl_uint_t __holdup) {
 
 
 mdl_u8_t data_to_send[] = "abcdefghijklmnopqrstuvwxyz - abcdefghijklmnopqrstuvwxyz";
-void se() {
+void* se(void *__arg) {
 struct tmp_io tmp_io = {
 	.rx_pid = TMP_RX_PID,
 	.tx_pid = TMP_TX_PID,
@@ -71,7 +72,7 @@ struct tmp_io tmp_io = {
 	.tx_co_pid = TMP_TX_OC_PID
 };
 	tmp_init(&tmp_io, &se_set_pmode, &se_set_pstate, &se_get_pstate);
-	tmp_set_holdup_fptr(&tmp_io, &holdup);
+	tmp_set_holdup_fp(&tmp_io, &holdup);
 	mdl_uint_t timeo = 6000000000;
 
 	tmp_io.snd_holdup_ic = 12;
@@ -85,9 +86,10 @@ struct tmp_io tmp_io = {
 	while(1) {
 	printf("%d\n", tmp_send(&tmp_io, tmp_io_buff(data_to_send, sizeof(data_to_send))));
 	}
+	return NULL;
 }
 
-void cl() {
+void* cl(void *__arg) {
 struct tmp_io tmp_io = {
 .rx_pid = TMP_RX_PID,
 .tx_pid = TMP_TX_PID,
@@ -98,7 +100,7 @@ struct tmp_io tmp_io = {
 };
 
 	tmp_init(&tmp_io, &cl_set_pmode, &cl_set_pstate, &cl_get_pstate);
-	tmp_set_holdup_fptr(&tmp_io, &holdup);
+	tmp_set_holdup_fp(&tmp_io, &holdup);
 	mdl_uint_t timeo = 6000000000;
 
 	tmp_tog_rcv_optflag(&tmp_io, TMP_FLIP_BIT_OPT);
@@ -114,6 +116,7 @@ struct tmp_io tmp_io = {
 	printf("%d\n", tmp_recv(&tmp_io, tmp_io_buff(data, sizeof(data_to_send))));
 	printf("recved: %s\n", data);
 	}
+	return NULL;
 }
 
 int main() {

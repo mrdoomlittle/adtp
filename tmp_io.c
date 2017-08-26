@@ -6,26 +6,30 @@ mdl_u8_t rx_clk_trig_val;
 mdl_u8_t tx_clk_trig_val;
 mdl_uint_t tmp_null;
 
-tmp_err_t tmp_init(struct tmp_io *__tmp_io, void (* __set_pmode_fptr) (mdl_u8_t, mdl_u8_t), void (* __set_pstate_fptr) (mdl_u8_t, mdl_u8_t), mdl_u8_t (* __get_pstate_fptr) (mdl_u8_t)) {
-	__tmp_io->set_pmode_fptr = __set_pmode_fptr;
-	__tmp_io->set_pstate_fptr = __set_pstate_fptr;
-	__tmp_io->get_pstate_fptr = __get_pstate_fptr;
-	__tmp_io->holdup_fptr = NULL;
+void static tmp_set_pin_mode(struct tmp_io*, mdl_u8_t, mdl_u8_t);
+void static tmp_set_pin_state(struct tmp_io*, mdl_u8_t, mdl_u8_t);
+mdl_u8_t static tmp_get_pin_state(struct tmp_io*, mdl_u8_t);
 
-	tmp_set_pmode(__tmp_io, tmp_gpio_in, __tmp_io->rx_pid);
-	tmp_set_pmode(__tmp_io, tmp_gpio_in, __tmp_io->rx_ci_pid); // msg: me recv data
-	tmp_set_pmode(__tmp_io, tmp_gpio_out, __tmp_io->rx_co_pid); // msg: node recv data
+tmp_err_t tmp_init(struct tmp_io *__tmp_io, void(*__set_pin_mode_fp)(mdl_u8_t, mdl_u8_t), void(*__set_pin_state_fp)(mdl_u8_t, mdl_u8_t), mdl_u8_t(*__get_pin_state_fp)(mdl_u8_t)) {
+	__tmp_io->set_pin_mode_fp = __set_pin_mode_fp;
+	__tmp_io->set_pin_state_fp = __set_pin_state_fp;
+	__tmp_io->get_pin_state_fp = __get_pin_state_fp;
+	__tmp_io->holdup_fp = NULL;
 
-	tmp_set_pmode(__tmp_io, tmp_gpio_out, __tmp_io->tx_pid);
-	tmp_set_pmode(__tmp_io, tmp_gpio_in, __tmp_io->tx_ci_pid); // msg: me send data
-	tmp_set_pmode(__tmp_io, tmp_gpio_out, __tmp_io->tx_co_pid); // msg: node send data
+	tmp_set_pin_mode(__tmp_io, tmp_gpio_in, __tmp_io->rx_pid);
+	tmp_set_pin_mode(__tmp_io, tmp_gpio_in, __tmp_io->rx_ci_pid); // msg: me recv data
+	tmp_set_pin_mode(__tmp_io, tmp_gpio_out, __tmp_io->rx_co_pid); // msg: node recv data
+
+	tmp_set_pin_mode(__tmp_io, tmp_gpio_out, __tmp_io->tx_pid);
+	tmp_set_pin_mode(__tmp_io, tmp_gpio_in, __tmp_io->tx_ci_pid); // msg: me send data
+	tmp_set_pin_mode(__tmp_io, tmp_gpio_out, __tmp_io->tx_co_pid); // msg: node send data
 
 	rx_clk_trig_val = tmp_gpio_low;
 	tx_clk_trig_val = tmp_gpio_low;
 
-	tmp_set_pstate(__tmp_io, ~rx_clk_trig_val & 0x1, __tmp_io->rx_co_pid);
-	tmp_set_pstate(__tmp_io, tmp_gpio_low, __tmp_io->tx_pid);
-	tmp_set_pstate(__tmp_io, ~tx_clk_trig_val & 0x1, __tmp_io->tx_co_pid);
+	tmp_set_pin_state(__tmp_io, ~rx_clk_trig_val & 0x1, __tmp_io->rx_co_pid);
+	tmp_set_pin_state(__tmp_io, tmp_gpio_low, __tmp_io->tx_pid);
+	tmp_set_pin_state(__tmp_io, ~tx_clk_trig_val & 0x1, __tmp_io->tx_co_pid);
 
 	__tmp_io->snd_timeo = 0;
 	__tmp_io->snd_timeo_ic = 0;
@@ -106,13 +110,13 @@ tmp_err_t tmp_seto_speed(struct tmp_io *__tmp_io, mdl_uint_t __bps) {
 	return TMP_SUCCESS;
 }
 
-void tmp_set_holdup_fptr(struct tmp_io *__tmp_io, void (*__holdup_fptr)(mdl_uint_t)) {
-	__tmp_io->holdup_fptr = __holdup_fptr;}
+void tmp_set_holdup_fp(struct tmp_io *__tmp_io, void(*__holdup_fp)(mdl_uint_t)) {
+	__tmp_io->holdup_fp = __holdup_fp;}
 
 void tmp_holdup(struct tmp_io *__tmp_io, mdl_uint_t __holdup_ic, mdl_uint_t __holdup) {
-	if (!__tmp_io->holdup_fptr || !__holdup_ic) return;
+	if (!__tmp_io->holdup_fp || !__holdup_ic) return;
 	mdl_uint_t ic = 0;
-	while(ic != __holdup_ic) {__tmp_io->holdup_fptr(__holdup);ic++;}
+	while(ic != __holdup_ic) {__tmp_io->holdup_fp(__holdup);ic++;}
 }
 
 void tmp_snd_holdup(struct tmp_io *__tmp_io){tmp_holdup(__tmp_io, __tmp_io->snd_holdup_ic, __tmp_io->snd_holdup);}
@@ -203,16 +207,16 @@ tmp_err_t tmp_recv_bit(struct tmp_io *__tmp_io, mdl_u8_t *__bit) {
 	mdl_u8_t _tx_clk_trig_val = tmp_is_rcv_optflag(__tmp_io, TMP_INVERT_TX_TRIG_VAL_OPT)? ~tx_clk_trig_val & 0x1 : tx_clk_trig_val;
 	mdl_u8_t _rx_clk_trig_val = tmp_is_rcv_optflag(__tmp_io, TMP_INVERT_RX_TRIG_VAL_OPT)? ~rx_clk_trig_val & 0x1 : rx_clk_trig_val;
 
-	tmp_set_pstate(__tmp_io, _tx_clk_trig_val, __tmp_io->tx_co_pid);
+	tmp_set_pin_state(__tmp_io, _tx_clk_trig_val, __tmp_io->tx_co_pid);
 	tmp_rcv_holdup(__tmp_io);
 
 	__tmp_io->rcv_timeo_ic = 0;
-	while(tmp_get_pstate(__tmp_io, __tmp_io->rx_ci_pid) != _rx_clk_trig_val) {
-		if (tmp_rcv_timeo(__tmp_io)) {tmp_set_pstate(__tmp_io, ~_tx_clk_trig_val & 0x1, __tmp_io->tx_co_pid);return TMP_TIMEO;}}
+	while(tmp_get_pin_state(__tmp_io, __tmp_io->rx_ci_pid) != _rx_clk_trig_val) {
+		if (tmp_rcv_timeo(__tmp_io)) {tmp_set_pin_state(__tmp_io, ~_tx_clk_trig_val & 0x1, __tmp_io->tx_co_pid);return TMP_TIMEO;}}
 
 	tmp_rcv_holdup(__tmp_io);
 
-	mdl_u8_t recved_bit = tmp_get_pstate(__tmp_io, __tmp_io->rx_pid);
+	mdl_u8_t recved_bit = tmp_get_pin_state(__tmp_io, __tmp_io->rx_pid);
 	if (tmp_is_rcv_optflag(__tmp_io, TMP_FLIP_BIT_OPT))
 		*__bit = ~recved_bit & 0x1;
 	else
@@ -220,11 +224,11 @@ tmp_err_t tmp_recv_bit(struct tmp_io *__tmp_io, mdl_u8_t *__bit) {
 
 	tmp_rcv_holdup(__tmp_io);
 
-	tmp_set_pstate(__tmp_io, ~_tx_clk_trig_val & 0x1, __tmp_io->tx_co_pid);
+	tmp_set_pin_state(__tmp_io, ~_tx_clk_trig_val & 0x1, __tmp_io->tx_co_pid);
 	tmp_rcv_holdup(__tmp_io);
 
 	__tmp_io->rcv_timeo_ic = 0;
-	while(tmp_get_pstate(__tmp_io, __tmp_io->rx_ci_pid) != (~_rx_clk_trig_val & 0x1)) {if (tmp_rcv_timeo(__tmp_io)) return TMP_TIMEO;}
+	while(tmp_get_pin_state(__tmp_io, __tmp_io->rx_ci_pid) != (~_rx_clk_trig_val & 0x1)) {if (tmp_rcv_timeo(__tmp_io)) return TMP_TIMEO;}
 
 	tmp_rcv_holdup(__tmp_io);
 
@@ -246,26 +250,26 @@ tmp_err_t tmp_send_bit(struct tmp_io *__tmp_io, mdl_u8_t __bit) {
 	if (tmp_is_snd_optflag(__tmp_io, TMP_FLIP_BIT_OPT)) {__bit = ~__bit & 0x1;}
 
 	__tmp_io->snd_timeo_ic = 0;
-	while(tmp_get_pstate(__tmp_io, __tmp_io->tx_ci_pid) != _tx_clk_trig_val){
+	while(tmp_get_pin_state(__tmp_io, __tmp_io->tx_ci_pid) != _tx_clk_trig_val){
 			if (tmp_snd_timeo(__tmp_io))return TMP_TIMEO;}
 
 	tmp_snd_holdup(__tmp_io);
 
-	tmp_set_pstate(__tmp_io, __bit, __tmp_io->tx_pid);
+	tmp_set_pin_state(__tmp_io, __bit, __tmp_io->tx_pid);
 	tmp_snd_holdup(__tmp_io);
 
-	tmp_set_pstate(__tmp_io, _rx_clk_trig_val, __tmp_io->rx_co_pid);
+	tmp_set_pin_state(__tmp_io, _rx_clk_trig_val, __tmp_io->rx_co_pid);
 	tmp_snd_holdup(__tmp_io);
 
 	__tmp_io->snd_timeo_ic = 0;
-	while(tmp_get_pstate(__tmp_io, __tmp_io->tx_ci_pid) != (~_tx_clk_trig_val & 0x1)){
-		if (tmp_snd_timeo(__tmp_io)) {tmp_set_pstate(__tmp_io, ~_rx_clk_trig_val & 0x1, __tmp_io->rx_co_pid);return TMP_TIMEO;}}
+	while(tmp_get_pin_state(__tmp_io, __tmp_io->tx_ci_pid) != (~_tx_clk_trig_val & 0x1)){
+		if (tmp_snd_timeo(__tmp_io)) {tmp_set_pin_state(__tmp_io, ~_rx_clk_trig_val & 0x1, __tmp_io->rx_co_pid);return TMP_TIMEO;}}
 	tmp_snd_holdup(__tmp_io);
 
-	tmp_set_pstate(__tmp_io, ~_rx_clk_trig_val & 0x1, __tmp_io->rx_co_pid);
+	tmp_set_pin_state(__tmp_io, ~_rx_clk_trig_val & 0x1, __tmp_io->rx_co_pid);
 	tmp_snd_holdup(__tmp_io);
 
-	if (__bit) tmp_set_pstate(__tmp_io, tmp_gpio_low, __tmp_io->tx_pid);
+	if (__bit) tmp_set_pin_state(__tmp_io, tmp_gpio_low, __tmp_io->tx_pid);
 
 # ifdef __AVR
 	if (re_enable_gi) sei();
@@ -275,14 +279,17 @@ tmp_err_t tmp_send_bit(struct tmp_io *__tmp_io, mdl_u8_t __bit) {
 
 
 // gpio pins
-void tmp_set_pmode(struct tmp_io *__tmp_io, mdl_u8_t __pmode, mdl_u8_t __pid) {
-	__tmp_io->set_pmode_fptr(__pmode, __pid);}
+void static tmp_set_pin_mode(struct tmp_io *__tmp_io, mdl_u8_t __pin_mode, mdl_u8_t __pid) {
+	__tmp_io->set_pin_mode_fp(__pin_mode, __pid);
+}
 
-void tmp_set_pstate(struct tmp_io *__tmp_io, mdl_u8_t __pstate, mdl_u8_t __pid) {
-	__tmp_io->set_pstate_fptr(__pstate, __pid);}
+void static tmp_set_pin_state(struct tmp_io *__tmp_io, mdl_u8_t __pin_state, mdl_u8_t __pid) {
+	__tmp_io->set_pin_state_fp(__pin_state, __pid);
+}
 
-mdl_u8_t tmp_get_pstate(struct tmp_io *__tmp_io, mdl_u8_t __pid) {
-	return __tmp_io->get_pstate_fptr(__pid);}
+mdl_u8_t static tmp_get_pin_state(struct tmp_io *__tmp_io, mdl_u8_t __pid) {
+	return __tmp_io->get_pin_state_fp(__pid);
+}
 
 # ifndef __TMP_LIGHT
 # define KEY 0xA500A50000A500A5
@@ -319,7 +326,7 @@ tmp_err_t recv_key_and_sync(struct tmp_io *__tmp_io) {
 
 tmp_err_t tmp_raw_send(struct tmp_io *__tmp_io, tmp_io_buff_t __io_buff) {
 	tmp_err_t any_err;
-	for (mdl_u8_t *itr = __io_buff.ptr; itr != __io_buff.ptr+__io_buff.bytes; itr++)
+	for (mdl_u8_t *itr = __io_buff.p; itr != __io_buff.p+__io_buff.bc; itr++)
 		if ((any_err = tmp_send_byte(__tmp_io, *itr)) != TMP_SUCCESS) return any_err;
 	return TMP_SUCCESS;
 }
@@ -327,21 +334,21 @@ tmp_err_t tmp_raw_send(struct tmp_io *__tmp_io, tmp_io_buff_t __io_buff) {
 
 tmp_err_t tmp_raw_recv(struct tmp_io *__tmp_io, tmp_io_buff_t __io_buff) {
 	tmp_err_t any_err;
-	for (mdl_u8_t *itr = __io_buff.ptr; itr != __io_buff.ptr+__io_buff.bytes; itr++)
+	for (mdl_u8_t *itr = __io_buff.p; itr != __io_buff.p+__io_buff.bc; itr++)
 		if ((any_err = tmp_recv_byte(__tmp_io, itr)) != TMP_SUCCESS) return any_err;
 	return TMP_SUCCESS;
 }
 
 # ifndef __TMP_LIGHT
-mdl_u16_t tmp_pk_dsec_len = TMP_PACKET_LENGTH-TMP_PK_HEADER_LEN;
+mdl_u16_t const static tmp_pk_dsec_len = TMP_PACKET_LENGTH-TMP_PK_HEADER_LEN;
 tmp_err_t tmp_send_packet(struct tmp_io *__tmp_io, struct tmp_packet_t *__tmp_packet) {
-	if (__tmp_packet->io_buff.bytes > tmp_pk_dsec_len) return TMP_FAILURE;
+	if (__tmp_packet->io_buff.bc > tmp_pk_dsec_len) return TMP_FAILURE;
 	tmp_err_t any_err;
 
 	if ((any_err = tmp_send_w32(__tmp_io, __tmp_packet->dst_addr)) != TMP_SUCCESS) return any_err;
 	if ((any_err = tmp_send_w32(__tmp_io, __tmp_packet->src_addr)) != TMP_SUCCESS) return any_err;
 
-	djb_hash(&__tmp_packet->dsec_hash, __tmp_packet->io_buff.ptr, __tmp_packet->io_buff.bytes);
+	djb_hash(&__tmp_packet->dsec_hash, __tmp_packet->io_buff.p, __tmp_packet->io_buff.bc);
 
 	if ((any_err = tmp_send_w32(__tmp_io, __tmp_packet->dsec_hash)) != TMP_SUCCESS) return any_err;
 
@@ -350,7 +357,7 @@ tmp_err_t tmp_send_packet(struct tmp_io *__tmp_io, struct tmp_packet_t *__tmp_pa
 }
 
 tmp_err_t tmp_recv_packet(struct tmp_io *__tmp_io, struct tmp_packet_t *__tmp_packet) {
-	if (__tmp_packet->io_buff.bytes > tmp_pk_dsec_len) return TMP_FAILURE;
+	if (__tmp_packet->io_buff.bc > tmp_pk_dsec_len) return TMP_FAILURE;
 	tmp_err_t any_err;
 
 	__tmp_packet->dsec_hash = 0x00;
@@ -361,7 +368,7 @@ tmp_err_t tmp_recv_packet(struct tmp_io *__tmp_io, struct tmp_packet_t *__tmp_pa
 	if ((any_err = tmp_raw_recv(__tmp_io, __tmp_packet->io_buff)) != TMP_SUCCESS) return any_err;
 
 	mdl_u32_t dsec_hash;
-	djb_hash(&dsec_hash, __tmp_packet->io_buff.ptr, __tmp_packet->io_buff.bytes);
+	djb_hash(&dsec_hash, __tmp_packet->io_buff.p, __tmp_packet->io_buff.bc);
 
 	if (dsec_hash != __tmp_packet->dsec_hash) return TMP_FAILURE;
 
@@ -381,7 +388,7 @@ tmp_err_t tmp_send(struct tmp_io *__tmp_io, tmp_io_buff_t __io_buff, tmp_addr_t 
 		.io_buff = __io_buff
 	};
 
-	mdl_uint_t *bc = &tmp_packet.io_buff.bytes;
+	mdl_uint_t *bc = &tmp_packet.io_buff.bc;
 	mdl_uint_t amount_sent = 0, bytes_to_send = *bc;
 
 	mdl_u16_t pk_to_send = 1;
@@ -391,12 +398,12 @@ tmp_err_t tmp_send(struct tmp_io *__tmp_io, tmp_io_buff_t __io_buff, tmp_addr_t 
 	}
 
 	for (mdl_u16_t ic = 0; ic != pk_to_send; ic++) {
-		if (bytes_to_send-amount_sent < tmp_pk_dsec_len && __io_buff.bytes > tmp_pk_dsec_len)
+		if (bytes_to_send-amount_sent < tmp_pk_dsec_len && __io_buff.bc > tmp_pk_dsec_len)
 			*bc = bytes_to_send-amount_sent;
 
 		if ((any_err = tmp_send_packet(__tmp_io, &tmp_packet)) != TMP_SUCCESS) return any_err;
 
-		tmp_packet.io_buff.ptr += tmp_pk_dsec_len;
+		tmp_packet.io_buff.p += tmp_pk_dsec_len;
 		amount_sent += tmp_pk_dsec_len;
 	}
 
@@ -412,7 +419,7 @@ tmp_err_t tmp_recv(struct tmp_io *__tmp_io, tmp_io_buff_t __io_buff, tmp_addr_t 
 		.io_buff = __io_buff
 	};
 
-	mdl_uint_t *bc = &tmp_packet.io_buff.bytes;
+	mdl_uint_t *bc = &tmp_packet.io_buff.bc;
 	mdl_uint_t amount_recved = 0, bytes_to_recv = *bc;
 
 	mdl_u16_t pk_to_recv = 1;
@@ -422,12 +429,12 @@ tmp_err_t tmp_recv(struct tmp_io *__tmp_io, tmp_io_buff_t __io_buff, tmp_addr_t 
 	}
 
 	for (mdl_u16_t ic = 0; ic != pk_to_recv; ic++) {
-		if (bytes_to_recv-amount_recved < tmp_pk_dsec_len && __io_buff.bytes > tmp_pk_dsec_len)
+		if (bytes_to_recv-amount_recved < tmp_pk_dsec_len && __io_buff.bc > tmp_pk_dsec_len)
 			*bc = bytes_to_recv-amount_recved;
 
 		if ((any_err = tmp_recv_packet(__tmp_io, &tmp_packet)) != TMP_SUCCESS) return any_err;
 
-		tmp_packet.io_buff.ptr += tmp_pk_dsec_len;
+		tmp_packet.io_buff.p += tmp_pk_dsec_len;
 		amount_recved += tmp_pk_dsec_len;
 	}
 
@@ -435,8 +442,8 @@ tmp_err_t tmp_recv(struct tmp_io *__tmp_io, tmp_io_buff_t __io_buff, tmp_addr_t 
 }
 # endif /*__TMP_LIGHT*/
 
-tmp_io_buff_t tmp_io_buff(mdl_u8_t *__ptr, mdl_uint_t __bytes) {
-	tmp_io_buff_t io_buff = {.ptr = __ptr, .bytes = __bytes};
+tmp_io_buff_t tmp_io_buff(mdl_u8_t *__p, mdl_uint_t __bc) {
+	tmp_io_buff_t io_buff = {.p = __p, .bc = __bc};
 	return io_buff;
 }
 
