@@ -1,6 +1,6 @@
 # ifndef __tmp__io
 # define __tmp__io
-# include <eint_t.h>
+# include <mdlint.h>
 # include <stdlib.h>
 # include <math.h>
 # ifdef __AVR
@@ -90,7 +90,7 @@ void tmp_set_pmode(struct tmp_io*, mdl_u8_t, mdl_u8_t);
 void tmp_set_pstate(struct tmp_io*, mdl_u8_t, mdl_u8_t);
 mdl_u8_t tmp_get_pstate(struct tmp_io*, mdl_u8_t);
 
-tmp_err_t tmp_init(struct tmp_io*, void (*)(mdl_u8_t, mdl_u8_t), void (*)(mdl_u8_t, mdl_u8_t), mdl_u8_t (*)(mdl_u8_t));
+tmp_err_t tmp_init(struct tmp_io*, void(*)(mdl_u8_t, mdl_u8_t), void(*)(mdl_u8_t, mdl_u8_t), mdl_u8_t(*)(mdl_u8_t));
 
 void tmp_set_holdup_fp(struct tmp_io*, void (*)(mdl_uint_t));
 void tmp_holdup(struct tmp_io*, mdl_uint_t, mdl_uint_t);
@@ -106,6 +106,8 @@ mdl_u8_t tmp_is_tx_clk_trig_val(mdl_u8_t);
 tmp_err_t tmp_raw_send(struct tmp_io*, tmp_io_buff_t);
 tmp_err_t tmp_raw_recv(struct tmp_io*, tmp_io_buff_t);
 
+mdl_u8_t tmp_par_arcv_sig(struct tmp_io*);
+mdl_u8_t tmp_par_asnd_sig(struct tmp_io*);
 # ifndef __TMP_LIGHT
 tmp_err_t tmp_send(struct tmp_io*, tmp_io_buff_t, tmp_addr_t);
 tmp_err_t tmp_recv(struct tmp_io*, tmp_io_buff_t, tmp_addr_t);
@@ -113,6 +115,7 @@ tmp_err_t tmp_recv(struct tmp_io*, tmp_io_buff_t, tmp_addr_t);
 # 	define tmp_send(__tmp_io, __io_buff) tmp_raw_send(__tmp_io, __io_buff)
 #	define tmp_recv(__tmp_io, __io_buff) tmp_raw_recv(__tmp_io, __io_buff)
 # endif
+
 tmp_err_t tmp_recv_nibble(struct tmp_io*, mdl_u8_t*);
 tmp_err_t tmp_send_nibble(struct tmp_io*, mdl_u8_t);
 tmp_err_t tmp_recv_byte(struct tmp_io*, mdl_u8_t*);
@@ -132,9 +135,11 @@ tmp_err_t tmp_send_w16(struct tmp_io*, mdl_u16_t);
 tmp_err_t tmp_recv_w16(struct tmp_io*, mdl_u16_t*);
 
 tmp_err_t __inline__ static tmp_send_w8(struct tmp_io *__tmp_io, mdl_u8_t __data) {
-	return tmp_send_byte(__tmp_io, __data);}
+	return tmp_send_byte(__tmp_io, __data);
+}
 tmp_err_t __inline__ static tmp_recv_w8(struct tmp_io *__tmp_io, mdl_u8_t *__data) {
-	return tmp_recv_byte(__tmp_io, __data);}
+	return tmp_recv_byte(__tmp_io, __data);
+}
 # endif
 
 enum tmp_opt {TMP_OPT_SND_TIMEO, TMP_OPT_RCV_TIMEO};
@@ -165,12 +170,16 @@ mdl_u8_t tmp_is_optflag(mdl_u8_t, mdl_u8_t);
 void tmp_tog_optflag(mdl_u8_t*, mdl_u8_t);
 
 void __inline__ static tmp_tog_snd_optflag(struct tmp_io *__tmp_io, mdl_u8_t __optflag) {
-	tmp_tog_optflag(&__tmp_io->snd_optflags, __optflag);}
+	tmp_tog_optflag(&__tmp_io->snd_optflags, __optflag);
+}
 mdl_u8_t __inline__ static tmp_is_snd_optflag(struct tmp_io *__tmp_io, mdl_u8_t __optflag) {
-	return tmp_is_optflag(__tmp_io->snd_optflags, __optflag);}
+	return tmp_is_optflag(__tmp_io->snd_optflags, __optflag);
+}
 
 void __inline__ static tmp_tog_rcv_optflag(struct tmp_io *__tmp_io, mdl_u8_t __optflag) {
-	tmp_tog_optflag(&__tmp_io->rcv_optflags, __optflag);}
+	tmp_tog_optflag(&__tmp_io->rcv_optflags, __optflag);
+}
 mdl_u8_t __inline__ static tmp_is_rcv_optflag(struct tmp_io *__tmp_io, mdl_u8_t __optflag) {
-	return tmp_is_optflag(__tmp_io->rcv_optflags, __optflag);}
+	return tmp_is_optflag(__tmp_io->rcv_optflags, __optflag);
+}
 # endif /*__tmp__io*/

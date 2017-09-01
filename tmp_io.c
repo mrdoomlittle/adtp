@@ -198,14 +198,18 @@ tmp_err_t tmp_send_byte(struct tmp_io *__tmp_io, mdl_u8_t __byte) {
 	return TMP_SUCCESS;
 }
 
+mdl_u8_t tmp_par_asnd_sig(struct tmp_io *__tmp_io) {
+	return (tmp_get_pin_state(__tmp_io, __tmp_io->rx_ci_pid) == (tmp_is_rcv_optflag(__tmp_io, TMP_INVERT_RX_TRIG_VAL_OPT)? ~rx_clk_trig_val & 0x1:rx_clk_trig_val));}
+mdl_u8_t tmp_par_arcv_sig(struct tmp_io *__tmp_io) {return ~tmp_par_asnd_sig(__tmp_io) & 0x1;}
+
 tmp_err_t tmp_recv_bit(struct tmp_io *__tmp_io, mdl_u8_t *__bit) {
 # ifdef __AVR
 	uint8_t re_enable_gi = 0;
 	if ((SREG >> 7) & 1) {re_enable_gi = 1;cli();}
 # endif
 
-	mdl_u8_t _tx_clk_trig_val = tmp_is_rcv_optflag(__tmp_io, TMP_INVERT_TX_TRIG_VAL_OPT)? ~tx_clk_trig_val & 0x1 : tx_clk_trig_val;
-	mdl_u8_t _rx_clk_trig_val = tmp_is_rcv_optflag(__tmp_io, TMP_INVERT_RX_TRIG_VAL_OPT)? ~rx_clk_trig_val & 0x1 : rx_clk_trig_val;
+	mdl_u8_t _tx_clk_trig_val = tmp_is_rcv_optflag(__tmp_io, TMP_INVERT_TX_TRIG_VAL_OPT)? ~tx_clk_trig_val & 0x1:tx_clk_trig_val;
+	mdl_u8_t _rx_clk_trig_val = tmp_is_rcv_optflag(__tmp_io, TMP_INVERT_RX_TRIG_VAL_OPT)? ~rx_clk_trig_val & 0x1:rx_clk_trig_val;
 
 	tmp_set_pin_state(__tmp_io, _tx_clk_trig_val, __tmp_io->tx_co_pid);
 	tmp_rcv_holdup(__tmp_io);
@@ -244,8 +248,8 @@ tmp_err_t tmp_send_bit(struct tmp_io *__tmp_io, mdl_u8_t __bit) {
 	if ((SREG >> 7) & 1) {re_enable_gi = 1;cli();}
 # endif
 
-	mdl_u8_t _tx_clk_trig_val = tmp_is_snd_optflag(__tmp_io, TMP_INVERT_TX_TRIG_VAL_OPT)? ~tx_clk_trig_val & 0x1 : tx_clk_trig_val;
-	mdl_u8_t _rx_clk_trig_val = tmp_is_snd_optflag(__tmp_io, TMP_INVERT_RX_TRIG_VAL_OPT)? ~rx_clk_trig_val & 0x1 : rx_clk_trig_val;
+	mdl_u8_t _tx_clk_trig_val = tmp_is_snd_optflag(__tmp_io, TMP_INVERT_TX_TRIG_VAL_OPT)? ~tx_clk_trig_val & 0x1:tx_clk_trig_val;
+	mdl_u8_t _rx_clk_trig_val = tmp_is_snd_optflag(__tmp_io, TMP_INVERT_RX_TRIG_VAL_OPT)? ~rx_clk_trig_val & 0x1:rx_clk_trig_val;
 
 	if (tmp_is_snd_optflag(__tmp_io, TMP_FLIP_BIT_OPT)) {__bit = ~__bit & 0x1;}
 
