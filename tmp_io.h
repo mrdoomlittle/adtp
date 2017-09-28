@@ -3,6 +3,7 @@
 # include <mdlint.h>
 # include <stdlib.h>
 # include <math.h>
+//# define __DEBUG_ENABLED
 # ifdef __AVR
 #	include <avr/interrupt.h>
 # endif
@@ -67,11 +68,11 @@ typedef struct {
 	mdl_uint_t bc;
 } tmp_io_buff_t;
 
-# define TMP_PACKET_LENGTH 126
-# define TMP_PK_HEADER_LEN 96
+# define TMP_PACKET_SIZE 126
+# define TMP_PK_HEADER_SIZE 96
 struct tmp_packet_t {
 	tmp_addr_t dst_addr, src_addr;
-	mdl_u32_t dsec_hash;
+	mdl_u32_t dt_sect_sv;
 	tmp_io_buff_t io_buff;
 };
 
@@ -135,8 +136,8 @@ tmp_err_t tmp_recv_w16(struct tmp_io*, mdl_u16_t*);
 
 tmp_err_t __inline__ static tmp_send_w8(struct tmp_io *__tmp_io, mdl_u8_t __data) {
 	return tmp_send_byte(__tmp_io, __data);}
-tmp_err_t __inline__ static tmp_recv_w8(struct tmp_io *__tmp_io, mdl_u8_t *__data) {
-	return tmp_recv_byte(__tmp_io, __data);}
+tmp_err_t __inline__ static tmp_recv_w8(struct tmp_io *__tmp_io, mdl_u8_t *__data_p) {
+	return tmp_recv_byte(__tmp_io, __data_p);}
 # endif
 
 enum tmp_opt {TMP_OPT_SND_TIMEO, TMP_OPT_RCV_TIMEO};
@@ -147,7 +148,11 @@ void tmp_get_opt(struct tmp_io*, tmp_opt_t, void*);
 
 mdl_u8_t __inline__ static tmp_timeo(mdl_uint_t *__timeo_ic, mdl_uint_t __timeo) {
 	if (!__timeo) return 0;
-	if (*__timeo_ic >= __timeo) {*__timeo_ic = 0;return 1;} else (*__timeo_ic)++;
+	if (*__timeo_ic >= __timeo) {
+		*__timeo_ic = 0;
+		return 1;
+	}
+	(*__timeo_ic)++;
 	return 0;
 }
 

@@ -55,13 +55,12 @@ uint8_t cl_get_pstate(uint8_t __pid) {
 	return cl_pinset[__pid];
 }
 
+# include <unistd.h>
 void holdup(mdl_uint_t __holdup) {
-//	usleep(0.001);
-	for (int x = 0; x != 2762; x ++);
+	usleep(10);
 }
 
-
-mdl_u8_t data_to_send[] = "abcdefghijklmnopqrstuvwxyz - abcdefghijklmnopqrstuvwxyz";
+mdl_u8_t data_to_send[] = "IJIjK[AH8YAA8YJU]#OI[I]i0-i9hihgs89ycxga[pu]-]9a]-08]-38]9#-2a0qiu03q=[j3q3]3]qa0''a';ps9a8suasA:S:2::";
 void* se(void *__arg) {
 struct tmp_io tmp_io = {
 	.rx_pid = TMP_RX_PID,
@@ -73,10 +72,10 @@ struct tmp_io tmp_io = {
 };
 	tmp_init(&tmp_io, &se_set_pmode, &se_set_pstate, &se_get_pstate);
 	tmp_set_holdup_fp(&tmp_io, &holdup);
-	mdl_uint_t timeo = 6000000000;
+	mdl_uint_t timeo = 1000000;
 
-	tmp_io.snd_holdup_ic = 12;
-	tmp_io.rcv_holdup_ic = 12;
+	tmp_io.snd_holdup_ic = 2;
+	tmp_io.rcv_holdup_ic = 2;
 	tmp_tog_rcv_optflag(&tmp_io, TMP_FLIP_BIT_OPT);
 	tmp_set_opt(&tmp_io, TMP_OPT_SND_TIMEO, &timeo);
 	tmp_set_opt(&tmp_io, TMP_OPT_RCV_TIMEO, &timeo);
@@ -84,15 +83,14 @@ struct tmp_io tmp_io = {
 	tmp_tog_rcv_optflag(&tmp_io, TMP_INVERT_RX_TRIG_VAL_OPT);
 
 	while(1) {
-	printf("%d\n", tmp_send(&tmp_io, tmp_io_buff(data_to_send, sizeof(data_to_send))));
+	fprintf(stdout, "send_success: %s.\n", tmp_send(&tmp_io, tmp_io_buff(data_to_send, sizeof(data_to_send))) == TMP_SUCCESS? "yes":"no");
 	}
 	return NULL;
 }
 
 void* cl(void *__arg) {
 struct tmp_io tmp_io = {
-.rx_pid = TMP_RX_PID,
-.tx_pid = TMP_TX_PID,
+.rx_pid = TMP_RX_PID, .tx_pid = TMP_TX_PID,
 .rx_ci_pid = TMP_RX_IC_PID,
 .tx_ci_pid = TMP_TX_IC_PID,
 .rx_co_pid = TMP_RX_OC_PID,
@@ -101,11 +99,11 @@ struct tmp_io tmp_io = {
 
 	tmp_init(&tmp_io, &cl_set_pmode, &cl_set_pstate, &cl_get_pstate);
 	tmp_set_holdup_fp(&tmp_io, &holdup);
-	mdl_uint_t timeo = 6000000000;
+	mdl_uint_t timeo = 1000000;
 
 	tmp_tog_rcv_optflag(&tmp_io, TMP_FLIP_BIT_OPT);
-	tmp_io.snd_holdup_ic = 12;
-	tmp_io.rcv_holdup_ic = 12;
+	tmp_io.snd_holdup_ic = 2;
+	tmp_io.rcv_holdup_ic = 2;
 	tmp_tog_snd_optflag(&tmp_io, TMP_INVERT_TX_TRIG_VAL_OPT);
 	tmp_tog_rcv_optflag(&tmp_io, TMP_INVERT_RX_TRIG_VAL_OPT);
 	tmp_set_opt(&tmp_io, TMP_OPT_SND_TIMEO, &timeo);
@@ -113,8 +111,8 @@ struct tmp_io tmp_io = {
 	while(1) {
 	mdl_u8_t data[sizeof(data_to_send)];
 	memset(data, 0x0, sizeof(data_to_send));
-	printf("%d\n", tmp_recv(&tmp_io, tmp_io_buff(data, sizeof(data_to_send))));
-	printf("recved: %s\n", data);
+	fprintf(stdout, "recv_success?: %s.\n", tmp_recv(&tmp_io, tmp_io_buff(data, sizeof(data_to_send))) == TMP_SUCCESS? "yes":"no");
+	fprintf(stdout, "recved: %s, is_correct? %s.\n", data, !memcmp(data_to_send, data, sizeof(data_to_send))? "yes":"no");
 	}
 	return NULL;
 }
