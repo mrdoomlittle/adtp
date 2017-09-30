@@ -12,7 +12,8 @@
 #	include <stdio.h>
 # endif
 
-# define __TMP_LIGHT
+//# define __TMP_LIGHT
+# define __TMP_KOS
 
 # define TMP_SUCCESS 0
 # define TMP_TIMEO 1
@@ -21,15 +22,20 @@
 # define ACK_SUCCESS 1
 # define ACK_FAILURE 0
 
-# define TMP_FLIP_BIT_OPT 0b10000000
-# define TMP_INVERT_TX_TRIG_VAL_OPT 0b01000000
-# define TMP_INVERT_RX_TRIG_VAL_OPT 0b00100000
+# define TMP_OPT_FLIP_BIT 0b10000000
+# define TMP_OPT_INV_TX_TRIG_VAL 0b01000000
+# define TMP_OPT_INV_RX_TRIG_VAL 0b00100000
+
+# define TMP_DB_ONLY_ERR
+// key and sync
+# define TMP_FLG_KAS 0b10000000
+# define TMP_FLG_NORET 0b01000000
+# define TMP_DEF_FLAGS TMP_FLG_KAS
+# define TMP_MAX_TRY_C 10
 typedef mdl_u32_t tmp_addr_t;
 typedef mdl_u8_t tmp_version_t;
-
-/*
-	tmp_opt and optflags are diffrent as optflags have no value & tmp_opt effects all not just snd or rcv oporations
-*/
+typedef mdl_u8_t tmp_method_t;
+typedef mdl_u8_t tmp_flag_t;
 
 struct tmp_io {
 	mdl_u8_t rx_pid, tx_pid;
@@ -41,12 +47,13 @@ struct tmp_io {
 
 	mdl_uint_t snd_holdup_ic, rcv_holdup_ic;
 	mdl_uint_t snd_holdup, rcv_holdup;
-	mdl_u8_t snd_optflags, rcv_optflags;
+	tmp_flag_t snd_optflags, rcv_optflags;
 
 	void(*set_pin_mode_fp)(mdl_u8_t, mdl_u8_t);
 	void(*set_pin_state_fp)(mdl_u8_t, mdl_u8_t);
 	mdl_u8_t(*get_pin_state_fp)(mdl_u8_t);
 	void(*holdup_fp)(mdl_uint_t);
+	tmp_flag_t flags;
 # ifndef __TMP_LIGHT
 	tmp_addr_t iface_addr;
 # endif
@@ -90,7 +97,11 @@ void tmp_set_pmode(struct tmp_io*, mdl_u8_t, mdl_u8_t);
 void tmp_set_pstate(struct tmp_io*, mdl_u8_t, mdl_u8_t);
 mdl_u8_t tmp_get_pstate(struct tmp_io*, mdl_u8_t);
 
-tmp_err_t tmp_init(struct tmp_io*, void(*)(mdl_u8_t, mdl_u8_t), void(*)(mdl_u8_t, mdl_u8_t), mdl_u8_t(*)(mdl_u8_t));
+tmp_err_t tmp_init(struct tmp_io*, void(*)(mdl_u8_t, mdl_u8_t), void(*)(mdl_u8_t, mdl_u8_t), mdl_u8_t(*)(mdl_u8_t)
+# ifndef __TMP_LIGHT
+, tmp_method_t, tmp_flag_t
+# endif
+);
 
 void tmp_set_holdup_fp(struct tmp_io*, void(*)(mdl_uint_t));
 void tmp_holdup(struct tmp_io*, mdl_uint_t, mdl_uint_t);
@@ -112,8 +123,8 @@ mdl_u8_t tmp_par_asnd_sig(struct tmp_io*);
 tmp_err_t tmp_send(struct tmp_io*, tmp_io_buff_t, tmp_addr_t);
 tmp_err_t tmp_recv(struct tmp_io*, tmp_io_buff_t, tmp_addr_t);
 # else
-# 	define tmp_send(__tmp_io, __io_buff) tmp_raw_send(__tmp_io, __io_buff)
-#	define tmp_recv(__tmp_io, __io_buff) tmp_raw_recv(__tmp_io, __io_buff)
+tmp_err_t tmp_send(struct tmp_io*, tmp_io_buff_t);
+tmp_err_t tmp_recv(struct tmp_io*, tmp_io_buff_t);
 # endif
 
 tmp_err_t tmp_recv_nibble(struct tmp_io*, mdl_u8_t*);
@@ -168,18 +179,18 @@ mdl_u8_t __inline__ static tmp_rcv_timeo(struct tmp_io *__tmp_io) {
 	return res;
 }
 
-mdl_u8_t tmp_is_optflag(mdl_u8_t, mdl_u8_t);
-void tmp_tog_optflag(mdl_u8_t*, mdl_u8_t);
+mdl_u8_t tmp_is_flag(mdl_u8_t, mdl_u8_t);
+void tmp_tog_flag(mdl_u8_t*, mdl_u8_t);
 
 void __inline__ static tmp_tog_snd_optflag(struct tmp_io *__tmp_io, mdl_u8_t __optflag) {
-	tmp_tog_optflag(&__tmp_io->snd_optflags, __optflag);}
+	tmp_tog_flag(&__tmp_io->snd_optflags, __optflag);}
 
 mdl_u8_t __inline__ static tmp_is_snd_optflag(struct tmp_io *__tmp_io, mdl_u8_t __optflag) {
-	return tmp_is_optflag(__tmp_io->snd_optflags, __optflag);}
+	return tmp_is_flag(__tmp_io->snd_optflags, __optflag);}
 
 void __inline__ static tmp_tog_rcv_optflag(struct tmp_io *__tmp_io, mdl_u8_t __optflag) {
-	tmp_tog_optflag(&__tmp_io->rcv_optflags, __optflag);}
+	tmp_tog_flag(&__tmp_io->rcv_optflags, __optflag);}
 
 mdl_u8_t __inline__ static tmp_is_rcv_optflag(struct tmp_io *__tmp_io, mdl_u8_t __optflag) {
-	return tmp_is_optflag(__tmp_io->rcv_optflags, __optflag);}
+	return tmp_is_flag(__tmp_io->rcv_optflags, __optflag);}
 # endif /*__tmp__io*/

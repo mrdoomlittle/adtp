@@ -11,6 +11,8 @@
 # define TMP_RX_PID 6
 # define TMP_TX_PID 7
 
+# define ONLY_SUCCESS
+
 uint8_t se_pinset[12] = {0x0}, cl_pinset[12] = {0x0};
 
 void se_set_pmode(uint8_t __pmode, uint8_t __pid) {}
@@ -70,20 +72,33 @@ struct tmp_io tmp_io = {
 	.rx_co_pid = TMP_RX_OC_PID,
 	.tx_co_pid = TMP_TX_OC_PID
 };
+# ifndef __TMP_LIGHT
+	tmp_init(&tmp_io, &se_set_pmode, &se_set_pstate, &se_get_pstate, 0, 0);
+# else
 	tmp_init(&tmp_io, &se_set_pmode, &se_set_pstate, &se_get_pstate);
+# endif
 	tmp_set_holdup_fp(&tmp_io, &holdup);
-	mdl_uint_t timeo = 1000000;
+	mdl_uint_t timeo = 10000;
 
 	tmp_io.snd_holdup_ic = 2;
 	tmp_io.rcv_holdup_ic = 2;
-	tmp_tog_rcv_optflag(&tmp_io, TMP_FLIP_BIT_OPT);
+	tmp_tog_rcv_optflag(&tmp_io, TMP_OPT_FLIP_BIT);
 	tmp_set_opt(&tmp_io, TMP_OPT_SND_TIMEO, &timeo);
 	tmp_set_opt(&tmp_io, TMP_OPT_RCV_TIMEO, &timeo);
-	tmp_tog_snd_optflag(&tmp_io, TMP_INVERT_TX_TRIG_VAL_OPT);
-	tmp_tog_rcv_optflag(&tmp_io, TMP_INVERT_RX_TRIG_VAL_OPT);
+	tmp_tog_snd_optflag(&tmp_io, TMP_OPT_INV_TX_TRIG_VAL);
+	tmp_tog_rcv_optflag(&tmp_io, TMP_OPT_INV_RX_TRIG_VAL);
 
 	while(1) {
-	fprintf(stdout, "send_success: %s.\n", tmp_send(&tmp_io, tmp_io_buff(data_to_send, sizeof(data_to_send))) == TMP_SUCCESS? "yes":"no");
+# ifndef __TMP_LIGHT
+	tmp_err_t err = tmp_send(&tmp_io, tmp_io_buff(data_to_send, sizeof(data_to_send)), 0);
+# else
+	tmp_err_t err = tmp_send(&tmp_io, tmp_io_buff(data_to_send, sizeof(data_to_send)));
+# endif
+# ifdef ONLY_SUCCESS
+	if (err != TMP_SUCCESS) continue;
+# endif
+	fprintf(stdout, "send_success?: %s.\n", err == TMP_SUCCESS? "yes":"no");
+
 	}
 	return NULL;
 }
@@ -96,22 +111,33 @@ struct tmp_io tmp_io = {
 .rx_co_pid = TMP_RX_OC_PID,
 .tx_co_pid = TMP_TX_OC_PID
 };
-
+# ifndef __TMP_LIGHT
+	tmp_init(&tmp_io, &cl_set_pmode, &cl_set_pstate, &cl_get_pstate, 0, TMP_FLG_NORET);
+# else
 	tmp_init(&tmp_io, &cl_set_pmode, &cl_set_pstate, &cl_get_pstate);
+# endif
 	tmp_set_holdup_fp(&tmp_io, &holdup);
-	mdl_uint_t timeo = 1000000;
+	mdl_uint_t timeo = 10000;
 
-	tmp_tog_rcv_optflag(&tmp_io, TMP_FLIP_BIT_OPT);
+	tmp_tog_rcv_optflag(&tmp_io, TMP_OPT_FLIP_BIT);
 	tmp_io.snd_holdup_ic = 2;
 	tmp_io.rcv_holdup_ic = 2;
-	tmp_tog_snd_optflag(&tmp_io, TMP_INVERT_TX_TRIG_VAL_OPT);
-	tmp_tog_rcv_optflag(&tmp_io, TMP_INVERT_RX_TRIG_VAL_OPT);
+	tmp_tog_snd_optflag(&tmp_io, TMP_OPT_INV_TX_TRIG_VAL);
+	tmp_tog_rcv_optflag(&tmp_io, TMP_OPT_INV_RX_TRIG_VAL);
 	tmp_set_opt(&tmp_io, TMP_OPT_SND_TIMEO, &timeo);
 	tmp_set_opt(&tmp_io, TMP_OPT_RCV_TIMEO, &timeo);
 	while(1) {
 	mdl_u8_t data[sizeof(data_to_send)];
 	memset(data, 0x0, sizeof(data_to_send));
-	fprintf(stdout, "recv_success?: %s.\n", tmp_recv(&tmp_io, tmp_io_buff(data, sizeof(data_to_send))) == TMP_SUCCESS? "yes":"no");
+# ifndef __TMP_LIGHT
+	tmp_err_t err = tmp_recv(&tmp_io, tmp_io_buff(data, sizeof(data_to_send)), 0);
+# else
+	tmp_err_t err = tmp_recv(&tmp_io, tmp_io_buff(data, sizeof(data_to_send)));
+# endif
+# ifdef ONLY_SUCCESS
+	if (err != TMP_SUCCESS) continue;
+# endif
+	fprintf(stdout, "recv_success?: %s.\n", err == TMP_SUCCESS? "yes":"no");
 	fprintf(stdout, "recved: %s, is_correct? %s.\n", data, !memcmp(data_to_send, data, sizeof(data_to_send))? "yes":"no");
 	}
 	return NULL;
@@ -123,6 +149,17 @@ int main() {
 	pthread_create(&se_th, NULL, se, NULL);
 	pthread_create(&cl_th, NULL, cl, NULL);
 
-	pthread_join(se_th, NULL);
-	pthread_join(cl_th, NULL);
+	while(1) {
+/*
+		printf("se:");
+		for (mdl_u8_t i = 0; i != sizeof(se_pinset); i++)
+			printf("%u", se_pinset[i]);
+		printf("\ncl:");
+		for (mdl_u8_t i = 0; i != sizeof(cl_pinset); i++)
+			printf("%u", cl_pinset[i]);
+		printf("\n");
+*/
+	}
+//	pthread_join(se_th, NULL);
+//	pthread_join(cl_th, NULL);
 }
