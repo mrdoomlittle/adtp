@@ -3,7 +3,7 @@
 # include <mdlint.h>
 # include <stdlib.h>
 # include <math.h>
-//# define __DEBUG_ENABLED
+# define __DEBUG_ENABLED
 # ifdef __AVR
 #	include <avr/interrupt.h>
 # endif
@@ -55,13 +55,18 @@ struct tmp_io {
 	void(*holdup_fp)(mdl_uint_t);
 	tmp_flag_t flags;
 # ifndef __TMP_LIGHT
+	void(*set_iface_no_fp)(mdl_u8_t);
 	tmp_addr_t iface_addr;
 # endif
 };
 
 # ifndef __TMP_LIGHT
-void __inline__ static tmp_set_iface_addr(struct tmp_io *__tmp_io, tmp_addr_t __iface_addr) {
-	__tmp_io->iface_addr = __iface_addr;}
+void __inline__ static tmp_set_iface_addr(struct tmp_io *__tmp_io, tmp_addr_t __addr) {
+	__tmp_io->iface_addr = __addr;
+}
+void __inline__ static tmp_set_iface_no(struct tmp_io *__tmp_io, mdl_u8_t __no) {
+	__tmp_io->set_iface_no_fp(__no);
+}
 # endif
 
 typedef mdl_i8_t tmp_err_t;
@@ -92,11 +97,6 @@ tmp_err_t tmp_recv_packet(struct tmp_io*, struct tmp_packet_t*);
 # endif
 
 mdl_u8_t extern tmp_errno;
-
-void tmp_set_pmode(struct tmp_io*, mdl_u8_t, mdl_u8_t);
-void tmp_set_pstate(struct tmp_io*, mdl_u8_t, mdl_u8_t);
-mdl_u8_t tmp_get_pstate(struct tmp_io*, mdl_u8_t);
-
 tmp_err_t tmp_init(struct tmp_io*, void(*)(mdl_u8_t, mdl_u8_t), void(*)(mdl_u8_t, mdl_u8_t), mdl_u8_t(*)(mdl_u8_t)
 # ifndef __TMP_LIGHT
 , tmp_method_t, tmp_flag_t

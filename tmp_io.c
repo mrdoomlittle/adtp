@@ -295,17 +295,16 @@ tmp_err_t tmp_send_bit(struct tmp_io *__tmp_io, mdl_u8_t __bit) {
 	return TMP_SUCCESS;
 }
 
-// gpio pins
-void static tmp_set_pin_mode(struct tmp_io *__tmp_io, mdl_u8_t __pin_mode, mdl_u8_t __pid) {
-	__tmp_io->set_pin_mode_fp(__pin_mode, __pid);
+void static tmp_set_pin_mode(struct tmp_io *__tmp_io, mdl_u8_t __mode, mdl_u8_t __id) {
+	__tmp_io->set_pin_mode_fp(__mode, __id);
 }
 
-void static tmp_set_pin_state(struct tmp_io *__tmp_io, mdl_u8_t __pin_state, mdl_u8_t __pid) {
-	__tmp_io->set_pin_state_fp(__pin_state, __pid);
+void static tmp_set_pin_state(struct tmp_io *__tmp_io, mdl_u8_t __state, mdl_u8_t __id) {
+	__tmp_io->set_pin_state_fp(__state, __id);
 }
 
-mdl_u8_t static tmp_get_pin_state(struct tmp_io *__tmp_io, mdl_u8_t __pid) {
-	return __tmp_io->get_pin_state_fp(__pid);
+mdl_u8_t static tmp_get_pin_state(struct tmp_io *__tmp_io, mdl_u8_t __id) {
+	return __tmp_io->get_pin_state_fp(__id);
 }
 
 # if !defined(__TMP_LIGHT) || defined(__TMP_KOS)

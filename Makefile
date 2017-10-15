@@ -8,8 +8,8 @@ all: clean
 	cp tmp_io.h inc
 
 debug: clean
-	gcc -std=c11 -c $(ARC) $(CFLAGS) -Wall -o tmp_io.o tmp_io.c
-	gcc -std=c11 $(ARC) $(CFLAGS) -Iinc -Llib -o debug debug.c tmp_io.o -lpthread -lm
+	gcc -std=gnu11 -c $(ARC) $(CFLAGS) -Wall -o tmp_io.o tmp_io.c
+	gcc -std=gnu11 $(ARC) $(CFLAGS) -Iinc -Llib -o debug debug.c tmp_io.o -lpthread -lm
 clean:
 	rm -f *.o *.exec debug
-	rm -f inc/* lib/*
+	rm -f inc/mdl/* lib/*

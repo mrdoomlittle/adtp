@@ -13,48 +13,46 @@
 
 # define ONLY_SUCCESS
 
-uint8_t se_pinset[12] = {0x0}, cl_pinset[12] = {0x0};
+mdl_u8_t se_pinset[12] = {0x0}, cl_pinset[12] = {0x0};
 
-void se_set_pmode(uint8_t __pmode, uint8_t __pid) {}
-void se_set_pstate(uint8_t __pstate, uint8_t __pid) {
-//	usleep(1000);
-	__pstate = ~__pstate & 0x1;
-
-	if (__pid == TMP_RX_OC_PID) {
-		cl_pinset[TMP_RX_IC_PID] = __pstate;
+void se_set_pin_mode(mdl_u8_t __mode, mdl_u8_t __id) {}
+void se_set_pin_state(mdl_u8_t __state, mdl_u8_t __id) {
+	__state = ~__state & 0x1;
+	if (__id == TMP_RX_OC_PID) {
+		cl_pinset[TMP_RX_IC_PID] = __state;
 		return;
-    } else if (__pid == TMP_TX_OC_PID) {
-		cl_pinset[TMP_TX_IC_PID] = __pstate;
+    } else if (__id == TMP_TX_OC_PID) {
+		cl_pinset[TMP_TX_IC_PID] = __state;
 		return;
-    } else if (__pid == TMP_TX_PID) {
-		cl_pinset[TMP_RX_PID] = __pstate;
+    } else if (__id == TMP_TX_PID) {
+		cl_pinset[TMP_RX_PID] = __state;
 		return;
 	}
-	se_pinset[__pid] = __pstate;
+	se_pinset[__id] = __state;
 }
 
-uint8_t se_get_pstate(uint8_t __pid) {
+mdl_u8_t se_get_pin_state(mdl_u8_t __pid) {
 	return se_pinset[__pid];
 }
 
-void cl_set_pmode(uint8_t __pmode, uint8_t __pid) {}
-void cl_set_pstate(uint8_t __pstate, uint8_t __pid) {
-	__pstate = ~__pstate & 0x1;
-	if (__pid == TMP_RX_OC_PID) {
-		se_pinset[TMP_RX_IC_PID] = __pstate;
+void cl_set_pin_mode(mdl_u8_t __mode, mdl_u8_t __id) {}
+void cl_set_pin_state(mdl_u8_t __state, mdl_u8_t __id) {
+	__state = ~__state & 0x1;
+	if (__id == TMP_RX_OC_PID) {
+		se_pinset[TMP_RX_IC_PID] = __state;
 		return;
-	} else if (__pid == TMP_TX_OC_PID) {
-		se_pinset[TMP_TX_IC_PID] = __pstate;
+	} else if (__id == TMP_TX_OC_PID) {
+		se_pinset[TMP_TX_IC_PID] = __state;
 		return;
-	} else if (__pid == TMP_TX_PID) {
-		se_pinset[TMP_RX_PID] = __pstate;
+	} else if (__id == TMP_TX_PID) {
+		se_pinset[TMP_RX_PID] = __state;
 		return;
 	}
-	cl_pinset[__pid] = __pstate;
+	cl_pinset[__id] = __state;
 }
 
-uint8_t cl_get_pstate(uint8_t __pid) {
-	return cl_pinset[__pid];
+mdl_u8_t cl_get_pin_state(mdl_u8_t __id) {
+	return cl_pinset[__id];
 }
 
 # include <unistd.h>
@@ -73,9 +71,9 @@ struct tmp_io tmp_io = {
 	.tx_co_pid = TMP_TX_OC_PID
 };
 # ifndef __TMP_LIGHT
-	tmp_init(&tmp_io, &se_set_pmode, &se_set_pstate, &se_get_pstate, 0, 0);
+	tmp_init(&tmp_io, &se_set_pin_mode, &se_set_pin_state, &se_get_pin_state, 0, 0);
 # else
-	tmp_init(&tmp_io, &se_set_pmode, &se_set_pstate, &se_get_pstate);
+	tmp_init(&tmp_io, &se_set_pin_mode, &se_set_pin_state, &se_get_pin_state);
 # endif
 	tmp_set_holdup_fp(&tmp_io, &holdup);
 	mdl_uint_t timeo = 10000;
@@ -112,9 +110,9 @@ struct tmp_io tmp_io = {
 .tx_co_pid = TMP_TX_OC_PID
 };
 # ifndef __TMP_LIGHT
-	tmp_init(&tmp_io, &cl_set_pmode, &cl_set_pstate, &cl_get_pstate, 0, TMP_FLG_NORET);
+	tmp_init(&tmp_io, &cl_set_pin_mode, &cl_set_pin_state, &cl_get_pin_state, 0, TMP_FLG_NORET);
 # else
-	tmp_init(&tmp_io, &cl_set_pmode, &cl_set_pstate, &cl_get_pstate);
+	tmp_init(&tmp_io, &cl_set_pin_mode, &cl_set_pin_state, &cl_get_pin_state);
 # endif
 	tmp_set_holdup_fp(&tmp_io, &holdup);
 	mdl_uint_t timeo = 10000;
