@@ -17,35 +17,45 @@
 # define TMP_RX_OC_PID 3
 # define TMP_TX_OC_PID 4
 # define TMP_TX_PID 5
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-
+pthread_mutex_t m1 = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t m2 = PTHREAD_MUTEX_INITIALIZER;
+// bits
 mdl_u8_t pins[] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
 mdl_u8_t iface_no = 0;
 atomic_uchar iface_c = 0;
 
 void set_iface_no(mdl_u8_t __no) {
-	pthread_mutex_lock(&mutex);
+	pthread_mutex_lock(&m1);
 	iface_no = __no;
-	pthread_mutex_unlock(&mutex);
+	pthread_mutex_unlock(&m1);
 	__asm__("nop");
+}
+
+mdl_u8_t get_iface_no() {
+	mdl_u8_t no;
+	pthread_mutex_lock(&m1);
+	no = iface_no;
+	pthread_mutex_unlock(&m1);
+	__asm__("nop");
+	return no;
 }
 
 void set_pin_mode(mdl_u8_t __mode, mdl_u8_t __id) {}
 void set_pin_state(mdl_u8_t __state, mdl_u8_t __id) {
 	__state = ~__state&0x1;
-	pthread_mutex_lock(&mutex);
+	pthread_mutex_lock(&m1);
 	if (__state)
 		pins[iface_no] |= 1<<__id;
 	else
 		pins[iface_no] ^= 1<<__id;
-	pthread_mutex_unlock(&mutex);
+	pthread_mutex_unlock(&m1);
 	__asm__("nop");
 }
 
 mdl_u8_t get_pin_state(mdl_u8_t __id) {
-	pthread_mutex_lock(&mutex);
+	pthread_mutex_lock(&m1);
 	mdl_u8_t ret_val = (pins[iface_no]>>__id)&0x1;
-	pthread_mutex_unlock(&mutex);
+	pthread_mutex_unlock(&m1);
 	__asm__("nop");
 	return ret_val;
 }
@@ -56,26 +66,35 @@ void ctrl_c(int __sig) {
 	cc_flag = 0x1;
 	shutdown(sock, SHUT_RDWR);
 }
+# include <mdl/forward.h>
 
 void* m(void *__arg_p) {
 	struct tmp_io *tmp_io = (struct tmp_io*)__arg_p;
 
-	mdl_u8_t data = 212;
-	mdl_u8_t _iface_no;
+//	mdl_u8_t data = 212;
+//	mdl_u8_t _iface_no;
 	_again:
+/*
 	_iface_no = 0;
 	for(;_iface_no != iface_c;_iface_no++) {
+		pthread_mutex_lock(&m2);
 		tmp_set_iface_no(tmp_io, _iface_no);
 		tmp_send(tmp_io, tmp_io_buff(&data, 1), 0);
+		pthread_mutex_unlock(&m2);
 		printf("sent: %u, to %u\n\n", data, _iface_no);
 	}
+*/
+	pthread_mutex_lock(&m2);
+	tmp_forward(tmp_io);
+	pthread_mutex_unlock(&m2);
+	__asm__("nop");
 
 	goto _again;
 	return NULL;
 }
 
 
-void holdup(mdl_uint_t __holdup) {usleep(30);}
+void holdup(mdl_uint_t __holdup) {usleep(50);}
 
 int main(void) {
 	signal(SIGINT, ctrl_c);
@@ -115,17 +134,20 @@ int main(void) {
 	};
 
 	tmp_io.set_iface_no_fp = &set_iface_no;
+	tmp_io.get_iface_no_fp = &get_iface_no;
 	tmp_init(&tmp_io, &set_pin_mode, &set_pin_state, &get_pin_state, 0, 0);
 	tmp_set_holdup_fp(&tmp_io, &holdup);
 	mdl_uint_t timeo = 10000;
 
 	tmp_tog_rcv_optflag(&tmp_io, TMP_OPT_FLIP_BIT);
-	tmp_io.snd_holdup_ic = 2;
-	tmp_io.rcv_holdup_ic = 2;
+	tmp_io.snd_holdup_ic = 1;
+	tmp_io.rcv_holdup_ic = 1;
 	tmp_tog_snd_optflag(&tmp_io, TMP_OPT_INV_TX_TRIG_VAL);
 	tmp_tog_rcv_optflag(&tmp_io, TMP_OPT_INV_RX_TRIG_VAL);
 	tmp_set_opt(&tmp_io, TMP_OPT_SND_TIMEO, &timeo);
 	tmp_set_opt(&tmp_io, TMP_OPT_RCV_TIMEO, &timeo);
+	tmp_err_t err;
+	tmp_add_iface(&tmp_io, tmp_addr_from_str("0.0.0.0", &err), 0);
 
 	pthread_create(&thread, NULL, &m, (void*)&tmp_io);
 
@@ -152,18 +174,21 @@ int main(void) {
 		}
 
 		printf("client conencted with id: %u\n", iface_c);
+		pthread_mutex_lock(&m2);
+		tmp_add_iface(&tmp_io, tmp_addr_from_str(iface_c == 1? "2.2.2.2":"1.1.1.1", &err), 0);
+		pthread_mutex_unlock(&m2);
 		my_id = iface_c++;
 	}
 
-	pthread_mutex_lock(&mutex);
+	pthread_mutex_lock(&m1);
 	pins[my_id] = (pins[my_id]^(pins[my_id]&0x7))|(temp&0x7);
 	temp = (pins[my_id]>>3)&0x7;
 	if ((bc = sendto(sock, &temp, 1, 0, (struct sockaddr*)&src, sizeof(struct sockaddr_in))) < 0) {
 		printf("error.\n");
 	}
-	pthread_mutex_unlock(&mutex);
-	usleep(800);
+	pthread_mutex_unlock(&m1);
 	__asm__("nop");
+	usleep(400);
 	goto _loop;
 	_end:
 	close(sock);
