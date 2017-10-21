@@ -15,9 +15,9 @@ void static bzero(void *__p, mdl_uint_t __bc) {
 	while(itr != (mdl_u8_t*)__p+__bc) {
 		mdl_uint_t off = itr-(mdl_u8_t*)__p;
 		if (off >= sizeof(mdl_u64_t)) {
-			*((mdl_u64_t*)(itr++)) = 0x00000000000000;
-		} else
-			*(itr++) = 0x0;
+			*((mdl_u64_t*)itr) = 0x00000000000000;
+			itr+=sizeof(mdl_u64_t);
+		} else *(itr++) = 0x0;
 	}
 }
 
