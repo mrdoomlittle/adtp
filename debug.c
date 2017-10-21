@@ -15,9 +15,16 @@
 
 mdl_u8_t se_pinset[12] = {0x0}, cl_pinset[12] = {0x0};
 
+void set_iface_no(mdl_u8_t __no) {
+}
+
+mdl_u8_t get_iface_no() {
+	return 0;
+}
+
 void se_set_pin_mode(mdl_u8_t __mode, mdl_u8_t __id) {}
 void se_set_pin_state(mdl_u8_t __state, mdl_u8_t __id) {
-	__state = ~__state & 0x1;
+	__state = ~__state&0x1;
 	if (__id == TMP_RX_OC_PID) {
 		cl_pinset[TMP_RX_IC_PID] = __state;
 		return;
@@ -31,13 +38,13 @@ void se_set_pin_state(mdl_u8_t __state, mdl_u8_t __id) {
 	se_pinset[__id] = __state;
 }
 
-mdl_u8_t se_get_pin_state(mdl_u8_t __pid) {
-	return se_pinset[__pid];
+mdl_u8_t se_get_pin_state(mdl_u8_t __id) {
+	return se_pinset[__id];
 }
 
 void cl_set_pin_mode(mdl_u8_t __mode, mdl_u8_t __id) {}
 void cl_set_pin_state(mdl_u8_t __state, mdl_u8_t __id) {
-	__state = ~__state & 0x1;
+	__state = ~__state&0x1;
 	if (__id == TMP_RX_OC_PID) {
 		se_pinset[TMP_RX_IC_PID] = __state;
 		return;
@@ -85,7 +92,13 @@ struct tmp_io tmp_io = {
 	tmp_set_opt(&tmp_io, TMP_OPT_RCV_TIMEO, &timeo);
 	tmp_tog_snd_optflag(&tmp_io, TMP_OPT_INV_TX_TRIG_VAL);
 	tmp_tog_rcv_optflag(&tmp_io, TMP_OPT_INV_RX_TRIG_VAL);
-
+# ifndef __TMP_LIGHT
+	tmp_io.set_iface_no_fp = &set_iface_no;
+	tmp_io.get_iface_no_fp = &get_iface_no;
+	tmp_err_t err;
+	tmp_add_iface(&tmp_io, tmp_addr_from_str("0.0.0.0", &err), 0);
+# endif
+	printf("node{1} online.\n");
 	while(1) {
 # ifndef __TMP_LIGHT
 	tmp_err_t err = tmp_send(&tmp_io, tmp_io_buff(data_to_send, sizeof(data_to_send)), 0);
@@ -110,7 +123,7 @@ struct tmp_io tmp_io = {
 .tx_co_pid = TMP_TX_OC_PID
 };
 # ifndef __TMP_LIGHT
-	tmp_init(&tmp_io, &cl_set_pin_mode, &cl_set_pin_state, &cl_get_pin_state, 0, TMP_FLG_NORET);
+	tmp_init(&tmp_io, &cl_set_pin_mode, &cl_set_pin_state, &cl_get_pin_state, 0, 0);
 # else
 	tmp_init(&tmp_io, &cl_set_pin_mode, &cl_set_pin_state, &cl_get_pin_state);
 # endif
@@ -124,6 +137,13 @@ struct tmp_io tmp_io = {
 	tmp_tog_rcv_optflag(&tmp_io, TMP_OPT_INV_RX_TRIG_VAL);
 	tmp_set_opt(&tmp_io, TMP_OPT_SND_TIMEO, &timeo);
 	tmp_set_opt(&tmp_io, TMP_OPT_RCV_TIMEO, &timeo);
+# ifndef __TMP_LIGHT
+	tmp_io.set_iface_no_fp = &set_iface_no;
+	tmp_io.get_iface_no_fp = &get_iface_no;
+	tmp_err_t err;
+	tmp_add_iface(&tmp_io, tmp_addr_from_str("0.0.0.0", &err), 0);
+# endif
+	printf("node{0} online.\n");
 	while(1) {
 	mdl_u8_t data[sizeof(data_to_send)];
 	memset(data, 0x0, sizeof(data_to_send));

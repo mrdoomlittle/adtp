@@ -58,10 +58,9 @@ tmp_err_t tmp_init(struct tmp_io *__tmp_io, void(*__set_pin_mode_fp)(mdl_u8_t, m
 	__tmp_io->rcv_holdup = 0;
 	__tmp_io->snd_optflags = 0;
 	__tmp_io->rcv_optflags = 0;
-
+# ifndef __TMP_LIGHT
 	__tmp_io->iface = NULL;
 	__tmp_io->iface_c = 0;
-# ifndef __TMP_LIGHT
 	__tmp_io->flags = __flags|TMP_DEF_FLAGS;
 # endif
 	tmp_holdup(__tmp_io, 200, 0);
@@ -103,7 +102,11 @@ void tmp_rm_iface(struct tmp_io *__tmp_io, struct tmp_iface* __p) {
 mdl_u32_t tmp_cal_sv(mdl_u8_t *__p, mdl_uint_t __bc) {
 	mdl_u32_t ret_val = 0;
 	mdl_u8_t *itr = __p;
-	while(itr != __p+__bc) ret_val += *(itr++);
+	while(itr != __p+__bc) {
+//		ret_val += *(itr++);
+		ret_val ^= ((ret_val<<2)|(*itr))<<((itr-__p)&0x3);
+		itr++;
+	}
 	return ret_val;
 }
 
@@ -444,7 +447,12 @@ tmp_err_t tmp_rcv_pk(struct tmp_io *__tmp_io, struct tmp_packet *__packet) {
 	if ((any_err = tmp_rcv_32l(__tmp_io, &__packet->dt_sect_sv)) != TMP_SUCCESS) return any_err;
 	if ((any_err = tmp_raw_rcv(__tmp_io, __packet->io_buff)) != TMP_SUCCESS) return any_err;
 
-	if (tmp_cal_sv(__packet->io_buff.p, __packet->io_buff.bc) != __packet->dt_sect_sv) return TMP_FAILURE;
+	if (tmp_cal_sv(__packet->io_buff.p, __packet->io_buff.bc) != __packet->dt_sect_sv) {
+# ifdef __DEBUG_ENABLED
+		printf("mismatch.\n");
+# endif
+		return TMP_FAILURE;
+	}
 # ifdef __DEBUG_ENABLED
 	printf("src addr: %u.%u.%u.%u\n", __packet->src_addr&0xFF,__packet->src_addr>>8&0xFF, __packet->src_addr>>16&0xFF, __packet->src_addr>>24&0xFF);
 # endif
