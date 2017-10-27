@@ -33,7 +33,7 @@
 # define TMP_DEF_FLAGS TMP_FLG_KAS
 # define TMP_MAX_TRY_C 10
 # define TMP_FLG_RBS 0b1000
-# define TMP_FLG_MSG 0b0100
+# define TMP_FLG_CTMSG 0b0100
 
 enum {
 	_d2,
@@ -42,19 +42,11 @@ enum {
 	_d16,
 	_d32,
 	_d64,
-	_d128,
-	_d256,
-	_d512,
-	_d1024,
-	_d2048,
-	_d4096,
-	_d8192,
-	_d16384,
-	_d32768
+	_d128
 };
 
 enum {
-	_msg_route
+	_ctmsg_route
 };
 
 typedef mdl_u32_t tmp_addr_t;
@@ -63,12 +55,7 @@ typedef mdl_u8_t tmp_method_t;
 typedef mdl_u8_t tmp_flag_t;
 typedef mdl_i8_t tmp_err_t;
 
-typedef struct {
-	mdl_u8_t *p;
-	mdl_uint_t bc;
-} tmp_io_buf_t;
-
-struct tmp_msg {
+struct tmp_ctmsg {
 	mdl_u8_t kind;
 	mdl_u32_t lu_addr;
 };
@@ -133,6 +120,11 @@ typedef mdl_i8_t tmp_err_t;
 mdl_u32_t tmp_addr_from_str(char const*, tmp_err_t*);
 # endif
 
+typedef struct {
+	mdl_u8_t *p;
+	mdl_uint_t bc;
+} tmp_io_buf_t;
+
 # define TMP_PACKET_SIZE 128
 # define TMP_PK_HEADER_SIZE 96
 struct tmp_packet {
@@ -155,8 +147,6 @@ tmp_err_t tmp_init(struct tmp_io*, void(*)(mdl_u8_t, mdl_u8_t), void(*)(mdl_u8_t
 , tmp_method_t, tmp_flag_t
 # endif
 );
-
-void tmp_prepare(struct tmp_io*);
 
 void tmp_set_holdup_fp(struct tmp_io*, void(*)(mdl_uint_t));
 void tmp_holdup(struct tmp_io*, mdl_uint_t, mdl_uint_t);
@@ -212,7 +202,22 @@ typedef enum tmp_opt tmp_opt_t;
 void tmp_set_opt(struct tmp_io*, tmp_opt_t, void*);
 void tmp_get_opt(struct tmp_io*, tmp_opt_t, void*);
 
-mdl_u8_t tmp_cutoff(mdl_u8_t, mdl_u16_t*, mdl_u32_t*, mdl_uint_t);
+mdl_u8_t __inline__ static tmp_cutoff(mdl_u8_t __divider, mdl_u16_t *__c, mdl_u32_t *__p, mdl_uint_t __cutoff) {
+	if (!__cutoff) return 0;
+	if (((*__c)>>__divider)&0x1) {
+		(*__p)++;
+		*__c = 0;
+	}
+
+	if (*__p >= __cutoff) {
+		*__p = 0;
+		*__c = 0;
+		return 1;
+	}
+	(*__c)++;
+	return 0;
+}
+
 mdl_u8_t __inline__ static tmp_snd_cutoff(struct tmp_io *__tmp_io, mdl_u16_t *__c, mdl_u32_t *__p) {
 	mdl_u8_t res = tmp_cutoff(__tmp_io->divider, __c, __p, __tmp_io->snd_cutoff);
 	tmp_holdup(__tmp_io, 1, 1);

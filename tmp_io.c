@@ -21,6 +21,22 @@ void static bzero(void *__p, mdl_uint_t __bc) {
 	}
 }
 
+mdl_u8_t tmp_cutoff(mdl_u8_t __divider, mdl_u16_t *__c, mdl_u32_t *__p, mdl_uint_t __cutoff) {
+	if (!__cutoff) return 0;
+	if (((*__c)>>__divider)&0x1) {
+		(*__p)++;
+		*__c = 0;
+	}
+
+	if (*__p >= __cutoff) {
+		*__p = 0;
+		*__c = 0;
+		return 1;
+	}
+	(*__c)++;
+	return 0;
+}
+
 tmp_err_t tmp_init(struct tmp_io *__tmp_io, void(*__set_pin_mode_fp)(mdl_u8_t, mdl_u8_t), void(*__set_pin_state_fp)(mdl_u8_t, mdl_u8_t), mdl_u8_t(*__get_pin_state_fp)(mdl_u8_t)
 # ifndef __TMP_LIGHT
 , tmp_method_t __tr_method, tmp_flag_t __flags
@@ -42,15 +58,11 @@ tmp_err_t tmp_init(struct tmp_io *__tmp_io, void(*__set_pin_mode_fp)(mdl_u8_t, m
 	rx_clk_trig_val = tmp_gpio_low;
 	tx_clk_trig_val = tmp_gpio_low;
 
-	tmp_set_pin_state(__tmp_io, ~rx_clk_trig_val&0x1, __tmp_io->rx_co_pid);
 	tmp_set_pin_state(__tmp_io, tmp_gpio_low, __tmp_io->tx_pid);
-	tmp_set_pin_state(__tmp_io, ~tx_clk_trig_val&0x1, __tmp_io->tx_co_pid);
 
-	__tmp_io->snd_timeo = 0;
-	__tmp_io->snd_timeo_ic = 0;
-
-	__tmp_io->rcv_timeo = 0;
-	__tmp_io->rcv_timeo_ic = 0;
+	__tmp_io->snd_cutoff = 0;
+	__tmp_io->rcv_cutoff = 0;
+	__tmp_io->divider = 1<<_d2;
 
 	__tmp_io->snd_holdup_ic = 0;
 	__tmp_io->rcv_holdup_ic = 0;
@@ -62,9 +74,16 @@ tmp_err_t tmp_init(struct tmp_io *__tmp_io, void(*__set_pin_mode_fp)(mdl_u8_t, m
 	__tmp_io->iface = NULL;
 	__tmp_io->iface_c = 0;
 	__tmp_io->flags = __flags|TMP_DEF_FLAGS;
+# else
+	__tmp_io->flags = TMP_DEF_FLAGS;
 # endif
 	tmp_holdup(__tmp_io, 200, 0);
 	return TMP_SUCCESS;
+}
+
+void tmp_prepare(struct tmp_io *__tmp_io) {
+	tmp_set_pin_state(__tmp_io, tmp_is_snd_optflag(__tmp_io, TMP_OPT_INV_RX_TRIG_VAL)? rx_clk_trig_val:~rx_clk_trig_val&0x1, __tmp_io->rx_co_pid);
+	tmp_set_pin_state(__tmp_io, tmp_is_rcv_optflag(__tmp_io, TMP_OPT_INV_TX_TRIG_VAL)? tx_clk_trig_val:~tx_clk_trig_val&0x1, __tmp_io->tx_co_pid);
 }
 
 # ifndef __TMP_LIGHT
@@ -280,13 +299,30 @@ tmp_err_t tmp_rcv_bit(struct tmp_io *__tmp_io, mdl_u8_t *__bit) {
 # endif
 	mdl_u8_t _tx_clk_trig_val = tmp_is_rcv_optflag(__tmp_io, TMP_OPT_INV_TX_TRIG_VAL)? ~tx_clk_trig_val&0x1:tx_clk_trig_val;
 	mdl_u8_t _rx_clk_trig_val = tmp_is_rcv_optflag(__tmp_io, TMP_OPT_INV_RX_TRIG_VAL)? ~rx_clk_trig_val&0x1:rx_clk_trig_val;
+	mdl_u16_t c = 0;
+	mdl_u32_t p = 0;
 
 	tmp_set_pin_state(__tmp_io, _tx_clk_trig_val, __tmp_io->tx_co_pid);
 	tmp_rcv_holdup(__tmp_io);
 
-	__tmp_io->rcv_timeo_ic = 0;
-	while(tmp_get_pin_state(__tmp_io, __tmp_io->rx_ci_pid) != _rx_clk_trig_val) {
-		if (tmp_rcv_timeo(__tmp_io)) {tmp_set_pin_state(__tmp_io, ~_tx_clk_trig_val&0x1, __tmp_io->tx_co_pid);return TMP_TIMEO;}}
+	while (tmp_get_pin_state(__tmp_io, __tmp_io->rx_ci_pid) != _rx_clk_trig_val) {
+		if (tmp_get_pin_state(__tmp_io, __tmp_io->tx_ci_pid) == (~_tx_clk_trig_val&0x1)) {
+			tmp_set_pin_state(__tmp_io, ~_tx_clk_trig_val&0x1, __tmp_io->tx_co_pid);
+# ifdef __DEBUG_ENABLED
+			fprintf(stderr, "tmp can't recv.\n");
+# endif
+			return TMP_FAILURE;
+        }
+
+		if (tmp_rcv_cutoff(__tmp_io, &c, &p)){
+			tmp_set_pin_state(__tmp_io, ~_tx_clk_trig_val&0x1, __tmp_io->tx_co_pid);
+# ifdef __DEBUG_ENABLED
+			fprintf(stderr, "tmp, cutoff reched, took too long.\n");
+# endif
+			return TMP_CUTOFF;
+		}
+	}
+
 	tmp_rcv_holdup(__tmp_io);
 
 	mdl_u8_t recved_bit = tmp_get_pin_state(__tmp_io, __tmp_io->rx_pid);
@@ -299,8 +335,16 @@ tmp_err_t tmp_rcv_bit(struct tmp_io *__tmp_io, mdl_u8_t *__bit) {
 	tmp_set_pin_state(__tmp_io, ~_tx_clk_trig_val&0x1, __tmp_io->tx_co_pid);
 	tmp_rcv_holdup(__tmp_io);
 
-	__tmp_io->rcv_timeo_ic = 0;
-	while(tmp_get_pin_state(__tmp_io, __tmp_io->rx_ci_pid) != (~_rx_clk_trig_val&0x1)) if (tmp_rcv_timeo(__tmp_io)) return TMP_TIMEO;
+	c = 0;
+	p = 0;
+	while(tmp_get_pin_state(__tmp_io, __tmp_io->rx_ci_pid) != (~_rx_clk_trig_val&0x1)) {
+		if (tmp_rcv_cutoff(__tmp_io, &c, &p)) {
+# ifdef __DEBUG_ENABLED
+			fprintf(stderr, "tmp, cutoff reched, took too long.\n");
+# endif
+			return TMP_CUTOFF;
+		}
+	}
 	tmp_rcv_holdup(__tmp_io);
 # ifdef __AVR
 	if (re_enable_gi) sei();
@@ -316,9 +360,17 @@ tmp_err_t tmp_snd_bit(struct tmp_io *__tmp_io, mdl_u8_t __bit) {
 	mdl_u8_t _tx_clk_trig_val = tmp_is_snd_optflag(__tmp_io, TMP_OPT_INV_TX_TRIG_VAL)? ~tx_clk_trig_val&0x1:tx_clk_trig_val;
 	mdl_u8_t _rx_clk_trig_val = tmp_is_snd_optflag(__tmp_io, TMP_OPT_INV_RX_TRIG_VAL)? ~rx_clk_trig_val&0x1:rx_clk_trig_val;
 	if (tmp_is_snd_optflag(__tmp_io, TMP_OPT_FLIP_BIT)) __bit = ~__bit&0x1;
+	mdl_u16_t c = 0;
+	mdl_u32_t p = 0;
 
-	__tmp_io->snd_timeo_ic = 0;
-	while(tmp_get_pin_state(__tmp_io, __tmp_io->tx_ci_pid) != _tx_clk_trig_val) if (tmp_snd_timeo(__tmp_io))return TMP_TIMEO;
+	while(tmp_get_pin_state(__tmp_io, __tmp_io->tx_ci_pid) != _tx_clk_trig_val) {
+		if (tmp_snd_cutoff(__tmp_io, &c, &p)) {
+# ifdef __DEBUG_ENABLED
+			fprintf(stderr, "tmp, cutoff reched, took too long.\n");
+# endif
+			return TMP_CUTOFF;
+		}
+	}
 	tmp_snd_holdup(__tmp_io);
 
 	tmp_set_pin_state(__tmp_io, __bit, __tmp_io->tx_pid);
@@ -327,9 +379,18 @@ tmp_err_t tmp_snd_bit(struct tmp_io *__tmp_io, mdl_u8_t __bit) {
 	tmp_set_pin_state(__tmp_io, _rx_clk_trig_val, __tmp_io->rx_co_pid);
 	tmp_snd_holdup(__tmp_io);
 
-	__tmp_io->snd_timeo_ic = 0;
-	while(tmp_get_pin_state(__tmp_io, __tmp_io->tx_ci_pid) != (~_tx_clk_trig_val&0x1)){
-		if (tmp_snd_timeo(__tmp_io)) {tmp_set_pin_state(__tmp_io, ~_rx_clk_trig_val&0x1, __tmp_io->rx_co_pid);return TMP_TIMEO;}}
+	c = 0;
+	p = 0;
+	while(tmp_get_pin_state(__tmp_io, __tmp_io->tx_ci_pid) != (~_tx_clk_trig_val&0x1)) {
+		if (tmp_snd_cutoff(__tmp_io, &c, &p)) {
+			tmp_set_pin_state(__tmp_io, ~_rx_clk_trig_val&0x1, __tmp_io->rx_co_pid);
+# ifdef __DEBUG_ENABLED
+			fprintf(stderr, "tmp, cutoff reched, took too long.\n");
+# endif
+			return TMP_CUTOFF;
+		}
+	}
+
 	tmp_snd_holdup(__tmp_io);
 
 	tmp_set_pin_state(__tmp_io, ~_rx_clk_trig_val&0x1, __tmp_io->rx_co_pid);
@@ -356,14 +417,14 @@ mdl_u8_t static tmp_get_pin_state(struct tmp_io *__tmp_io, mdl_u8_t __id) {
 # if !defined(__TMP_LIGHT) || defined(__TMP_KOS)
 tmp_err_t tmp_snd_ack(struct tmp_io *__tmp_io, mdl_u8_t __ack_val) {
 	tmp_err_t any_err = TMP_SUCCESS;
-	tmp_snd_bit(__tmp_io, __ack_val&0x1);
+	any_err = tmp_snd_bit(__tmp_io, __ack_val&0x1);
 	return any_err;
 }
 
 tmp_err_t tmp_rcv_ack(struct tmp_io *__tmp_io, mdl_u8_t *__ackv_p) {
 	tmp_err_t any_err = TMP_SUCCESS;
 	*__ackv_p = 0;
-	tmp_rcv_bit(__tmp_io, __ackv_p);
+	any_err = tmp_rcv_bit(__tmp_io, __ackv_p);
 	return any_err;
 }
 
@@ -395,7 +456,7 @@ tmp_err_t recv_key_and_sync(struct tmp_io *__tmp_io) {
 # ifndef __TMP_LIGHT
 	if ((any_err = tmp_rcv_64l(__tmp_io, &recved_key)) != TMP_SUCCESS) return any_err;
 # else
-	if ((any_err = tmp_raw_snd(__tmp_io, tmp_io_buff((mdl_u8_t*)&recved_key, sizeof(mdl_u64_t)))) != TMP_SUCCESS) return any_err;
+	if ((any_err = tmp_raw_rcv(__tmp_io, tmp_io_buff((mdl_u8_t*)&recved_key, sizeof(mdl_u64_t)))) != TMP_SUCCESS) return any_err;
 # endif
 	if (recved_key != KEY) {
 		tmp_rcv_ack(__tmp_io, (mdl_u8_t*)&tmp_null);
@@ -469,8 +530,19 @@ tmp_err_t tmp_send(struct tmp_io *__tmp_io, tmp_io_buf_t __io_buff, tmp_addr_t _
 tmp_err_t tmp_snd(struct tmp_io *__tmp_io, tmp_io_buf_t *__io_buff, tmp_addr_t __to_addr, mdl_u8_t __flags, struct tmp_packet *__pkbuf) {
 	tmp_err_t any_err = TMP_SUCCESS;
 	if (tmp_is_flag(__tmp_io->flags, TMP_FLG_KAS)) {
-	if ((any_err = recv_key_and_sync(__tmp_io)) != TMP_SUCCESS) return any_err;
-	if ((any_err = send_key_and_sync(__tmp_io)) != TMP_SUCCESS) return any_err;
+	if ((any_err = recv_key_and_sync(__tmp_io)) != TMP_SUCCESS) {
+# ifdef __DEBUG_ENABLED
+		fprintf(stderr, "tmp, failed to recv key and sync.\n");
+# endif
+		return any_err;
+	}
+
+	if ((any_err = send_key_and_sync(__tmp_io)) != TMP_SUCCESS) {
+# ifdef __DEBUG_ENABLED
+		fprintf(stderr, "tmp, failed to send key and sync.\n");
+# endif
+		return any_err;
+	}
 	}
 
 	mdl_u8_t s_flags = __flags, r_flags = 0x0;
@@ -551,37 +623,58 @@ tmp_err_t tmp_rcv(struct tmp_io *__tmp_io, tmp_io_buf_t *__io_buff, tmp_addr_t _
 	tmp_err_t any_err = TMP_SUCCESS;
 	mdl_u8_t s_flags, r_flags = __flags;
 	struct tmp_packet packet;
-	struct tmp_ctmsg msg;
-	bzero((void*)&msg, sizeof(struct tmp_ctmsg));
+	struct tmp_msg msg;
+	bzero((void*)&msg, sizeof(struct tmp_msg));
 	bzero((void*)&packet, sizeof(struct tmp_packet));
-	tmp_io_buf_t *_io_buff, _io_buff_;
+	tmp_io_buf_t *io_buff = __io_buff, _io_buff;
 
 	_btt:
 	{
 	s_flags = 0x0;
 	if (tmp_is_flag(__tmp_io->flags, TMP_FLG_KAS)) {
-	if ((any_err = send_key_and_sync(__tmp_io)) != TMP_SUCCESS) return any_err;
-	if ((any_err = recv_key_and_sync(__tmp_io)) != TMP_SUCCESS) return any_err;
+	if ((any_err = send_key_and_sync(__tmp_io)) != TMP_SUCCESS) {
+# ifdef __DEBUG_ENABLED
+		fprintf(stderr, "tmp, failed to send key and sync.\n");
+# endif
+		return any_err;
+	}
+	if ((any_err = recv_key_and_sync(__tmp_io)) != TMP_SUCCESS) {
+# ifdef __DEBUG_ENABLED
+		fprintf(stderr, "tmp, failed to recv key and sync.\n");
+# endif
+		return any_err;
+	}
 	}
 
-	tmp_snd_nib(__tmp_io, r_flags);
-	tmp_rcv_nib(__tmp_io, &s_flags);
+	if (tmp_snd_nib(__tmp_io, r_flags) != TMP_SUCCESS) {
+# ifdef __DEBUG_ENABLED
+		fprintf(stderr, "tmp, failed to send flags.\n");
+# endif
+		return TMP_FAILURE;
+	}
+
+	if (tmp_rcv_nib(__tmp_io, &s_flags) != TMP_SUCCESS) {
+# ifdef __DEBUG_ENABLED
+		fprintf(stderr, "tmp, failed to recv flags.\n");
+# endif
+		return TMP_FAILURE;
+	}
+
 	if (tmp_is_flag(r_flags, TMP_FLG_RBS))
-		tmp_rcv_16l(__tmp_io, (mdl_u16_t*)&__io_buff->bc);
-	if (tmp_is_flag(s_flags, TMP_FLG_CTMSG)) {
+		tmp_rcv_16l(__tmp_io, (mdl_u16_t*)&io_buff->bc);
+	if (tmp_is_flag(s_flags, TMP_FLG_MSG)) {
 		printf("recved control message.\n");
-		_io_buff = __io_buff;
-		__io_buff = &_io_buff_;
-		_io_buff_ = tmp_io_buff(&msg, sizeof(struct tmp_ctmsg));
+		io_buff = &_io_buff;
+		_io_buff = tmp_io_buff(&msg, sizeof(struct tmp_msg));
 	}
 # ifdef __DEBUG_ENABLED
 	mdl_u8_t pk_c = 0;
 # endif
-	mdl_u8_t *begin = __io_buff->p;
+	mdl_u8_t *begin = io_buff->p;
 	mdl_u8_t *itr = begin;
-	while (itr != begin+__io_buff->bc) {
+	while (itr != begin+io_buff->bc) {
 		mdl_uint_t off = itr-begin;
-		mdl_uint_t left = __io_buff->bc-off;
+		mdl_uint_t left = io_buff->bc-off;
 
 		mdl_uint_t bc = left >= pk_dt_sect_size? pk_dt_sect_size:left;
 		packet.io_buff = tmp_io_buff(itr, bc);
@@ -617,23 +710,23 @@ tmp_err_t tmp_rcv(struct tmp_io *__tmp_io, tmp_io_buf_t *__io_buff, tmp_addr_t _
 # endif
 	}
 # ifdef __DEBUG_ENABLED
-	fprintf(stdout, "tmp, recved %u packets, %u bytes.\n", pk_c, __io_buff->bc);
+	fprintf(stdout, "tmp, recved %u packets, %u bytes.\n", pk_c, io_buff->bc);
 # endif
 	}
 
-	if (tmp_is_flag(s_flags, TMP_FLG_CTMSG)) {
+	if (tmp_is_flag(s_flags, TMP_FLG_MSG)) {
 		mdl_u8_t route[24];
 		struct tmp_iface *iface = __tmp_io->iface+tmp_get_iface_no(__tmp_io);
 		printf("------------------------ %u - %u\n", msg.lu_addr, iface->addr);
 		if (msg.lu_addr == iface->addr) {
 			route[0] = 200;//iface->no;
 			tmp_snd_bit(__tmp_io, 1);
-			tmp_io_buf_t io_buff = tmp_io_buff(route, sizeof(mdl_u8_t));
-			tmp_snd(__tmp_io, &io_buff, 0x0, 0x0, NULL);
+			*io_buff = tmp_io_buff(route, sizeof(mdl_u8_t));
+			tmp_snd(__tmp_io, io_buff, 0x0, 0x0, NULL);
 			printf("found.\n");
 		} else
 			tmp_snd_bit(__tmp_io, 0);
-		__io_buff = _io_buff;
+		io_buff = __io_buff;
 		goto _btt;
 	}
 
@@ -734,22 +827,22 @@ tmp_err_t tmp_rcv_16l(struct tmp_io *__tmp_io, mdl_u16_t *__data) {
 
 void tmp_set_opt(struct tmp_io *__tmp_io, tmp_opt_t __tmp_opt, void *__data) {
 	switch(__tmp_opt) {
-		case TMP_OPT_SND_TIMEO:
-			__tmp_io->snd_timeo = *(mdl_uint_t*)__data;
+		case TMP_OPT_SND_CUTOFF:
+			__tmp_io->snd_cutoff = *(mdl_uint_t*)__data;
 		break;
-		case TMP_OPT_RCV_TIMEO:
-			__tmp_io->rcv_timeo = *(mdl_uint_t*)__data;
+		case TMP_OPT_RCV_CUTOFF:
+			__tmp_io->rcv_cutoff = *(mdl_uint_t*)__data;
 		break;
 	}
 }
 
 void tmp_get_opt(struct tmp_io *__tmp_io, tmp_opt_t __tmp_opt, void *__data) {
 	switch(__tmp_opt) {
-		case TMP_OPT_SND_TIMEO:
-			*(mdl_uint_t*)__data = __tmp_io->snd_timeo;
+		case TMP_OPT_SND_CUTOFF:
+			*(mdl_uint_t*)__data = __tmp_io->snd_cutoff;
 		break;
-		case TMP_OPT_RCV_TIMEO:
-			*(mdl_uint_t*)__data = __tmp_io->rcv_timeo;
+		case TMP_OPT_RCV_CUTOFF:
+			*(mdl_uint_t*)__data = __tmp_io->rcv_cutoff;
 		break;
 	}
 }

@@ -9,30 +9,35 @@ void tmp_forward(struct tmp_io *__tmp_io) {
 	tmp_io_buf_t io_buff;
 	tmp_err_t any_err;
 	while((iface_no&0xFF) != __tmp_io->iface_c) {
-		tmp_set_iface_no(__tmp_io, iface_no);
+		tmp_set_iface_no(__tmp_io, iface_no&0xFF);
 # ifdef __DEBUG_ENABLED
-		//fprintf(stdout, "tmp_forward, set iface no to '%u'\n", iface_no&0xFF);
+		fprintf(stdout, "tmp_forward, set iface no to '%u'\n", iface_no&0xFF);
 # endif
-//		printf("%u\n", tmp_par_arcv_sig(__tmp_io));
 		io_buff = tmp_io_buff(data_buff, 0x0);
 		if ((any_err = tmp_rcv(__tmp_io, &io_buff, 0x0, TMP_FLG_RBS, pkbuf)) != TMP_SUCCESS) goto _sk;
 		bc = io_buff.bc;
-//		addr = get_iface(__tmp_io, iface_no)->addr;
 # ifdef __DEBUG_ENABLED
 		fprintf(stdout, "tmp_forward, recved %u bytes of data on iface %u. %u\n", io_buff.bc, iface_no&0xFF, *data_buff);
 # endif
 		iface_no<<=8;
 		while((iface_no&0xFF) != __tmp_io->iface_c) {
+# ifdef __DEBUG_ENABLED
+			fprintf(stdout, "tmp_forward, -- iface_no: %u\n", iface_no&0xFF);
+# endif
 			if ((iface_no&0xFF) != iface_no>>8) {
-				tmp_set_iface_no(__tmp_io, iface_no);
-				struct tmp_ctmsg msg = {
-					.kind=_ctmsg_route,
+				tmp_set_iface_no(__tmp_io, iface_no&0xFF);
+				struct tmp_msg msg = {
+					.kind=_msg_route,
 					.lu_addr=pkbuf->dst_addr
 				};
-				printf("%u\n", pkbuf->dst_addr);
+				printf("dst: %u\n", pkbuf->dst_addr);
 
-				io_buff = tmp_io_buff(&msg, sizeof(struct tmp_ctmsg));
-				tmp_snd(__tmp_io, &io_buff, 0x0, TMP_FLG_CTMSG, NULL);
+				io_buff = tmp_io_buff(&msg, sizeof(struct tmp_msg));
+				if (tmp_snd(__tmp_io, &io_buff, 0x0, TMP_FLG_MSG, NULL) != TMP_SUCCESS) {
+# ifdef __DEBUG_ENABLED
+					fprintf(stderr, "tmp_forward, failed to send message.\n");
+# endif
+				}
 				mdl_u8_t found = 0x0;
 				tmp_rcv_bit(__tmp_io, &found);
 				if (found) {

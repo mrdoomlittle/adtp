@@ -82,14 +82,15 @@ struct tmp_io tmp_io = {
 # else
 	tmp_init(&tmp_io, &se_set_pin_mode, &se_set_pin_state, &se_get_pin_state);
 # endif
+	tmp_io.divider = _d16;
 	tmp_set_holdup_fp(&tmp_io, &holdup);
-	mdl_uint_t timeo = 10000;
+	mdl_uint_t cutoff = 10000;
 
 	tmp_io.snd_holdup_ic = 2;
 	tmp_io.rcv_holdup_ic = 2;
 	tmp_tog_rcv_optflag(&tmp_io, TMP_OPT_FLIP_BIT);
-	tmp_set_opt(&tmp_io, TMP_OPT_SND_TIMEO, &timeo);
-	tmp_set_opt(&tmp_io, TMP_OPT_RCV_TIMEO, &timeo);
+	tmp_set_opt(&tmp_io, TMP_OPT_SND_CUTOFF, &cutoff);
+	tmp_set_opt(&tmp_io, TMP_OPT_RCV_CUTOFF, &cutoff);
 	tmp_tog_snd_optflag(&tmp_io, TMP_OPT_INV_TX_TRIG_VAL);
 	tmp_tog_rcv_optflag(&tmp_io, TMP_OPT_INV_RX_TRIG_VAL);
 # ifndef __TMP_LIGHT
@@ -99,6 +100,7 @@ struct tmp_io tmp_io = {
 	tmp_add_iface(&tmp_io, tmp_addr_from_str("0.0.0.0", &err), 0);
 # endif
 	printf("node{1} online.\n");
+	tmp_prepare(&tmp_io);
 	while(1) {
 # ifndef __TMP_LIGHT
 	tmp_err_t err = tmp_send(&tmp_io, tmp_io_buff(data_to_send, sizeof(data_to_send)), 0);
@@ -127,16 +129,17 @@ struct tmp_io tmp_io = {
 # else
 	tmp_init(&tmp_io, &cl_set_pin_mode, &cl_set_pin_state, &cl_get_pin_state);
 # endif
+	tmp_io.divider = _d16;
 	tmp_set_holdup_fp(&tmp_io, &holdup);
-	mdl_uint_t timeo = 10000;
+	mdl_uint_t cutoff = 10000;
 
 	tmp_tog_rcv_optflag(&tmp_io, TMP_OPT_FLIP_BIT);
 	tmp_io.snd_holdup_ic = 2;
 	tmp_io.rcv_holdup_ic = 2;
 	tmp_tog_snd_optflag(&tmp_io, TMP_OPT_INV_TX_TRIG_VAL);
 	tmp_tog_rcv_optflag(&tmp_io, TMP_OPT_INV_RX_TRIG_VAL);
-	tmp_set_opt(&tmp_io, TMP_OPT_SND_TIMEO, &timeo);
-	tmp_set_opt(&tmp_io, TMP_OPT_RCV_TIMEO, &timeo);
+	tmp_set_opt(&tmp_io, TMP_OPT_SND_CUTOFF, &cutoff);
+	tmp_set_opt(&tmp_io, TMP_OPT_RCV_CUTOFF, &cutoff);
 # ifndef __TMP_LIGHT
 	tmp_io.set_iface_no_fp = &set_iface_no;
 	tmp_io.get_iface_no_fp = &get_iface_no;
@@ -144,9 +147,11 @@ struct tmp_io tmp_io = {
 	tmp_add_iface(&tmp_io, tmp_addr_from_str("0.0.0.0", &err), 0);
 # endif
 	printf("node{0} online.\n");
+	tmp_prepare(&tmp_io);
 	while(1) {
 	mdl_u8_t data[sizeof(data_to_send)];
 	memset(data, 0x0, sizeof(data_to_send));
+	usleep(50000);
 # ifndef __TMP_LIGHT
 	tmp_err_t err = tmp_recv(&tmp_io, tmp_io_buff(data, sizeof(data_to_send)), 0);
 # else

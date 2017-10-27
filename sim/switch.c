@@ -10,6 +10,7 @@
 # include <signal.h>
 # include <sys/ioctl.h>
 # include <stdatomic.h>
+# include <time.h>
 # define TMP_RX_IC_PID 0
 # define TMP_TX_IC_PID 1
 # define TMP_RX_PID 2
@@ -17,6 +18,7 @@
 # define TMP_RX_OC_PID 3
 # define TMP_TX_OC_PID 4
 # define TMP_TX_PID 5
+# define NOP "nop"
 pthread_mutex_t m1 = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t m2 = PTHREAD_MUTEX_INITIALIZER;
 // bits
@@ -28,7 +30,7 @@ void set_iface_no(mdl_u8_t __no) {
 	pthread_mutex_lock(&m1);
 	iface_no = __no;
 	pthread_mutex_unlock(&m1);
-	__asm__("nop");
+	__asm__(NOP);
 }
 
 mdl_u8_t get_iface_no() {
@@ -36,7 +38,7 @@ mdl_u8_t get_iface_no() {
 	pthread_mutex_lock(&m1);
 	no = iface_no;
 	pthread_mutex_unlock(&m1);
-	__asm__("nop");
+	__asm__(NOP);
 	return no;
 }
 
@@ -44,19 +46,22 @@ void set_pin_mode(mdl_u8_t __mode, mdl_u8_t __id) {}
 void set_pin_state(mdl_u8_t __state, mdl_u8_t __id) {
 	__state = ~__state&0x1;
 	pthread_mutex_lock(&m1);
-	if (__state)
-		pins[iface_no] |= 1<<__id;
-	else
-		pins[iface_no] ^= 1<<__id;
+	if ((pins[iface_no]>>__id&0x1) != __state) {
+		if (__state)
+			pins[iface_no] |= 1<<__id;
+		else
+			pins[iface_no] ^= 1<<__id;
+	}
+
 	pthread_mutex_unlock(&m1);
-	__asm__("nop");
+	__asm__(NOP);
 }
 
 mdl_u8_t get_pin_state(mdl_u8_t __id) {
 	pthread_mutex_lock(&m1);
-	mdl_u8_t ret_val = (pins[iface_no]>>__id)&0x1;
+	mdl_u8_t ret_val = pins[iface_no]>>__id&0x1;
 	pthread_mutex_unlock(&m1);
-	__asm__("nop");
+	__asm__(NOP);
 	return ret_val;
 }
 
@@ -87,14 +92,13 @@ void* m(void *__arg_p) {
 	pthread_mutex_lock(&m2);
 	tmp_forward(tmp_io);
 	pthread_mutex_unlock(&m2);
-	__asm__("nop");
-
+	__asm__(NOP);
 	goto _again;
 	return NULL;
 }
 
 
-void holdup(mdl_uint_t __holdup) {usleep(50);}
+void holdup(mdl_uint_t __holdup) {if (__holdup != 0) usleep(__holdup);}
 
 int main(void) {
 	signal(SIGINT, ctrl_c);
@@ -114,6 +118,14 @@ int main(void) {
 	int rcvbuf_size = 1024;
 	setsockopt(sock, SOL_SOCKET, SO_SNDBUF, &sndbuf_size, sizeof(int));
 	setsockopt(sock, SOL_SOCKET, SO_RCVBUF, &rcvbuf_size, sizeof(int));
+
+//	struct timeval tv = {
+//		.tv_sec = 2,
+//		.tv_usec = 0
+//	};
+
+//	setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, (void*)&tv, sizeof(struct timeval));
+//	setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (void*)&tv, sizeof(struct timeval));
 
 	if (bind(sock, (struct sockaddr*)&dst, sizeof(struct sockaddr_in)) < 0) {
 		fprintf(stderr, "failed to bind socket.\n");
@@ -136,25 +148,38 @@ int main(void) {
 	tmp_io.set_iface_no_fp = &set_iface_no;
 	tmp_io.get_iface_no_fp = &get_iface_no;
 	tmp_init(&tmp_io, &set_pin_mode, &set_pin_state, &get_pin_state, 0, 0);
+	tmp_io.divider = _d16;
+
 	tmp_set_holdup_fp(&tmp_io, &holdup);
-	mdl_uint_t timeo = 10000;
+	mdl_uint_t cutoff = 10000;
 
 	tmp_tog_rcv_optflag(&tmp_io, TMP_OPT_FLIP_BIT);
 	tmp_io.snd_holdup_ic = 1;
 	tmp_io.rcv_holdup_ic = 1;
 	tmp_tog_snd_optflag(&tmp_io, TMP_OPT_INV_TX_TRIG_VAL);
 	tmp_tog_rcv_optflag(&tmp_io, TMP_OPT_INV_RX_TRIG_VAL);
-	tmp_set_opt(&tmp_io, TMP_OPT_SND_TIMEO, &timeo);
-	tmp_set_opt(&tmp_io, TMP_OPT_RCV_TIMEO, &timeo);
+	tmp_set_opt(&tmp_io, TMP_OPT_SND_CUTOFF, &cutoff);
+	tmp_set_opt(&tmp_io, TMP_OPT_RCV_CUTOFF, &cutoff);
 	tmp_err_t err;
-	tmp_add_iface(&tmp_io, tmp_addr_from_str("0.0.0.0", &err), 0);
+	tmp_prepare(&tmp_io);
+//	tmp_add_iface(&tmp_io, tmp_addr_from_str("0.0.0.0", &err), 0);
 
 	pthread_create(&thread, NULL, &m, (void*)&tmp_io);
 
  	mdl_u16_t temp;
 	mdl_u8_t my_id = 0;
+	mdl_u64_t ups = 0;
 	printf("now online.\n");
+	struct timespec begin, now;
+    clock_gettime(CLOCK_MONOTONIC, &begin);
 	_loop:
+	clock_gettime(CLOCK_MONOTONIC, &now);
+	if ((now.tv_sec-begin.tv_sec) >= 1) {
+		begin.tv_sec = now.tv_sec;
+		printf("--{%lu UPS}\n", ups);
+		ups = 0;
+	}
+
 	if (cc_flag) {
 		pthread_kill(thread, 0);
 		goto _end;
@@ -177,6 +202,7 @@ int main(void) {
 		pthread_mutex_lock(&m2);
 		tmp_add_iface(&tmp_io, tmp_addr_from_str(iface_c == 1? "2.2.2.2":"1.1.1.1", &err), 0);
 		pthread_mutex_unlock(&m2);
+		__asm__(NOP);
 		my_id = iface_c++;
 	}
 
@@ -187,8 +213,8 @@ int main(void) {
 		printf("error.\n");
 	}
 	pthread_mutex_unlock(&m1);
-	__asm__("nop");
-	usleep(400);
+	__asm__(NOP);
+	ups++;
 	goto _loop;
 	_end:
 	close(sock);
