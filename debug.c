@@ -15,10 +15,10 @@
 
 mdl_u8_t se_pinset[12] = {0x0}, cl_pinset[12] = {0x0};
 
-void set_iface_no(mdl_u8_t __no) {
+void set_port_id(mdl_u8_t __id) {
 }
 
-mdl_u8_t get_iface_no() {
+mdl_u8_t get_port_id() {
 	return 0;
 }
 
@@ -78,7 +78,7 @@ struct tmp_io tmp_io = {
 	.tx_co_pid = TMP_TX_OC_PID
 };
 # ifndef __TMP_LIGHT
-	tmp_init(&tmp_io, &se_set_pin_mode, &se_set_pin_state, &se_get_pin_state, 0, 0);
+	tmp_init(&tmp_io, &se_set_pin_mode, &se_set_pin_state, &se_get_pin_state, 0, 0, 1);
 # else
 	tmp_init(&tmp_io, &se_set_pin_mode, &se_set_pin_state, &se_get_pin_state);
 # endif
@@ -94,10 +94,10 @@ struct tmp_io tmp_io = {
 	tmp_tog_snd_optflag(&tmp_io, TMP_OPT_INV_TX_TRIG_VAL);
 	tmp_tog_rcv_optflag(&tmp_io, TMP_OPT_INV_RX_TRIG_VAL);
 # ifndef __TMP_LIGHT
-	tmp_io.set_iface_no_fp = &set_iface_no;
-	tmp_io.get_iface_no_fp = &get_iface_no;
+	tmp_io.set_port_id = &set_port_id;
+	tmp_io.get_port_id = &get_port_id;
 	tmp_err_t err;
-	tmp_add_iface(&tmp_io, tmp_addr_from_str("0.0.0.0", &err), 0);
+	tmp_add_iface(&tmp_io, tmp_addr_from_str("0.0.0.0", &err), 0, 0);
 # endif
 	printf("node{1} online.\n");
 	tmp_prepare(&tmp_io);
@@ -125,7 +125,7 @@ struct tmp_io tmp_io = {
 .tx_co_pid = TMP_TX_OC_PID
 };
 # ifndef __TMP_LIGHT
-	tmp_init(&tmp_io, &cl_set_pin_mode, &cl_set_pin_state, &cl_get_pin_state, 0, 0);
+	tmp_init(&tmp_io, &cl_set_pin_mode, &cl_set_pin_state, &cl_get_pin_state, 0, 0, 1);
 # else
 	tmp_init(&tmp_io, &cl_set_pin_mode, &cl_set_pin_state, &cl_get_pin_state);
 # endif
@@ -141,10 +141,10 @@ struct tmp_io tmp_io = {
 	tmp_set_opt(&tmp_io, TMP_OPT_SND_CUTOFF, &cutoff);
 	tmp_set_opt(&tmp_io, TMP_OPT_RCV_CUTOFF, &cutoff);
 # ifndef __TMP_LIGHT
-	tmp_io.set_iface_no_fp = &set_iface_no;
-	tmp_io.get_iface_no_fp = &get_iface_no;
+	tmp_io.set_port_id = &set_port_id;
+	tmp_io.get_port_id = &get_port_id;
 	tmp_err_t err;
-	tmp_add_iface(&tmp_io, tmp_addr_from_str("0.0.0.0", &err), 0);
+	tmp_add_iface(&tmp_io, tmp_addr_from_str("0.0.0.0", &err), 0, 0);
 # endif
 	printf("node{0} online.\n");
 	tmp_prepare(&tmp_io);

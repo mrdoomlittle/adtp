@@ -19,10 +19,10 @@
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 # define NOP "nop"
-void set_iface_no(mdl_u8_t __no) {
+void set_port_id(mdl_u8_t __id) {
 }
 
-mdl_u8_t get_iface_no() {
+mdl_u8_t get_port_id() {
 	return 0;
 }
 
@@ -55,6 +55,7 @@ mdl_u8_t static cc_flag = 0;
 void ctrl_c(int __sig) {
 	cc_flag = 0x1;
 	shutdown(sock, SHUT_RDWR);
+	exit(0);
 }
 
 enum {
@@ -93,6 +94,11 @@ void holdup(mdl_uint_t __holdup) {if (__holdup != 0) usleep(__holdup);}
 
 int main(int __argc, char const *__argv[]) {
 	tmp_err_t err;
+	if (__argc != 4) {
+		fprintf(stdout, "usage: [s,r] [to/from addr] [interface addr]\n");
+		return -1;
+	}
+
 	if (*__argv[1] == 's') {
 		op = OP_SND;
 		to_addr = tmp_addr_from_str(__argv[3], &err);
@@ -138,7 +144,7 @@ int main(int __argc, char const *__argv[]) {
 		.rx_co_pid = TMP_RX_OC_PID,
 		.tx_co_pid = TMP_TX_OC_PID
 	};
-	tmp_init(&tmp_io, &set_pin_mode, &set_pin_state, &get_pin_state, 0, 0);
+	tmp_init(&tmp_io, &set_pin_mode, &set_pin_state, &get_pin_state, 0, 0, 1);
 	tmp_io.divider = _d32;
 	tmp_set_holdup_fp(&tmp_io, &holdup);
 	mdl_uint_t cutoff = 10000;
@@ -150,14 +156,14 @@ int main(int __argc, char const *__argv[]) {
 	tmp_tog_rcv_optflag(&tmp_io, TMP_OPT_INV_RX_TRIG_VAL);
 	tmp_set_opt(&tmp_io, TMP_OPT_SND_CUTOFF, &cutoff);
 	tmp_set_opt(&tmp_io, TMP_OPT_RCV_CUTOFF, &cutoff);
-	tmp_io.set_iface_no_fp = &set_iface_no;
-	tmp_io.get_iface_no_fp = &get_iface_no;
+	tmp_io.set_port_id = &set_port_id;
+	tmp_io.get_port_id = &get_port_id;
 	tmp_prepare(&tmp_io);
 
 	if (op == OP_SND)
-		tmp_add_iface(&tmp_io, tmp_addr_from_str(__argv[2], &err), 0);
+		tmp_add_iface(&tmp_io, tmp_addr_from_str(__argv[2], &err), 0, 0);
 	else if (op == OP_RCV)
-		tmp_add_iface(&tmp_io, tmp_addr_from_str(__argv[2], &err), 0);
+		tmp_add_iface(&tmp_io, tmp_addr_from_str(__argv[2], &err), 0, 0);
 	set_pin_state(1, 3);
 	pthread_create(&thread, NULL, &m, (void*)&tmp_io);
 	mdl_u16_t temp;

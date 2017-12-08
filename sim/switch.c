@@ -23,34 +23,34 @@ pthread_mutex_t m1 = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t m2 = PTHREAD_MUTEX_INITIALIZER;
 // bits
 mdl_u8_t pins[] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0};
-mdl_u8_t iface_no = 0;
-atomic_uchar iface_c = 0;
+mdl_u8_t port_id = 0;
+atomic_uchar port_c = 0;
 
-void set_iface_no(mdl_u8_t __no) {
+void set_port_id(mdl_u8_t __id) {
 	pthread_mutex_lock(&m1);
-	iface_no = __no;
+	port_id = __id;
 	pthread_mutex_unlock(&m1);
 	__asm__(NOP);
 }
 
-mdl_u8_t get_iface_no() {
-	mdl_u8_t no;
+mdl_u8_t get_port_id() {
+	mdl_u8_t id;
 	pthread_mutex_lock(&m1);
-	no = iface_no;
+	id = port_id;
 	pthread_mutex_unlock(&m1);
 	__asm__(NOP);
-	return no;
+	return id;
 }
 
 void set_pin_mode(mdl_u8_t __mode, mdl_u8_t __id) {}
 void set_pin_state(mdl_u8_t __state, mdl_u8_t __id) {
 	__state = ~__state&0x1;
 	pthread_mutex_lock(&m1);
-	if ((pins[iface_no]>>__id&0x1) != __state) {
+	if ((pins[port_id]>>__id&0x1) != __state) {
 		if (__state)
-			pins[iface_no] |= 1<<__id;
+			pins[port_id] |= 1<<__id;
 		else
-			pins[iface_no] ^= 1<<__id;
+			pins[port_id] ^= 1<<__id;
 	}
 
 	pthread_mutex_unlock(&m1);
@@ -59,7 +59,7 @@ void set_pin_state(mdl_u8_t __state, mdl_u8_t __id) {
 
 mdl_u8_t get_pin_state(mdl_u8_t __id) {
 	pthread_mutex_lock(&m1);
-	mdl_u8_t ret_val = pins[iface_no]>>__id&0x1;
+	mdl_u8_t ret_val = pins[port_id]>>__id&0x1;
 	pthread_mutex_unlock(&m1);
 	__asm__(NOP);
 	return ret_val;
@@ -70,6 +70,7 @@ mdl_u8_t static cc_flag = 0;
 void ctrl_c(int __sig) {
 	cc_flag = 0x1;
 	shutdown(sock, SHUT_RDWR);
+	exit(0);
 }
 # include <mdl/forward.h>
 
@@ -77,16 +78,16 @@ void* m(void *__arg_p) {
 	struct tmp_io *tmp_io = (struct tmp_io*)__arg_p;
 
 //	mdl_u8_t data = 212;
-//	mdl_u8_t _iface_no;
+//	mdl_u8_t _port_id;
 	_again:
 /*
-	_iface_no = 0;
-	for(;_iface_no != iface_c;_iface_no++) {
+	_port_id = 0;
+	for(;_port_id != port_c;_port_id++) {
 		pthread_mutex_lock(&m2);
-		tmp_set_iface_no(tmp_io, _iface_no);
+		tmp_set_port_id(tmp_io, _port_id);
 		tmp_send(tmp_io, tmp_io_buff(&data, 1), 0);
 		pthread_mutex_unlock(&m2);
-		printf("sent: %u, to %u\n\n", data, _iface_no);
+		printf("sent: %u, to %u\n\n", data, _port_id);
 	}
 */
 	pthread_mutex_lock(&m2);
@@ -145,9 +146,9 @@ int main(void) {
 		.tx_co_pid = TMP_TX_OC_PID
 	};
 
-	tmp_io.set_iface_no_fp = &set_iface_no;
-	tmp_io.get_iface_no_fp = &get_iface_no;
-	tmp_init(&tmp_io, &set_pin_mode, &set_pin_state, &get_pin_state, 0, 0);
+	tmp_io.set_port_id = &set_port_id;
+	tmp_io.get_port_id = &get_port_id;
+	tmp_init(&tmp_io, &set_pin_mode, &set_pin_state, &get_pin_state, 0, 0, 2);
 	tmp_io.divider = _d16;
 
 	tmp_set_holdup_fp(&tmp_io, &holdup);
@@ -194,16 +195,16 @@ int main(void) {
 //	printf("%u\n", temp&0x7);
 
 	if ((my_id = (temp>>8)) == 0xFF) {
-		if ((bc = sendto(sock, &iface_c, 1, 0, (struct sockaddr*)&src, sizeof(struct sockaddr_in))) < 0) {
+		if ((bc = sendto(sock, &port_c, 1, 0, (struct sockaddr*)&src, sizeof(struct sockaddr_in))) < 0) {
 			printf("error.\n");
 		}
 
-		printf("client conencted with id: %u\n", iface_c);
+		printf("client conencted with id: %u\n", port_c);
 		pthread_mutex_lock(&m2);
-		tmp_add_iface(&tmp_io, tmp_addr_from_str(iface_c == 1? "2.2.2.2":"1.1.1.1", &err), 0);
+		tmp_add_iface(&tmp_io, tmp_addr_from_str(port_c == 1? "2.2.2.2":"1.1.1.1", &err), 0, port_c);
 		pthread_mutex_unlock(&m2);
 		__asm__(NOP);
-		my_id = iface_c++;
+		my_id = port_c++;
 	}
 
 	pthread_mutex_lock(&m1);

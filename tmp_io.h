@@ -3,12 +3,12 @@
 # include <mdlint.h>
 # include <stdlib.h>
 # include <math.h>
-# define __DEBUG_ENABLED
+# define __TMP_DEBUG
 # ifdef __AVR
 #	include <avr/interrupt.h>
 # endif
 
-# ifdef __DEBUG_ENABLED
+# ifdef __TMP_DEBUG
 #	include <stdio.h>
 # endif
 
@@ -21,6 +21,9 @@
 
 # define ACK_SUCCESS 1
 # define ACK_FAILURE 0
+# define MAX_SIG_TRYS 4
+# define SIG_OK 1
+# define SIG_EXIT 0
 
 # define TMP_OPT_FLIP_BIT 0b10000000
 # define TMP_OPT_INV_TX_TRIG_VAL 0b01000000
@@ -34,7 +37,10 @@
 # define TMP_MAX_TRY_C 10
 # define TMP_FLG_RBS 0b1000
 # define TMP_FLG_MSG 0b0100
-
+# define MAX_PORTS 4
+# define TMP_FLG_INUSE 0x1
+# define _err(__r)((__r) != TMP_SUCCESS)
+# define _ok(__r)((__r) == TMP_SUCCESS)
 enum {
 	_d2,
 	_d4,
@@ -73,9 +79,16 @@ struct tmp_msg {
 	mdl_u32_t lu_addr;
 };
 
+struct tmp_port {
+	mdl_u8_t flags, id;
+	mdl_u16_t left;
+	struct tmp_port *by;
+};
+
 struct tmp_iface {
 	tmp_addr_t addr;
 	mdl_u8_t no;
+	struct tmp_port *port;
 };
 
 struct tmp_io {
@@ -97,28 +110,38 @@ struct tmp_io {
 	mdl_u32_t(*get_us)();
 	tmp_flag_t flags;
 # ifndef __TMP_LIGHT
-	void(*set_iface_no_fp)(mdl_u8_t);
-	mdl_u8_t(*get_iface_no_fp)();
+	struct tmp_port ports[MAX_PORTS];
+	void(*set_port_id)(mdl_u8_t);
+	mdl_u8_t(*get_port_id)();
 	struct tmp_iface *iface;
-	mdl_u8_t iface_c;
+	mdl_u8_t iface_c, cur_iface;
+	mdl_u8_t port_c;
 # endif
 };
 
 # ifndef __TMP_LIGHT
-void __inline__ static tmp_set_iface_addr(struct tmp_io *__tmp_io, tmp_addr_t __addr, mdl_u8_t __no) {
-	__tmp_io->iface[__no].addr = __addr;
-}
-void __inline__ static tmp_set_iface_no(struct tmp_io *__tmp_io, mdl_u8_t __no) {
-	__tmp_io->set_iface_no_fp(__no);
-}
-mdl_u8_t __inline__ static tmp_get_iface_no(struct tmp_io *__tmp_io) {
-	return __tmp_io->get_iface_no_fp();
-}
-__inline__ static struct tmp_iface *get_iface(struct tmp_io *__tmp_io, mdl_u8_t __no) {
-	return __tmp_io->iface+__no;
-}
+# define tmp_set_iface_addr(__tmp_io, __addr, __no) \
+	__tmp_io->iface[__no].addr = __addr
 
-struct tmp_iface* tmp_add_iface(struct tmp_io *__tmp_io, tmp_addr_t, mdl_u8_t);
+# define tmp_set_iface_no(__tmp_io, __no) \
+	__tmp_io->cur_iface = __no
+
+# define tmp_set_port_id(__tmp_io, __id) \
+	__tmp_io->set_port_id(__id)
+
+# define tmp_get_iface_no(__tmp_io) \
+	__tmp_io->cur_iface
+
+# define tmp_get_port_id(__tmp_io) \
+	__tmp_io->get_port_id()
+
+# define tmp_get_iface(__tmp_io, __no) \
+	(__tmp_io->iface+__no)
+
+# define tmp_get_port(__tmp_io, __id) \
+	(__tmp_io->ports+__id)
+
+struct tmp_iface* tmp_add_iface(struct tmp_io *__tmp_io, tmp_addr_t, mdl_u8_t, mdl_u8_t);
 void tmp_rm_iface(struct tmp_io *__tmp_io, struct tmp_iface*);
 tmp_err_t tmp_snd_ack(struct tmp_io*, mdl_u8_t);
 tmp_err_t tmp_rcv_ack(struct tmp_io*, mdl_u8_t*);
@@ -134,7 +157,8 @@ mdl_u32_t tmp_addr_from_str(char const*, tmp_err_t*);
 # endif
 
 # define TMP_PACKET_SIZE 128
-# define TMP_PK_HEADER_SIZE 96
+# define TMP_PKT_HDR_SIZE sizeof(struct tmp_packet)
+# define TMP_PKT_MSS (TMP_PACKET_SIZE-TMP_PKT_HDR_SIZE)
 struct tmp_packet {
 	tmp_addr_t dst_addr, src_addr;
 	mdl_u32_t dt_sect_sv;
@@ -152,12 +176,11 @@ tmp_err_t tmp_recv_packet(struct tmp_io*, struct tmp_packet*);
 mdl_u8_t extern tmp_errno;
 tmp_err_t tmp_init(struct tmp_io*, void(*)(mdl_u8_t, mdl_u8_t), void(*)(mdl_u8_t, mdl_u8_t), mdl_u8_t(*)(mdl_u8_t)
 # ifndef __TMP_LIGHT
-, tmp_method_t, tmp_flag_t
+, tmp_method_t, tmp_flag_t, mdl_u8_t
 # endif
 );
 
 void tmp_prepare(struct tmp_io*);
-
 void tmp_set_holdup_fp(struct tmp_io*, void(*)(mdl_uint_t));
 void tmp_holdup(struct tmp_io*, mdl_uint_t, mdl_uint_t);
 
@@ -211,7 +234,6 @@ enum tmp_opt {TMP_OPT_SND_CUTOFF, TMP_OPT_RCV_CUTOFF};
 typedef enum tmp_opt tmp_opt_t;
 void tmp_set_opt(struct tmp_io*, tmp_opt_t, void*);
 void tmp_get_opt(struct tmp_io*, tmp_opt_t, void*);
-
 mdl_u8_t tmp_cutoff(mdl_u8_t, mdl_u16_t*, mdl_u32_t*, mdl_uint_t);
 mdl_u8_t __inline__ static tmp_snd_cutoff(struct tmp_io *__tmp_io, mdl_u16_t *__c, mdl_u32_t *__p) {
 	mdl_u8_t res = tmp_cutoff(__tmp_io->divider, __c, __p, __tmp_io->snd_cutoff);
