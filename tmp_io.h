@@ -21,7 +21,7 @@
 
 # define ACK_SUCCESS 1
 # define ACK_FAILURE 0
-# define MAX_SIG_TRYS 4
+# define MAX_SIG_TRYS 1
 # define SIG_OK 1
 # define SIG_EXIT 0
 
@@ -34,13 +34,17 @@
 # define TMP_FLG_KAS 0b10000000
 # define TMP_FLG_NORET 0b01000000
 # define TMP_DEF_FLAGS TMP_FLG_KAS
-# define TMP_MAX_TRY_C 10
+# define TMP_MAX_TRY_C 3
 # define TMP_FLG_RBS 0b1000
 # define TMP_FLG_MSG 0b0100
 # define MAX_PORTS 4
 # define TMP_FLG_INUSE 0x1
+# define TMP_FLG_LINKED
+# define TMP_FLG_LOCKED 0x2
 # define _err(__r)((__r) != TMP_SUCCESS)
 # define _ok(__r)((__r) == TMP_SUCCESS)
+# define is_flag(__flags, __flag) tmp_is_flag(__flags, __flag)
+# define tog_flag(__flags, __flag) tmp_tog_flag(__flags, __flag)
 enum {
 	_d2,
 	_d4,
@@ -82,13 +86,12 @@ struct tmp_msg {
 struct tmp_port {
 	mdl_u8_t flags, id;
 	mdl_u16_t left;
-	struct tmp_port *by;
+	struct tmp_port *by, *next;
 };
 
 struct tmp_iface {
 	tmp_addr_t addr;
 	mdl_u8_t no;
-	struct tmp_port *port;
 };
 
 struct tmp_io {
@@ -110,7 +113,8 @@ struct tmp_io {
 	mdl_u32_t(*get_us)();
 	tmp_flag_t flags;
 # ifndef __TMP_LIGHT
-	struct tmp_port ports[MAX_PORTS];
+	struct tmp_port *pys_port;
+	struct tmp_port *inactive;
 	void(*set_port_id)(mdl_u8_t);
 	mdl_u8_t(*get_port_id)();
 	struct tmp_iface *iface;
@@ -138,10 +142,7 @@ struct tmp_io {
 # define tmp_get_iface(__tmp_io, __no) \
 	(__tmp_io->iface+__no)
 
-# define tmp_get_port(__tmp_io, __id) \
-	(__tmp_io->ports+__id)
-
-struct tmp_iface* tmp_add_iface(struct tmp_io *__tmp_io, tmp_addr_t, mdl_u8_t, mdl_u8_t);
+struct tmp_iface* tmp_add_iface(struct tmp_io *__tmp_io, tmp_addr_t, mdl_u8_t);
 void tmp_rm_iface(struct tmp_io *__tmp_io, struct tmp_iface*);
 tmp_err_t tmp_snd_ack(struct tmp_io*, mdl_u8_t);
 tmp_err_t tmp_rcv_ack(struct tmp_io*, mdl_u8_t*);
@@ -156,12 +157,12 @@ typedef mdl_i8_t tmp_err_t;
 mdl_u32_t tmp_addr_from_str(char const*, tmp_err_t*);
 # endif
 
-# define TMP_PACKET_SIZE 128
-# define TMP_PKT_HDR_SIZE sizeof(struct tmp_packet)
+# define TMP_PACKET_SIZE 40
+# define TMP_PKT_HDR_SIZE ((sizeof(tmp_addr_t)*2)+sizeof(mdl_u32_t))
 # define TMP_PKT_MSS (TMP_PACKET_SIZE-TMP_PKT_HDR_SIZE)
 struct tmp_packet {
 	tmp_addr_t dst_addr, src_addr;
-	mdl_u32_t dt_sect_sv;
+	mdl_u32_t dt_sect_sv, checksum;
 	tmp_io_buf_t io_buff;
 };
 

@@ -97,7 +97,7 @@ struct tmp_io tmp_io = {
 	tmp_io.set_port_id = &set_port_id;
 	tmp_io.get_port_id = &get_port_id;
 	tmp_err_t err;
-	tmp_add_iface(&tmp_io, tmp_addr_from_str("0.0.0.0", &err), 0, 0);
+	tmp_add_iface(&tmp_io, tmp_addr_from_str("0.0.0.0", &err), 0);
 # endif
 	printf("node{1} online.\n");
 	tmp_prepare(&tmp_io);
@@ -144,7 +144,7 @@ struct tmp_io tmp_io = {
 	tmp_io.set_port_id = &set_port_id;
 	tmp_io.get_port_id = &get_port_id;
 	tmp_err_t err;
-	tmp_add_iface(&tmp_io, tmp_addr_from_str("0.0.0.0", &err), 0, 0);
+	tmp_add_iface(&tmp_io, tmp_addr_from_str("0.0.0.0", &err), 0);
 # endif
 	printf("node{0} online.\n");
 	tmp_prepare(&tmp_io);

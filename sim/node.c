@@ -26,6 +26,7 @@ mdl_u8_t get_port_id() {
 	return 0;
 }
 
+mdl_u8_t id = 0xFF;
 mdl_u8_t pins = 0;
 void set_pin_mode(mdl_u8_t __mode, mdl_u8_t __id) {}
 void set_pin_state(mdl_u8_t __state, mdl_u8_t __id) {
@@ -65,25 +66,26 @@ enum {
 
 tmp_addr_t to_addr;
 tmp_addr_t from_addr;
-
 mdl_u8_t op = 0;
+# define BUFF_SIZE 70
 void* m(void *__arg_p) {
 	struct tmp_io *tmp_io = (struct tmp_io*)__arg_p;
-
-	mdl_u8_t data;
+	char static *buf = NULL;
+	if (buf == NULL)
+		buf = (char*)malloc(BUFF_SIZE);
 	tmp_err_t err;
 	_again:
+	memset(buf, '\0', BUFF_SIZE);
 	if (op == OP_SND) {
-		data = 212;
-		err = tmp_send(tmp_io, tmp_io_buff(&data, 1), to_addr);
+		sprintf(buf, "|------< https://github.com/mrdoomlittle/tmp >------| -> %u", id);
+		err = tmp_send(tmp_io, tmp_io_buff(buf, BUFF_SIZE), to_addr);
 
-		printf("sent: %u\n", data);
+		printf("sent: %s\n", buf);
 		fprintf(stdout, "send_success?: %s.\n", err == TMP_SUCCESS? "yes":"no");
 	} else if (op == OP_RCV) {
-		data = 0;
-		err = tmp_recv(tmp_io, tmp_io_buff(&data, 1), from_addr);
+		err = tmp_recv(tmp_io, tmp_io_buff(buf, BUFF_SIZE), from_addr);
 
-		printf("recved: %u\n", data);
+		printf("recved: %s\n", buf);
 		fprintf(stdout, "recv_success?: %s.\n", err == TMP_SUCCESS? "yes":"no");
 	}
 	goto _again;
@@ -91,7 +93,6 @@ void* m(void *__arg_p) {
 }
 
 void holdup(mdl_uint_t __holdup) {if (__holdup != 0) usleep(__holdup);}
-
 int main(int __argc, char const *__argv[]) {
 	tmp_err_t err;
 	if (__argc != 4) {
@@ -117,10 +118,10 @@ int main(int __argc, char const *__argv[]) {
 
 	dst.sin_family = AF_INET;
 	dst.sin_port = htons(21299);
-	inet_pton(AF_INET, "127.0.1", &dst.sin_addr);
+	inet_pton(AF_INET, "127.0.0.1", &dst.sin_addr);
 
-	int sndbuf_size = 65536;
-	int rcvbuf_size = 65536;
+	int sndbuf_size = 44000;
+	int rcvbuf_size = 44000;
 	setsockopt(sock, SOL_SOCKET, SO_SNDBUF, &sndbuf_size, sizeof(int));
 	setsockopt(sock, SOL_SOCKET, SO_RCVBUF, &rcvbuf_size, sizeof(int));
 
@@ -147,7 +148,7 @@ int main(int __argc, char const *__argv[]) {
 	tmp_init(&tmp_io, &set_pin_mode, &set_pin_state, &get_pin_state, 0, 0, 1);
 	tmp_io.divider = _d32;
 	tmp_set_holdup_fp(&tmp_io, &holdup);
-	mdl_uint_t cutoff = 10000;
+	mdl_uint_t cutoff = 100000;
 
 	tmp_tog_rcv_optflag(&tmp_io, TMP_OPT_FLIP_BIT);
 	tmp_io.snd_holdup_ic = 1;
@@ -161,13 +162,12 @@ int main(int __argc, char const *__argv[]) {
 	tmp_prepare(&tmp_io);
 
 	if (op == OP_SND)
-		tmp_add_iface(&tmp_io, tmp_addr_from_str(__argv[2], &err), 0, 0);
+		tmp_add_iface(&tmp_io, tmp_addr_from_str(__argv[2], &err), 0);
 	else if (op == OP_RCV)
-		tmp_add_iface(&tmp_io, tmp_addr_from_str(__argv[2], &err), 0, 0);
+		tmp_add_iface(&tmp_io, tmp_addr_from_str(__argv[2], &err), 0);
 	set_pin_state(1, 3);
 	pthread_create(&thread, NULL, &m, (void*)&tmp_io);
 	mdl_u16_t temp;
-	mdl_u8_t id = 0xFF;
 	mdl_u64_t ups = 0;
 	struct timespec begin, now;
 	clock_gettime(CLOCK_MONOTONIC, &begin);
@@ -185,6 +185,7 @@ int main(int __argc, char const *__argv[]) {
 	}
 
 	pthread_mutex_lock(&mutex);
+//	printf(".\n");
 	temp = ((pins>>3)&0x7)|(id<<8);
 //	printf("sent: %u\n", (pins>>3)&0x7);
 	if ((bc = sendto(sock, &temp, sizeof(mdl_u16_t), 0, (struct sockaddr*)&dst, sizeof(struct sockaddr_in))) <= 0) {
@@ -207,7 +208,7 @@ int main(int __argc, char const *__argv[]) {
 	pthread_mutex_unlock(&mutex);
 	__asm__(NOP);
 	ups++;
-	usleep(100);
+	usleep(1000);
 	goto _loop;
 	_end:
 	close(sock);

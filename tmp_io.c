@@ -10,14 +10,15 @@ void static tmp_set_pin_mode(struct tmp_io*, mdl_u8_t, mdl_u8_t);
 void static tmp_set_pin_state(struct tmp_io*, mdl_u8_t, mdl_u8_t);
 mdl_u8_t static tmp_get_pin_state(struct tmp_io*, mdl_u8_t);
 
-void static bzero(void *__p, mdl_uint_t __bc) {
+void tmp_bzero(void *__p, mdl_uint_t __bc) {
 	mdl_u8_t *itr = (mdl_u8_t*)__p;
 	while(itr != (mdl_u8_t*)__p+__bc) {
 		mdl_uint_t off = itr-(mdl_u8_t*)__p;
-		if (off >= sizeof(mdl_u64_t)) {
-			*((mdl_u64_t*)itr) = 0x00000000000000;
-			itr+=sizeof(mdl_u64_t);
-		} else *(itr++) = 0x0;
+		if ((__bc-off) >= sizeof(mdl_u64_t)) {
+			*((mdl_u64_t*)itr) = 0x0000000000000000;
+			itr+= sizeof(mdl_u64_t);
+		} else
+			*(itr++) = 0x0;
 	}
 }
 
@@ -76,14 +77,22 @@ tmp_err_t tmp_init(struct tmp_io *__tmp_io, void(*__set_pin_mode_fp)(mdl_u8_t, m
 	__tmp_io->flags = __flags|TMP_DEF_FLAGS;
 	__tmp_io->cur_iface = 0;
 	__tmp_io->port_c = __port_c;
-	struct tmp_port *itr = __tmp_io->ports;
-	struct tmp_port *end = __tmp_io->ports+__port_c;
-	while(itr != end) {
-		*(itr++) = (struct tmp_port) {
-			.flags = 0x0, .id = (itr-__tmp_io->ports)-1,
-			.left = 0, .by = NULL
+	struct tmp_port *root = (struct tmp_port*)malloc(sizeof(struct tmp_port));
+	struct tmp_port **port = &__tmp_io->pys_port;
+	struct tmp_port *tail = root;
+	mdl_u8_t i = 0;
+	while(i != __port_c) {
+		if (i>0)
+			(*port)->next = tail;
+		*tail = (struct tmp_port) {
+			.flags = 0x0, .id = i,
+			.left = 0, .by = NULL, .next = NULL
 		};
+		*port = tail;
+		if (++i != __port_c)
+			tail = (struct tmp_port*)malloc(sizeof(struct tmp_port));
 	}
+	*port = root;
 # else
 	__tmp_io->flags = TMP_DEF_FLAGS;
 # endif
@@ -97,7 +106,7 @@ void tmp_prepare(struct tmp_io *__tmp_io) {
 }
 
 # ifndef __TMP_LIGHT
-struct tmp_iface* tmp_add_iface(struct tmp_io *__tmp_io, tmp_addr_t __addr, mdl_u8_t __no, mdl_u8_t __port_id) {
+struct tmp_iface* tmp_add_iface(struct tmp_io *__tmp_io, tmp_addr_t __addr, mdl_u8_t __no) {
 	if (!__tmp_io->iface) {
 		*(__tmp_io->iface = (struct tmp_iface*)malloc(sizeof(struct tmp_iface))) = (struct tmp_iface) {.addr=__addr, .no=__no};
 		__tmp_io->iface_c++;
@@ -106,7 +115,7 @@ struct tmp_iface* tmp_add_iface(struct tmp_io *__tmp_io, tmp_addr_t __addr, mdl_
 
 	__tmp_io->iface = (struct tmp_iface*)realloc(__tmp_io->iface, (++__tmp_io->iface_c)*sizeof(struct tmp_iface));
 	struct tmp_iface *iface;
-	*(iface = (__tmp_io->iface+(__tmp_io->iface_c-1))) = (struct tmp_iface) {.addr=__addr, .no=__no, .port=tmp_get_port(__tmp_io, __port_id)};
+	*(iface = (__tmp_io->iface+(__tmp_io->iface_c-1))) = (struct tmp_iface) {.addr=__addr, .no=__no};
 	return iface;
 }
 
@@ -128,19 +137,16 @@ void tmp_rm_iface(struct tmp_io *__tmp_io, struct tmp_iface* __p) {
 	__tmp_io->iface = (struct tmp_iface*)realloc(__tmp_io->iface, (--__tmp_io->iface_c)*sizeof(struct tmp_iface));
 }
 
-mdl_u32_t tmp_cal_sv(mdl_u8_t *__p, mdl_uint_t __bc) {
+mdl_u32_t tmp_cksum(mdl_u8_t *__p, mdl_uint_t __bc) {
 	mdl_u32_t ret_val = 0;
 	mdl_u8_t *itr = __p;
-	while(itr != __p+__bc) {
-//		ret_val += *(itr++);
-		ret_val ^= ((ret_val<<2)|(*itr))<<((itr-__p)&0x3);
-		itr++;
-	}
+	while(itr != __p+__bc)
+		ret_val = (((ret_val>>1)+((ret_val&0x1)<<24))+*(itr++))&0xFFFFFFF;
 	return ret_val;
 }
 
 mdl_u32_t tmp_addr_from_str(char const *__addr, tmp_err_t *__any_err) {
-	mdl_u32_t addr = 0x000000, addr_off = 0;
+	mdl_u32_t addr = 0x00000000, addr_off = 0;
 	mdl_u8_t addr_bit = 0, no_unit = 1, nu_cald = 0;
 	mdl_u8_t i = 0;
 	for (;;i++) {
@@ -203,7 +209,6 @@ void tmp_holdup(struct tmp_io *__tmp_io, mdl_uint_t __holdup_ic, mdl_uint_t __ho
 	if (ic == __holdup_ic) return;
 	__tmp_io->holdup_fp(__holdup);
 	ic++;
-
 	goto _again;
 }
 
@@ -473,6 +478,9 @@ tmp_err_t recv_key_and_sync(struct tmp_io *__tmp_io) {
 		return any_err;
 # endif
 	if (recved_key != KEY) {
+# ifdef __TMP_DEBUG
+		fprintf(stdout , "key is wrong, trying again.\n");
+# endif
 		tmp_rcv_ack(__tmp_io, (mdl_u8_t*)&tmp_null);
 		tmp_snd_ack(__tmp_io, ACK_FAILURE);
 		goto _again;
@@ -497,52 +505,91 @@ tmp_err_t tmp_raw_rcv(struct tmp_io *__tmp_io, tmp_io_buf_t __io_buff) {
 	return TMP_SUCCESS;
 }
 # ifndef __TMP_LIGHT
-tmp_err_t tmp_snd_pkt(struct tmp_io *__tmp_io, struct tmp_packet *__packet) {
-	if (__packet->io_buff.bc > TMP_PKT_MSS) return TMP_FAILURE;
+tmp_err_t tmp_snd_pkt(struct tmp_io *__tmp_io, struct tmp_packet *__pk) {
+	if (__pk->io_buff.bc > TMP_PKT_MSS) return TMP_FAILURE;
 
 	tmp_err_t any_err;
-	if (_err(any_err = tmp_snd_32l(__tmp_io, __packet->dst_addr))) return any_err;
-	if (_err(any_err = tmp_snd_32l(__tmp_io, __packet->src_addr))) return any_err;
-
-	__packet->dt_sect_sv = tmp_cal_sv(__packet->io_buff.p, __packet->io_buff.bc);
-	if (_err(any_err = tmp_snd_32l(__tmp_io, __packet->dt_sect_sv))) return any_err;
-	if (_err(any_err = tmp_raw_snd(__tmp_io, __packet->io_buff))) return any_err;
-	return TMP_SUCCESS;
-}
-
-tmp_err_t tmp_rcv_pkt(struct tmp_io *__tmp_io, struct tmp_packet *__packet) {
-	if (__packet->io_buff.bc > TMP_PKT_MSS) return TMP_FAILURE;
-
-	tmp_err_t any_err;
-	if (_err(any_err = tmp_rcv_32l(__tmp_io, &__packet->dst_addr))) return any_err;
-	if (_err(any_err = tmp_rcv_32l(__tmp_io, &__packet->src_addr))) return any_err;
-
-	__packet->dt_sect_sv = 0x00000000;
-	if (_err(any_err = tmp_rcv_32l(__tmp_io, &__packet->dt_sect_sv))) return any_err;
-	if (_err(any_err = tmp_raw_rcv(__tmp_io, __packet->io_buff))) return any_err;
-
-	if (tmp_cal_sv(__packet->io_buff.p, __packet->io_buff.bc) != __packet->dt_sect_sv) {
+	if (_err(any_err = tmp_snd_32l(__tmp_io, __pk->dst_addr))) {
 # ifdef __TMP_DEBUG
-		printf("mismatch.\n");
+		fprintf(stdout, "failed to send dest address.\n");
 # endif
-	//	return TMP_FAILURE;
+		return any_err;
+	}
+
+	if (_err(any_err = tmp_snd_32l(__tmp_io, __pk->src_addr))) {
+# ifdef __TMP_DEBUG
+		fprintf(stdout, "failed to send src address.\n");
+# endif
+		return any_err;
+	}
+	__pk->checksum = tmp_cksum(__pk->io_buff.p, __pk->io_buff.bc);
+	if (_err(any_err = tmp_snd_32l(__tmp_io, __pk->checksum))) {
+# ifdef __TMP_DEBUG
+		fprintf(stdout, "failed to send checksum.\n");
+# endif
+		return any_err;
+	}
+	if (_err(any_err = tmp_raw_snd(__tmp_io, __pk->io_buff))) {
+# ifdef __TMP_DEBUG
+		fprintf(stdout, "failed to send data.\n");
+# endif
+		return any_err;
 	}
 # ifdef __TMP_DEBUG
-	printf("src addr: %u.%u.%u.%u\n", __packet->src_addr&0xFF,__packet->src_addr>>8&0xFF, __packet->src_addr>>16&0xFF, __packet->src_addr>>24&0xFF);
+	fprintf(stdout, "sent packet, checksum: %x\n", __pk->checksum);
+	fprintf(stdout, "dest addr: %u.%u.%u.%u\n", __pk->dst_addr&0xFF,__pk->dst_addr>>8&0xFF, __pk->dst_addr>>16&0xFF, __pk->dst_addr>>24&0xFF);
 # endif
 	return TMP_SUCCESS;
 }
 
-void tmp_build_pk(struct tmp_packet *__pk, tmp_io_buf_t __io_buff) {
-	__pk->io_buff = __io_buff;
-	// ...
+tmp_err_t tmp_rcv_pkt(struct tmp_io *__tmp_io, struct tmp_packet *__pk) {
+	if (__pk->io_buff.bc > TMP_PKT_MSS) return TMP_FAILURE;
+	tmp_err_t any_err;
+	if (_err(any_err = tmp_rcv_32l(__tmp_io, &__pk->dst_addr))) {
+# ifdef __TMP_DEBUG
+		fprintf(stdout, "failed to recv dest address.\n");
+# endif
+		return any_err;
+	}
+
+	if (_err(any_err = tmp_rcv_32l(__tmp_io, &__pk->src_addr))) {
+# ifdef __TMP_DEBUG
+		fprintf(stdout, "failed to recv src address.\n");
+# endif
+		return any_err;
+	}
+
+	if (_err(any_err = tmp_rcv_32l(__tmp_io, &__pk->checksum))) {
+# ifdef __TMP_DEBUG
+		fprintf(stdout, "failed to recv checksum.\n");
+# endif
+		return any_err;
+	}
+	if (_err(any_err = tmp_raw_rcv(__tmp_io, __pk->io_buff))) {
+# ifdef __TMP_DEBUG
+		fprintf(stdout, "failed to recv data.\n");
+# endif
+		return any_err;
+	}
+
+	if (tmp_cksum(__pk->io_buff.p, __pk->io_buff.bc) != __pk->checksum) {
+# ifdef __TMP_DEBUG
+		fprintf(stdout, "mismatch.\n");
+# endif
+		return TMP_FAILURE;
+	}
+# ifdef __TMP_DEBUG
+	fprintf(stdout, "recved packet, checksum: %x\n", __pk->checksum);
+	fprintf(stdout, "src addr: %u.%u.%u.%u\n", __pk->src_addr&0xFF,__pk->src_addr>>8&0xFF, __pk->src_addr>>16&0xFF, __pk->src_addr>>24&0xFF);
+# endif
+	return TMP_SUCCESS;
 }
 # endif /*__TMP_LIGHT*/
 
 # ifndef __TMP_LIGHT
 tmp_err_t tmp_snd_prepare(struct tmp_io *__tmp_io, mdl_u8_t *__rcv_optflags, mdl_u8_t __snd_optflags) {
 	tmp_err_t any_err;
-	if (tmp_is_flag(__tmp_io->flags, TMP_FLG_KAS)) {
+	if (is_flag(__tmp_io->flags, TMP_FLG_KAS)) {
 		if (_err(any_err = recv_key_and_sync(__tmp_io))) {
 # ifdef __TMP_DEBUG
 			fprintf(stdout, "tmp, failed to recv key and sync.\n");
@@ -570,7 +617,7 @@ tmp_err_t tmp_snd_prepare(struct tmp_io *__tmp_io, mdl_u8_t *__rcv_optflags, mdl
 
 tmp_err_t tmp_rcv_prepare(struct tmp_io *__tmp_io, mdl_u8_t __rcv_optflags, mdl_u8_t *__snd_optflags) {
 	tmp_err_t any_err;
-	if (tmp_is_flag(__tmp_io->flags, TMP_FLG_KAS)) {
+	if (is_flag(__tmp_io->flags, TMP_FLG_KAS)) {
 		if (_err(any_err = send_key_and_sync(__tmp_io))) {
 # ifdef __TMP_DEBUG
 			fprintf(stdout, "tmp, failed to send key and sync.\n");
@@ -592,6 +639,7 @@ tmp_err_t tmp_rcv_prepare(struct tmp_io *__tmp_io, mdl_u8_t __rcv_optflags, mdl_
 	if (_err(any_err = tmp_rcv_nib(__tmp_io, __snd_optflags))) {
 		return any_err;
 	}
+
 	return TMP_SUCCESS;
 }
 
@@ -603,7 +651,7 @@ tmp_err_t tmp_rcv_sig(struct tmp_io *__tmp_io, mdl_u8_t *__sigv_p) {
 	return tmp_rcv_bit(__tmp_io, __sigv_p);
 }
 
-void tmp_sigwait(struct tmp_io *__tmp_io) {
+tmp_err_t tmp_sigwait(struct tmp_io *__tmp_io) {
 	mdl_u8_t sigval = 0x0;
 	mdl_uint_t trys = 0;
 	_wait:
@@ -611,16 +659,18 @@ void tmp_sigwait(struct tmp_io *__tmp_io) {
 # ifdef __TMP_DEBUG
 		fprintf(stdout, "waited for signal but exceded max amount of trys.\n");
 # endif
-		return;
+		return TMP_FAILURE;
 	}
 	if (_ok(tmp_rcv_sig(__tmp_io, &sigval))) {
 		if (sigval == SIG_EXIT) {
 # ifdef __TMP_DEBUG
 			fprintf(stdout, "exit signal recved.\n");
 # endif
-			return;
+			return TMP_SUCCESS;
 		}
-		tmp_snd_sig(__tmp_io, sigval);
+		if (_err(tmp_snd_sig(__tmp_io, sigval))) {
+			return TMP_FAILURE;
+		}
 	}
 	trys++;
 	goto _wait;
@@ -657,7 +707,8 @@ tmp_err_t tmp_send(struct tmp_io *__tmp_io, tmp_io_buf_t __io_buff, tmp_addr_t _
 }
 
 tmp_err_t tmp_snd(struct tmp_io *__tmp_io, tmp_io_buf_t *__io_buff, tmp_addr_t __to_addr, mdl_u8_t __flags, struct tmp_packet *__pkbuf) {
-	tmp_sigwait(__tmp_io);
+	if (_err(tmp_sigwait(__tmp_io)))
+		return TMP_FAILURE;
 	if (_err(tmp_signal(__tmp_io)))
 		return TMP_FAILURE;
 
@@ -667,7 +718,7 @@ tmp_err_t tmp_snd(struct tmp_io *__tmp_io, tmp_io_buf_t *__io_buff, tmp_addr_t _
 		return any_err;
 	}
 
-	if (tmp_is_flag(r_flags, TMP_FLG_RBS)) {
+	if (is_flag(r_flags, TMP_FLG_RBS)) {
 		if (_err(any_err = tmp_snd_16l(__tmp_io, __io_buff->bc))) {
 # ifdef __TMP_DEBUG
 			fprintf(stdout, "failed to send buffer size.\n");
@@ -677,13 +728,7 @@ tmp_err_t tmp_snd(struct tmp_io *__tmp_io, tmp_io_buf_t *__io_buff, tmp_addr_t _
 	}
 
 	struct tmp_packet pk;
-	if (!__pkbuf) {
-	pk = (struct tmp_packet){
-		.dst_addr = __to_addr,
-		.src_addr = tmp_get_iface(__tmp_io, tmp_get_iface_no(__tmp_io))->addr
-	};}
 # ifdef __TMP_DEBUG
-	fprintf(stdout, "src: %u.%u.%u.%u\n", pk.src_addr&0xFF, pk.src_addr>>8&0xFF, pk.src_addr>>16&0xFF, pk.src_addr>>24&0xFF);
 	mdl_u8_t pk_c = 0;
 # endif
 	mdl_u8_t *begin = __io_buff->p;
@@ -697,7 +742,15 @@ tmp_err_t tmp_snd(struct tmp_io *__tmp_io, tmp_io_buf_t *__io_buff, tmp_addr_t _
 		if (__pkbuf != NULL) {
 			pk = *(__pkbuf++);
 		} else {
-			tmp_build_pk(&pk, tmp_io_buff(itr, bc));
+			tmp_bzero((void*)&pk, sizeof(struct tmp_packet));
+			pk = (struct tmp_packet) {
+				.dst_addr = __to_addr,
+				.src_addr = tmp_get_iface(__tmp_io, tmp_get_iface_no(__tmp_io))->addr,
+				.io_buff = tmp_io_buff(itr, bc)
+			};
+# ifdef __TMP_DEBUG
+			fprintf(stdout, "src: %u.%u.%u.%u\n", pk.src_addr&0xFF, pk.src_addr>>8&0xFF, pk.src_addr>>16&0xFF, pk.src_addr>>24&0xFF);
+# endif
 		}
 
 		mdl_u8_t try_c = 0;
@@ -727,7 +780,7 @@ tmp_err_t tmp_snd(struct tmp_io *__tmp_io, tmp_io_buf_t *__io_buff, tmp_addr_t _
 # ifdef __TMP_DEBUG
 			fprintf(stdout, "tmp, ack reported the packet failed to send.\n");
 # endif
-			if (tmp_is_flag(__tmp_io->flags, TMP_FLG_NORET)) {
+			if (is_flag(__tmp_io->flags, TMP_FLG_NORET)) {
 # ifdef __TMP_DEBUG
 				fprintf(stdout, "tmp, going to try again to send packet.\n");
 # endif
@@ -758,28 +811,29 @@ tmp_err_t tmp_recv(struct tmp_io *__tmp_io, tmp_io_buf_t __io_buff, tmp_addr_t _
 }
 
 tmp_err_t tmp_rcv(struct tmp_io *__tmp_io, tmp_io_buf_t *__io_buff, tmp_addr_t __from_addr, mdl_u8_t __flags, struct tmp_packet *__pkbuf) {
-	if (_err(tmp_signal(__tmp_io)))
-		return TMP_FAILURE;
-	tmp_sigwait(__tmp_io);
-
 	tmp_err_t any_err;
 	mdl_u8_t s_flags, r_flags = __flags;
 	struct tmp_packet pk;
 	struct tmp_msg msg;
-	bzero((void*)&msg, sizeof(struct tmp_msg));
-	bzero((void*)&pk, sizeof(struct tmp_packet));
+	tmp_bzero((void*)&msg, sizeof(struct tmp_msg));
 	tmp_io_buf_t *io_buff = __io_buff, _io_buff;
 
 	_btt:
 	{
+	if (_err(tmp_signal(__tmp_io)))
+		return TMP_FAILURE;
+	if (_err(tmp_sigwait(__tmp_io)))
+		return TMP_FAILURE;
 	s_flags = 0x0;
+	fprintf(stdout, "pre.\n");
 	if (_err(any_err = tmp_rcv_prepare(__tmp_io, r_flags, &s_flags))) {
 		return any_err;
 	}
+	fprintf(stdout, "done.\n");
 
-	if (tmp_is_flag(r_flags, TMP_FLG_RBS))
+	if (is_flag(r_flags, TMP_FLG_RBS))
 		tmp_rcv_16l(__tmp_io, (mdl_u16_t*)&io_buff->bc);
-	if (tmp_is_flag(s_flags, TMP_FLG_MSG)) {
+	if (is_flag(s_flags, TMP_FLG_MSG)) {
 		printf("recved control message.\n");
 		io_buff = &_io_buff;
 		_io_buff = tmp_io_buff(&msg, sizeof(struct tmp_msg));
@@ -794,6 +848,7 @@ tmp_err_t tmp_rcv(struct tmp_io *__tmp_io, tmp_io_buf_t *__io_buff, tmp_addr_t _
 		mdl_uint_t left = io_buff->bc-off;
 
 		mdl_uint_t bc = left >= TMP_PKT_MSS? TMP_PKT_MSS:left;
+		tmp_bzero((void*)&pk, sizeof(struct tmp_packet));
 		pk.io_buff = tmp_io_buff(itr, bc);
 
 		mdl_u8_t try_c = 0;
@@ -804,6 +859,8 @@ tmp_err_t tmp_rcv(struct tmp_io *__tmp_io, tmp_io_buf_t *__io_buff, tmp_addr_t _
 # endif
 			return TMP_FAILURE;
 		}
+
+		fprintf(stdout, "recving packet.\n");
 		if (_err(any_err = tmp_rcv_pkt(__tmp_io, &pk))) {
 			if (_err(any_err = tmp_snd_ack(__tmp_io, ACK_FAILURE))) {
 # ifdef __TMP_DEBUG
@@ -814,7 +871,7 @@ tmp_err_t tmp_rcv(struct tmp_io *__tmp_io, tmp_io_buf_t *__io_buff, tmp_addr_t _
 # ifdef __TMP_DEBUG
 			fprintf(stdout, "tmp, failed to receive packet.\n");
 # endif
-			if (tmp_is_flag(__tmp_io->flags, TMP_FLG_NORET)) {
+			if (is_flag(__tmp_io->flags, TMP_FLG_NORET)) {
 # ifdef __TMP_DEBUG
 				fprintf(stdout, "tmp, going to try again to receive packet.\n");
 # endif
@@ -842,7 +899,7 @@ tmp_err_t tmp_rcv(struct tmp_io *__tmp_io, tmp_io_buf_t *__io_buff, tmp_addr_t _
 # endif
 	}
 
-	if (tmp_is_flag(s_flags, TMP_FLG_MSG)) {
+	if (is_flag(s_flags, TMP_FLG_MSG)) {
 		mdl_u8_t route[24];
 		struct tmp_iface *iface = __tmp_io->iface+tmp_get_iface_no(__tmp_io);
 		printf("------------------------ %u - %u\n", msg.lu_addr, iface->addr);
@@ -863,7 +920,7 @@ tmp_err_t tmp_rcv(struct tmp_io *__tmp_io, tmp_io_buf_t *__io_buff, tmp_addr_t _
 tmp_err_t tmp_send(struct tmp_io *__tmp_io, tmp_io_buf_t __io_buff) {
 	tmp_err_t any_err;
 # ifdef __TMP_KOS
-	if (tmp_is_flag(__tmp_io->flags, TMP_FLG_KAS)) {
+	if (is_flag(__tmp_io->flags, TMP_FLG_KAS)) {
 	if (_err(any_err = recv_key_and_sync(__tmp_io))) return any_err;
 	if (_err(any_err = send_key_and_sync(__tmp_io))) return any_err;
 	}
@@ -877,7 +934,7 @@ tmp_err_t tmp_send(struct tmp_io *__tmp_io, tmp_io_buf_t __io_buff) {
 tmp_err_t tmp_recv(struct tmp_io *__tmp_io, tmp_io_buf_t __io_buff) {
 	tmp_err_t any_err;
 # ifdef __TMP_KOS
-	if (tmp_is_flag(__tmp_io->flags, TMP_FLG_KAS)) {
+	if (is_flag(__tmp_io->flags, TMP_FLG_KAS)) {
 	if (_err(any_err = send_key_and_sync(__tmp_io))) return any_err;
 	if (_err(any_err = recv_key_and_sync(__tmp_io))) return any_err;
     }
@@ -982,7 +1039,7 @@ mdl_u8_t tmp_is_flag(mdl_u8_t __optflags, mdl_u8_t __optflag) {
 	return (__optflags&__optflag) == __optflag;}
 
 void tmp_tog_flag(mdl_u8_t *__optflags, mdl_u8_t __optflag) {
-	if (tmp_is_flag(*__optflags, __optflag))
+	if (is_flag(*__optflags, __optflag))
 		(*__optflags) ^= __optflag;
 	else
 		(*__optflags) |= __optflag;

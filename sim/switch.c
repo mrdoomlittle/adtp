@@ -113,10 +113,11 @@ int main(void) {
 
 	dst.sin_family = AF_INET;
 	dst.sin_addr.s_addr = htons(INADDR_ANY);
+
 	dst.sin_port = htons(21299);
 
-	int sndbuf_size = 1024;
-	int rcvbuf_size = 1024;
+	int sndbuf_size = 44000;
+	int rcvbuf_size = 44000;
 	setsockopt(sock, SOL_SOCKET, SO_SNDBUF, &sndbuf_size, sizeof(int));
 	setsockopt(sock, SOL_SOCKET, SO_RCVBUF, &rcvbuf_size, sizeof(int));
 
@@ -148,11 +149,11 @@ int main(void) {
 
 	tmp_io.set_port_id = &set_port_id;
 	tmp_io.get_port_id = &get_port_id;
-	tmp_init(&tmp_io, &set_pin_mode, &set_pin_state, &get_pin_state, 0, 0, 2);
+	tmp_init(&tmp_io, &set_pin_mode, &set_pin_state, &get_pin_state, 0, 0, 4);
 	tmp_io.divider = _d16;
 
 	tmp_set_holdup_fp(&tmp_io, &holdup);
-	mdl_uint_t cutoff = 10000;
+	mdl_uint_t cutoff = 20000;
 
 	tmp_tog_rcv_optflag(&tmp_io, TMP_OPT_FLIP_BIT);
 	tmp_io.snd_holdup_ic = 1;
@@ -201,7 +202,7 @@ int main(void) {
 
 		printf("client conencted with id: %u\n", port_c);
 		pthread_mutex_lock(&m2);
-		tmp_add_iface(&tmp_io, tmp_addr_from_str(port_c == 1? "2.2.2.2":"1.1.1.1", &err), 0, port_c);
+		tmp_add_iface(&tmp_io, tmp_addr_from_str("0.0.0.0", &err), 0);
 		pthread_mutex_unlock(&m2);
 		__asm__(NOP);
 		my_id = port_c++;
