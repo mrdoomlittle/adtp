@@ -23,7 +23,7 @@ void tmp_forward(struct tmp_io *__tmp_io) {
 	struct tmp_port *dst;
 	mdl_u8_t s_flags = 0x0, r_flags = TMP_FLG_RBS;
 	mdl_uint_t bc;
-	tmp_err_t any_err;
+	tmp_err_t err;
 	while(src != NULL) {
 		if (is_flag(src->flags, TMP_FLG_LOCKED)) {
 			goto _sk;
@@ -125,7 +125,7 @@ void tmp_forward(struct tmp_io *__tmp_io) {
 # ifdef __TMP_DEBUG
 			fprintf(stdout, "forwarding packet on to %u.%u.%u.%u\n", pk.dst_addr&0xFF, pk.dst_addr>>8&0xFF, pk.dst_addr>>16&0xFF, pk.dst_addr>>24&0xFF);
 # endif
-			if (_err(any_err = tmp_snd_pkt(__tmp_io, &pk))) {
+			if (_err(err = tmp_snd_pkt(__tmp_io, &pk))) {
 # ifdef __TMP_DEBUG
 				fprintf(stdout, "failed to send packet.\n");
 # endif
@@ -136,7 +136,7 @@ void tmp_forward(struct tmp_io *__tmp_io) {
 				fprintf(stdout, "failed to recv ack.\n");
 # endif
 			}
-			if (_err(any_err)) goto _sk;
+			if (_err(err)) goto _sk;
 		} else {
 
 		dst = __tmp_io->pys_port;
@@ -180,7 +180,7 @@ void tmp_forward(struct tmp_io *__tmp_io) {
 				r_flags = s_flags = 0x0;
 				if (_err(tmp_snd_prepare(__tmp_io, &r_flags, s_flags))) goto _sk;
 
-				if (_err(any_err = tmp_snd_pkt(__tmp_io, &pk))) {
+				if (_err(err = tmp_snd_pkt(__tmp_io, &pk))) {
 # ifdef __TMP_DEBUG
 					fprintf(stdout, "failed to send packet.\n");
 # endif
@@ -193,7 +193,7 @@ void tmp_forward(struct tmp_io *__tmp_io) {
 					goto _sk;
 				}
 
-				if (_err(any_err)) goto _sk;
+				if (_err(err)) goto _sk;
 				if (is_flag(src->flags, TMP_FLG_INUSE)) {
 					tog_flag(&dst->flags, TMP_FLG_LOCKED);
 					dst->by = src;
@@ -236,7 +236,7 @@ void tmp_forward(struct tmp_io *__tmp_io) {
 	mdl_u8_t data_buff[200];
 	mdl_uint_t bc;
 	tmp_io_buf_t io_buff;
-	tmp_err_t any_err;
+	tmp_err_t err;
 	mdl_u8_t s_flags = 0x0, r_flags = TMP_FLG_RBS;
 	while((iface_no&0xFF) != __tmp_io->iface_c) {
 		tmp_set_iface_no(__tmp_io, iface_no&0xFF);
@@ -266,7 +266,7 @@ void tmp_forward(struct tmp_io *__tmp_io) {
 			left[iface] -= pk.io_buff.bc;
 		}
 //		io_buff = tmp_io_buff(data_buff, 0x0);
-//		if ((any_err = tmp_rcv(__tmp_io, &io_buff, 0x0, TMP_FLG_RBS, pkbuf)) != TMP_SUCCESS) goto _sk;
+//		if ((err = tmp_rcv(__tmp_io, &io_buff, 0x0, TMP_FLG_RBS, pkbuf)) != TMP_SUCCESS) goto _sk;
 //		bc = io_buff.bc;
 # ifdef __DEBUG_ENABLED
 		fprintf(stdout, "tmp_forward, recved %u bytes of data on iface %u.\n", io_buff.bc, iface_no&0xFF);
