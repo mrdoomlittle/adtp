@@ -10,8 +10,11 @@ endif
 ifndef device
  device=atmega328p
 endif
+ifndef defines
+ defines=-D__TMP_LIGHT
+endif
 all: clean
-	avr-gcc -c -g -D__$(arc) $(inc_flags) -std=c11 -DF_CPU=$(f_cpu) -Os -mmcu=$(device) -o tmp_io.o tmp_io.c
+	avr-gcc -c -g -D__$(arc) $(inc_flags) $(defines) -std=c11 -DF_CPU=$(f_cpu) -Os -mmcu=$(device) -o tmp_io.o tmp_io.c
 	ar rc lib/libmdl-tmp_io.a tmp_io.o
 	cp *.h inc/mdl
 
