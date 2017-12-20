@@ -28,12 +28,12 @@ mdl_u8_t get_port_id() {
 
 mdl_u8_t id = 0xFF;
 mdl_u8_t pins = 0;
-void set_pin_mode(mdl_u8_t __mode, mdl_u8_t __id) {}
-void set_pin_state(mdl_u8_t __state, mdl_u8_t __id) {
-	__state = ~__state&0x1;
+void io_set_direct(mdl_u8_t __dir, mdl_u8_t __id) {}
+void io_set_val(mdl_u8_t __val, mdl_u8_t __id) {
+	__val = ~__val&0x1;
 	pthread_mutex_lock(&mutex);
-	if ((pins>>__id&0x1) != __state) {
-	if (__state)
+	if ((pins>>__id&0x1) != __val) {
+	if (__val)
 			pins |= 1<<__id;
 		else
 			pins ^= 1<<__id;
@@ -43,7 +43,7 @@ void set_pin_state(mdl_u8_t __state, mdl_u8_t __id) {
 	__asm__(NOP);
 }
 
-mdl_u8_t get_pin_state(mdl_u8_t __id) {
+mdl_u8_t io_get_val(mdl_u8_t __id) {
 	pthread_mutex_lock(&mutex);
 	mdl_u8_t ret_val = pins>>__id&0x1;
 	pthread_mutex_unlock(&mutex);
@@ -145,9 +145,8 @@ int main(int __argc, char const *__argv[]) {
 		.rx_co_pid = TMP_RX_OC_PID,
 		.tx_co_pid = TMP_TX_OC_PID
 	};
-	tmp_init(&tmp_io, &set_pin_mode, &set_pin_state, &get_pin_state, 0, 0, 1);
+	tmp_init(&tmp_io, &io_set_direct, &io_set_val, &io_get_val, &holdup, 0, 0, 1);
 	tmp_io.divider = _d32;
-	tmp_set_holdup_fp(&tmp_io, &holdup);
 	mdl_uint_t cutoff = 100000;
 
 	tmp_tog_rcv_optflag(&tmp_io, TMP_OPT_FLIP_BIT);
@@ -165,7 +164,7 @@ int main(int __argc, char const *__argv[]) {
 		tmp_add_iface(&tmp_io, tmp_addr_from_str(__argv[2], &err), 0);
 	else if (op == OP_RCV)
 		tmp_add_iface(&tmp_io, tmp_addr_from_str(__argv[2], &err), 0);
-	set_pin_state(1, 3);
+	io_set_val(1, 3);
 	pthread_create(&thread, NULL, &m, (void*)&tmp_io);
 	mdl_u16_t temp;
 	mdl_u64_t ups = 0;

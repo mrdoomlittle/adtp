@@ -42,12 +42,12 @@ mdl_u8_t get_port_id() {
 	return id;
 }
 
-void set_pin_mode(mdl_u8_t __mode, mdl_u8_t __id) {}
-void set_pin_state(mdl_u8_t __state, mdl_u8_t __id) {
-	__state = ~__state&0x1;
+void io_set_direct(mdl_u8_t __dir, mdl_u8_t __id) {}
+void io_set_val(mdl_u8_t __val, mdl_u8_t __id) {
+	__val = ~__val&0x1;
 	pthread_mutex_lock(&m1);
-	if ((pins[port_id]>>__id&0x1) != __state) {
-		if (__state)
+	if ((pins[port_id]>>__id&0x1) != __val) {
+		if (__val)
 			pins[port_id] |= 1<<__id;
 		else
 			pins[port_id] ^= 1<<__id;
@@ -57,7 +57,7 @@ void set_pin_state(mdl_u8_t __state, mdl_u8_t __id) {
 	__asm__(NOP);
 }
 
-mdl_u8_t get_pin_state(mdl_u8_t __id) {
+mdl_u8_t io_get_val(mdl_u8_t __id) {
 	pthread_mutex_lock(&m1);
 	mdl_u8_t ret_val = pins[port_id]>>__id&0x1;
 	pthread_mutex_unlock(&m1);
@@ -149,10 +149,8 @@ int main(void) {
 
 	tmp_io.set_port_id = &set_port_id;
 	tmp_io.get_port_id = &get_port_id;
-	tmp_init(&tmp_io, &set_pin_mode, &set_pin_state, &get_pin_state, 0, 0, 4);
+	tmp_init(&tmp_io, &io_set_direct, &io_set_val, &io_get_val, &holdup, 0, 0, 4);
 	tmp_io.divider = _d16;
-
-	tmp_set_holdup_fp(&tmp_io, &holdup);
 	mdl_uint_t cutoff = 20000;
 
 	tmp_tog_rcv_optflag(&tmp_io, TMP_OPT_FLIP_BIT);

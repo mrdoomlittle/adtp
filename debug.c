@@ -22,43 +22,43 @@ mdl_u8_t get_port_id() {
 	return 0;
 }
 
-void se_set_pin_mode(mdl_u8_t __mode, mdl_u8_t __id) {}
-void se_set_pin_state(mdl_u8_t __state, mdl_u8_t __id) {
-	__state = ~__state&0x1;
+void se_io_set_direct(mdl_u8_t __mode, mdl_u8_t __id) {}
+void se_io_set_val(mdl_u8_t __val, mdl_u8_t __id) {
+	__val = ~__val&0x1;
 	if (__id == TMP_RX_OC_PID) {
-		cl_pinset[TMP_RX_IC_PID] = __state;
+		cl_pinset[TMP_RX_IC_PID] = __val;
 		return;
     } else if (__id == TMP_TX_OC_PID) {
-		cl_pinset[TMP_TX_IC_PID] = __state;
+		cl_pinset[TMP_TX_IC_PID] = __val;
 		return;
     } else if (__id == TMP_TX_PID) {
-		cl_pinset[TMP_RX_PID] = __state;
+		cl_pinset[TMP_RX_PID] = __val;
 		return;
 	}
-	se_pinset[__id] = __state;
+	se_pinset[__id] = __val;
 }
 
-mdl_u8_t se_get_pin_state(mdl_u8_t __id) {
+mdl_u8_t se_io_get_val(mdl_u8_t __id) {
 	return se_pinset[__id];
 }
 
-void cl_set_pin_mode(mdl_u8_t __mode, mdl_u8_t __id) {}
-void cl_set_pin_state(mdl_u8_t __state, mdl_u8_t __id) {
-	__state = ~__state&0x1;
+void cl_io_set_direct(mdl_u8_t __dir, mdl_u8_t __id) {}
+void cl_io_set_val(mdl_u8_t __val, mdl_u8_t __id) {
+	__val = ~__val&0x1;
 	if (__id == TMP_RX_OC_PID) {
-		se_pinset[TMP_RX_IC_PID] = __state;
+		se_pinset[TMP_RX_IC_PID] = __val;
 		return;
 	} else if (__id == TMP_TX_OC_PID) {
-		se_pinset[TMP_TX_IC_PID] = __state;
+		se_pinset[TMP_TX_IC_PID] = __val;
 		return;
 	} else if (__id == TMP_TX_PID) {
-		se_pinset[TMP_RX_PID] = __state;
+		se_pinset[TMP_RX_PID] = __val;
 		return;
 	}
-	cl_pinset[__id] = __state;
+	cl_pinset[__id] = __val;
 }
 
-mdl_u8_t cl_get_pin_state(mdl_u8_t __id) {
+mdl_u8_t cl_io_get_val(mdl_u8_t __id) {
 	return cl_pinset[__id];
 }
 
@@ -78,12 +78,11 @@ struct tmp_io tmp_io = {
 	.tx_co_pid = TMP_TX_OC_PID
 };
 # ifndef __TMP_LIGHT
-	tmp_init(&tmp_io, &se_set_pin_mode, &se_set_pin_state, &se_get_pin_state, 0, 0, 1);
+	tmp_init(&tmp_io, &se_io_set_direct, &se_io_set_val, &se_io_get_val, &holdup, 0, 0, 1);
 # else
-	tmp_init(&tmp_io, &se_set_pin_mode, &se_set_pin_state, &se_get_pin_state);
+	tmp_init(&tmp_io, &se_io_set_direct, &se_io_set_val, &se_io_get_val, &holdup);
 # endif
 	tmp_io.divider = _d16;
-	tmp_set_holdup_fp(&tmp_io, &holdup);
 	mdl_uint_t cutoff = 10000;
 
 	tmp_io.snd_holdup_ic = 2;
@@ -125,12 +124,11 @@ struct tmp_io tmp_io = {
 .tx_co_pid = TMP_TX_OC_PID
 };
 # ifndef __TMP_LIGHT
-	tmp_init(&tmp_io, &cl_set_pin_mode, &cl_set_pin_state, &cl_get_pin_state, 0, 0, 1);
+	tmp_init(&tmp_io, &cl_io_set_direct, &cl_io_set_val, &cl_io_get_val, &holdup, 0, 0, 1);
 # else
-	tmp_init(&tmp_io, &cl_set_pin_mode, &cl_set_pin_state, &cl_get_pin_state);
+	tmp_init(&tmp_io, &cl_io_set_direct, &cl_io_set_val, &cl_io_get_val. &holdup);
 # endif
 	tmp_io.divider = _d16;
-	tmp_set_holdup_fp(&tmp_io, &holdup);
 	mdl_uint_t cutoff = 10000;
 
 	tmp_tog_rcv_optflag(&tmp_io, TMP_OPT_FLIP_BIT);

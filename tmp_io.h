@@ -106,10 +106,10 @@ struct tmp_io {
 	mdl_uint_t snd_holdup, rcv_holdup;
 	tmp_flag_t snd_optflags, rcv_optflags;
 
-	void(*set_pin_mode_fp)(mdl_u8_t, mdl_u8_t);
-	void(*set_pin_state_fp)(mdl_u8_t, mdl_u8_t);
-	mdl_u8_t(*get_pin_state_fp)(mdl_u8_t);
-	void(*holdup_fp)(mdl_uint_t);
+	void(*io_set_direct)(mdl_u8_t, mdl_u8_t);
+	void(*io_set_val)(mdl_u8_t, mdl_u8_t);
+	mdl_u8_t(*io_get_val)(mdl_u8_t);
+	void(*holdup)(mdl_uint_t);
 	mdl_u32_t(*get_us)();
 	tmp_flag_t flags;
 # ifndef __TMP_LIGHT
@@ -175,14 +175,13 @@ tmp_err_t tmp_recv_packet(struct tmp_io*, struct tmp_packet*);
 # endif
 
 mdl_u8_t extern tmp_errno;
-tmp_err_t tmp_init(struct tmp_io*, void(*)(mdl_u8_t, mdl_u8_t), void(*)(mdl_u8_t, mdl_u8_t), mdl_u8_t(*)(mdl_u8_t)
+tmp_err_t tmp_init(struct tmp_io*, void(*)(mdl_u8_t, mdl_u8_t), void(*)(mdl_u8_t, mdl_u8_t), mdl_u8_t(*)(mdl_u8_t), void(*)(mdl_uint_t)
 # ifndef __TMP_LIGHT
 , tmp_method_t, tmp_flag_t, mdl_u8_t
 # endif
 );
 
 void tmp_prepare(struct tmp_io*);
-void tmp_set_holdup_fp(struct tmp_io*, void(*)(mdl_uint_t));
 void tmp_holdup(struct tmp_io*, mdl_uint_t, mdl_uint_t);
 
 tmp_io_buf_t tmp_io_buff(void*, mdl_uint_t);

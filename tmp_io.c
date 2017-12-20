@@ -1,14 +1,14 @@
 # include "tmp_io.h"
-mdl_u8_t tmp_gpio_high = 0x1, tmp_gpio_low = 0x0;
-mdl_u8_t tmp_gpio_in = 0x0, tmp_gpio_out = 0x1;
+mdl_u8_t tmp_io_val_high = 0x1, tmp_io_val_low = 0x0;
+mdl_u8_t tmp_io_direct_in = 0x0, tmp_io_direct_out = 0x1;
 
 mdl_u8_t rx_clk_trig_val;
 mdl_u8_t tx_clk_trig_val;
 mdl_u64_t tmp_null;
 
-void static tmp_set_pin_mode(struct tmp_io*, mdl_u8_t, mdl_u8_t);
-void static tmp_set_pin_state(struct tmp_io*, mdl_u8_t, mdl_u8_t);
-mdl_u8_t static tmp_get_pin_state(struct tmp_io*, mdl_u8_t);
+void static tmp_io_set_direct(struct tmp_io*, mdl_u8_t, mdl_u8_t);
+void static tmp_io_set_val(struct tmp_io*, mdl_u8_t, mdl_u8_t);
+mdl_u8_t static tmp_io_get_val(struct tmp_io*, mdl_u8_t);
 
 void tmp_bzero(void *__p, mdl_uint_t __bc) {
 	mdl_u8_t *itr = (mdl_u8_t*)__p;
@@ -38,28 +38,28 @@ mdl_u8_t tmp_cutoff(mdl_u8_t __divider, mdl_u16_t *__c, mdl_u32_t *__p, mdl_uint
 	return 0;
 }
 
-tmp_err_t tmp_init(struct tmp_io *__tmp_io, void(*__set_pin_mode_fp)(mdl_u8_t, mdl_u8_t), void(*__set_pin_state_fp)(mdl_u8_t, mdl_u8_t), mdl_u8_t(*__get_pin_state_fp)(mdl_u8_t)
+tmp_err_t tmp_init(struct tmp_io *__tmp_io, void(*__io_set_direct)(mdl_u8_t, mdl_u8_t), void(*__io_set_val)(mdl_u8_t, mdl_u8_t), mdl_u8_t(*__io_get_val)(mdl_u8_t), void(*__holdup)(mdl_uint_t)
 # ifndef __TMP_LIGHT
 , tmp_method_t __tr_method, tmp_flag_t __flags, mdl_u8_t __port_c
 # endif
 ) {
-	__tmp_io->set_pin_mode_fp = __set_pin_mode_fp;
-	__tmp_io->set_pin_state_fp = __set_pin_state_fp;
-	__tmp_io->get_pin_state_fp = __get_pin_state_fp;
-	__tmp_io->holdup_fp = NULL;
+	__tmp_io->io_set_direct = __io_set_direct;
+	__tmp_io->io_set_val = __io_set_val;
+	__tmp_io->io_get_val = __io_get_val;
+	__tmp_io->holdup = __holdup;
 
-	tmp_set_pin_mode(__tmp_io, tmp_gpio_in, __tmp_io->rx_pid);
-	tmp_set_pin_mode(__tmp_io, tmp_gpio_in, __tmp_io->rx_ci_pid); // msg: me recv data
-	tmp_set_pin_mode(__tmp_io, tmp_gpio_out, __tmp_io->rx_co_pid); // msg: node recv data
+	tmp_io_set_direct(__tmp_io, tmp_io_direct_in, __tmp_io->rx_pid);
+	tmp_io_set_direct(__tmp_io, tmp_io_direct_in, __tmp_io->rx_ci_pid); // msg: me recv data
+	tmp_io_set_direct(__tmp_io, tmp_io_direct_out, __tmp_io->rx_co_pid); // msg: node recv data
 
-	tmp_set_pin_mode(__tmp_io, tmp_gpio_out, __tmp_io->tx_pid);
-	tmp_set_pin_mode(__tmp_io, tmp_gpio_in, __tmp_io->tx_ci_pid); // msg: me send data
-	tmp_set_pin_mode(__tmp_io, tmp_gpio_out, __tmp_io->tx_co_pid); // msg: node send data
+	tmp_io_set_direct(__tmp_io, tmp_io_direct_out, __tmp_io->tx_pid);
+	tmp_io_set_direct(__tmp_io, tmp_io_direct_in, __tmp_io->tx_ci_pid); // msg: me send data
+	tmp_io_set_direct(__tmp_io, tmp_io_direct_out, __tmp_io->tx_co_pid); // msg: node send data
 
-	rx_clk_trig_val = tmp_gpio_low;
-	tx_clk_trig_val = tmp_gpio_low;
+	rx_clk_trig_val = tmp_io_val_low;
+	tx_clk_trig_val = tmp_io_val_low;
 
-	tmp_set_pin_state(__tmp_io, tmp_gpio_low, __tmp_io->tx_pid);
+	tmp_io_set_val(__tmp_io, tmp_io_val_low, __tmp_io->tx_pid);
 
 	__tmp_io->snd_cutoff = 0;
 	__tmp_io->rcv_cutoff = 0;
@@ -101,8 +101,8 @@ tmp_err_t tmp_init(struct tmp_io *__tmp_io, void(*__set_pin_mode_fp)(mdl_u8_t, m
 }
 
 void tmp_prepare(struct tmp_io *__tmp_io) {
-	tmp_set_pin_state(__tmp_io, tmp_is_snd_optflag(__tmp_io, TMP_OPT_INV_RX_TRIG_VAL)? rx_clk_trig_val:~rx_clk_trig_val&0x1, __tmp_io->rx_co_pid);
-	tmp_set_pin_state(__tmp_io, tmp_is_rcv_optflag(__tmp_io, TMP_OPT_INV_TX_TRIG_VAL)? tx_clk_trig_val:~tx_clk_trig_val&0x1, __tmp_io->tx_co_pid);
+	tmp_io_set_val(__tmp_io, tmp_is_snd_optflag(__tmp_io, TMP_OPT_INV_RX_TRIG_VAL)? rx_clk_trig_val:~rx_clk_trig_val&0x1, __tmp_io->rx_co_pid);
+	tmp_io_set_val(__tmp_io, tmp_is_rcv_optflag(__tmp_io, TMP_OPT_INV_TX_TRIG_VAL)? tx_clk_trig_val:~tx_clk_trig_val&0x1, __tmp_io->tx_co_pid);
 }
 
 # ifndef __TMP_LIGHT
@@ -188,6 +188,7 @@ mdl_u32_t tmp_addr_from_str(char const *__addr, tmp_err_t *__err) {
 }
 # endif /*__TMP_LIGHT*/
 
+// ignore
 tmp_err_t tmp_seti_speed(struct tmp_io *__tmp_io, mdl_uint_t __bps) {
 	__tmp_io->rcv_holdup = (mdl_uint_t)(1000000/__bps);
 	return TMP_SUCCESS;
@@ -198,16 +199,13 @@ tmp_err_t tmp_seto_speed(struct tmp_io *__tmp_io, mdl_uint_t __bps) {
 	return TMP_SUCCESS;
 }
 
-void tmp_set_holdup_fp(struct tmp_io *__tmp_io, void(*__holdup_fp)(mdl_uint_t)) {
-	__tmp_io->holdup_fp = __holdup_fp;}
-
 void tmp_holdup(struct tmp_io *__tmp_io, mdl_uint_t __holdup_ic, mdl_uint_t __holdup) {
-	if (!__tmp_io->holdup_fp || !__holdup_ic) return;
+	if (!__tmp_io->holdup || !__holdup_ic) return;
 	mdl_uint_t ic = 0;
 	_again:
 
 	if (ic == __holdup_ic) return;
-	__tmp_io->holdup_fp(__holdup);
+	__tmp_io->holdup(__holdup);
 	ic++;
 	goto _again;
 }
@@ -304,7 +302,7 @@ tmp_err_t tmp_snd_byte(struct tmp_io *__tmp_io, mdl_u8_t __byte) {
 }
 
 mdl_u8_t tmp_par_asnd_sig(struct tmp_io *__tmp_io) {
-	return (tmp_get_pin_state(__tmp_io, __tmp_io->rx_ci_pid) == (tmp_is_rcv_optflag(__tmp_io, TMP_OPT_INV_RX_TRIG_VAL)? ~rx_clk_trig_val&0x1:rx_clk_trig_val));}
+	return (tmp_io_get_val(__tmp_io, __tmp_io->rx_ci_pid) == (tmp_is_rcv_optflag(__tmp_io, TMP_OPT_INV_RX_TRIG_VAL)? ~rx_clk_trig_val&0x1:rx_clk_trig_val));}
 mdl_u8_t tmp_par_arcv_sig(struct tmp_io *__tmp_io) {return ~tmp_par_asnd_sig(__tmp_io)&0x1;}
 
 tmp_err_t tmp_rcv_bit(struct tmp_io *__tmp_io, mdl_u8_t *__bit) {
@@ -317,12 +315,12 @@ tmp_err_t tmp_rcv_bit(struct tmp_io *__tmp_io, mdl_u8_t *__bit) {
 	mdl_u16_t c = 0;
 	mdl_u32_t p = 0;
 
-	tmp_set_pin_state(__tmp_io, _tx_clk_trig_val, __tmp_io->tx_co_pid);
+	tmp_io_set_val(__tmp_io, _tx_clk_trig_val, __tmp_io->tx_co_pid);
 	tmp_rcv_holdup(__tmp_io);
 
-	while (tmp_get_pin_state(__tmp_io, __tmp_io->rx_ci_pid) != _rx_clk_trig_val) {
-		if (tmp_get_pin_state(__tmp_io, __tmp_io->tx_ci_pid) == (~_tx_clk_trig_val&0x1)) {
-			tmp_set_pin_state(__tmp_io, ~_tx_clk_trig_val&0x1, __tmp_io->tx_co_pid);
+	while (tmp_io_get_val(__tmp_io, __tmp_io->rx_ci_pid) != _rx_clk_trig_val) {
+		if (tmp_io_get_val(__tmp_io, __tmp_io->tx_ci_pid) == (~_tx_clk_trig_val&0x1)) {
+			tmp_io_set_val(__tmp_io, ~_tx_clk_trig_val&0x1, __tmp_io->tx_co_pid);
 # ifdef __TMP_DEBUG
 			fprintf(stdout, "tmp can't recv.\n");
 # endif
@@ -330,7 +328,7 @@ tmp_err_t tmp_rcv_bit(struct tmp_io *__tmp_io, mdl_u8_t *__bit) {
         }
 
 		if (tmp_rcv_cutoff(__tmp_io, &c, &p)){
-			tmp_set_pin_state(__tmp_io, ~_tx_clk_trig_val&0x1, __tmp_io->tx_co_pid);
+			tmp_io_set_val(__tmp_io, ~_tx_clk_trig_val&0x1, __tmp_io->tx_co_pid);
 # ifdef __TMP_DEBUG
 			fprintf(stdout, "tmp, cutoff reched, took too long.\n");
 # endif
@@ -340,19 +338,19 @@ tmp_err_t tmp_rcv_bit(struct tmp_io *__tmp_io, mdl_u8_t *__bit) {
 
 	tmp_rcv_holdup(__tmp_io);
 
-	mdl_u8_t recved_bit = tmp_get_pin_state(__tmp_io, __tmp_io->rx_pid);
+	mdl_u8_t recved_bit = tmp_io_get_val(__tmp_io, __tmp_io->rx_pid);
 	if (tmp_is_rcv_optflag(__tmp_io, TMP_OPT_FLIP_BIT))
 		*__bit = ~recved_bit&0x1;
 	else
 		*__bit = recved_bit&0x1;
 	tmp_rcv_holdup(__tmp_io);
 
-	tmp_set_pin_state(__tmp_io, ~_tx_clk_trig_val&0x1, __tmp_io->tx_co_pid);
+	tmp_io_set_val(__tmp_io, ~_tx_clk_trig_val&0x1, __tmp_io->tx_co_pid);
 	tmp_rcv_holdup(__tmp_io);
 
 	c = 0;
 	p = 0;
-	while(tmp_get_pin_state(__tmp_io, __tmp_io->rx_ci_pid) != (~_rx_clk_trig_val&0x1)) {
+	while(tmp_io_get_val(__tmp_io, __tmp_io->rx_ci_pid) != (~_rx_clk_trig_val&0x1)) {
 		if (tmp_rcv_cutoff(__tmp_io, &c, &p)) {
 # ifdef __TMP_DEBUG
 			fprintf(stdout, "tmp, cutoff reched, took too long.\n");
@@ -378,7 +376,7 @@ tmp_err_t tmp_snd_bit(struct tmp_io *__tmp_io, mdl_u8_t __bit) {
 	mdl_u16_t c = 0;
 	mdl_u32_t p = 0;
 
-	while(tmp_get_pin_state(__tmp_io, __tmp_io->tx_ci_pid) != _tx_clk_trig_val) {
+	while(tmp_io_get_val(__tmp_io, __tmp_io->tx_ci_pid) != _tx_clk_trig_val) {
 		if (tmp_snd_cutoff(__tmp_io, &c, &p)) {
 # ifdef __TMP_DEBUG
 			fprintf(stdout, "tmp, cutoff reched, took too long.\n");
@@ -388,17 +386,17 @@ tmp_err_t tmp_snd_bit(struct tmp_io *__tmp_io, mdl_u8_t __bit) {
 	}
 	tmp_snd_holdup(__tmp_io);
 
-	tmp_set_pin_state(__tmp_io, __bit, __tmp_io->tx_pid);
+	tmp_io_set_val(__tmp_io, __bit, __tmp_io->tx_pid);
 	tmp_snd_holdup(__tmp_io);
 
-	tmp_set_pin_state(__tmp_io, _rx_clk_trig_val, __tmp_io->rx_co_pid);
+	tmp_io_set_val(__tmp_io, _rx_clk_trig_val, __tmp_io->rx_co_pid);
 	tmp_snd_holdup(__tmp_io);
 
 	c = 0;
 	p = 0;
-	while(tmp_get_pin_state(__tmp_io, __tmp_io->tx_ci_pid) != (~_tx_clk_trig_val&0x1)) {
+	while(tmp_io_get_val(__tmp_io, __tmp_io->tx_ci_pid) != (~_tx_clk_trig_val&0x1)) {
 		if (tmp_snd_cutoff(__tmp_io, &c, &p)) {
-			tmp_set_pin_state(__tmp_io, ~_rx_clk_trig_val&0x1, __tmp_io->rx_co_pid);
+			tmp_io_set_val(__tmp_io, ~_rx_clk_trig_val&0x1, __tmp_io->rx_co_pid);
 # ifdef __TMP_DEBUG
 			fprintf(stdout, "tmp, cutoff reched, took too long.\n");
 # endif
@@ -408,26 +406,26 @@ tmp_err_t tmp_snd_bit(struct tmp_io *__tmp_io, mdl_u8_t __bit) {
 
 	tmp_snd_holdup(__tmp_io);
 
-	tmp_set_pin_state(__tmp_io, ~_rx_clk_trig_val&0x1, __tmp_io->rx_co_pid);
+	tmp_io_set_val(__tmp_io, ~_rx_clk_trig_val&0x1, __tmp_io->rx_co_pid);
 	tmp_snd_holdup(__tmp_io);
 
-	if (__bit) tmp_set_pin_state(__tmp_io, tmp_gpio_low, __tmp_io->tx_pid);
+	if (__bit) tmp_io_set_val(__tmp_io, tmp_io_val_low, __tmp_io->tx_pid);
 # ifdef __AVR
 	if (re_enable_gi) sei();
 # endif
 	return TMP_SUCCESS;
 }
 
-void static tmp_set_pin_mode(struct tmp_io *__tmp_io, mdl_u8_t __mode, mdl_u8_t __id) {
-	__tmp_io->set_pin_mode_fp(__mode, __id);
+void static tmp_io_set_direct(struct tmp_io *__tmp_io, mdl_u8_t __dir, mdl_u8_t __id) {
+	__tmp_io->io_set_direct(__dir, __id);
 }
 
-void static tmp_set_pin_state(struct tmp_io *__tmp_io, mdl_u8_t __state, mdl_u8_t __id) {
-	__tmp_io->set_pin_state_fp(__state, __id);
+void static tmp_io_set_val(struct tmp_io *__tmp_io, mdl_u8_t __val, mdl_u8_t __id) {
+	__tmp_io->io_set_val(__val, __id);
 }
 
-mdl_u8_t static tmp_get_pin_state(struct tmp_io *__tmp_io, mdl_u8_t __id) {
-	return __tmp_io->get_pin_state_fp(__id);
+mdl_u8_t static tmp_io_get_val(struct tmp_io *__tmp_io, mdl_u8_t __id) {
+	return __tmp_io->io_get_val(__id);
 }
 # if !defined(__TMP_LIGHT) || defined(__TMP_KOS)
 tmp_err_t tmp_snd_ack(struct tmp_io *__tmp_io, mdl_u8_t __ack_val) {
